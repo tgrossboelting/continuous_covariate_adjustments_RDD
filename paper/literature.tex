@@ -2,4 +2,56 @@
 
 \begin{itemize}
 	\item \textcite{armstrong_simple_2020}
+	\item Cattaneo and Farrell (2013), ``Optimal Convergence Rates, Bahadur Representation, and Asymptotic Normality of Partitioning Estimators,'' \emph{Journal of Econometrics}, 174(2), 127--143.
+	Partition-based nonparametric estimators achieve the same convergence rates as kernel estimators with simpler inference (independence across cells).
+	\item \textbf{Kernel smoothing in $z$ vs.\ partition (note):} An alternative to the disjoint partition is to smooth over $z$ with overlapping kernel windows, targeting the same $\tau_w$.
+	In the minimax framework under anisotropic smoothness, this likely offers no rate improvement: the worst-case bias scales as bandwidth $\times$ Lipschitz constant in either case ($\delta \cdot M_z$ for partitions, $g \cdot M_z$ for kernels).
+	The partition estimator has the advantage of independence across segments, giving simple variance expressions.
+	Overlapping kernels induce pairwise covariance (U-statistic structure), adding analytical complexity without a clear payoff in worst-case bias or minimax MSE.
+	Partition estimators achieve the same convergence rates as kernel estimators for integrated functionals (cf.\ Cattaneo and Farrell, 2013).
+	Stick with the partition approach; mention kernel extension as future work at most.
+	\item \textbf{Connection to the discrete groups paper:} The structure of the argument parallels the groups paper (Gro\ss b\"olting, 2026).
+	The standard RDHonest approach places a single bound $M_P$ on the derivative of the pooled regression function $\bar{m}(x)$.
+	This is analogous to the isotropic class: $\abs{\bar{m}'(x)} \leq M_P$ bounds the whole derivative jointly, without distinguishing between the smoothing component ($\partial m / \partial x$) and the compositional component (from $\partial f_{Z|X} / \partial x$).
+	The anisotropic class achieves separation via the triangle inequality:
+	\begin{equation*}
+		\abs{\bar{m}'(x)} = \abs*{\int \frac{\partial m}{\partial x}(x,z) f(z|x)\, dz + \int m(x,z) \frac{\partial f}{\partial x}(z|x)\, dz} \leq M_x + \text{(compositional term)}.
+	\end{equation*}
+	This decomposition is the continuous analog of $M_P = M_L + C_{\Delta m} L$ in the groups paper.
+	In both cases, the single pooled bound is fungible --- the adversary can concentrate curvature in whichever channel maximizes bias.
+	The separated parameterization (anisotropic class / common parameter space) prevents this reallocation, which is the right way to set up the problem for studying covariate adjustment in RDDs.
+	\item \textbf{Rate improvement under treatment effect homogeneity (future work):}
+	In the groups paper, when $\tau$ is homogeneous ($C_{\Delta\tau} = 0$) and $m(x,z)$ is smoother than $g(x)$, the stratified estimator achieves a better \emph{rate} --- the pooled rate is dragged down by the lower smoothness of $g(x)$ through the product $\Delta m(x) \cdot g(x)$ in $\bar{m}(x)$.
+	The same structure translates: if $f_{Z|X}(z|x)$ is less smooth in $x$ (order $q$) than $m(x,z)$ (order $p > q$), then $\bar{m}(x) = \int m(x,z) f(z|x)\, dz$ has effective smoothness $q$, pinning the pooled estimator to rate $n^{-2q/(2q+1)}$.
+	Under treatment effect homogeneity, the segmented estimator targets $m(x,z)$ directly and achieves rate $n^{-2p/(2p+1)}$.
+	This would be a genuine rate improvement, not just a constant improvement from stranding the $M_z$ budget.
+	The constraint on the conditional density plays exactly the role of the smoothness of $g(x)$ in the groups paper.
+	\item \textbf{Main results to show (roadmap):}
+	\begin{enumerate}
+		\item \textbf{Minimax comparison across classes.}
+		Show that the minimax risk over the anisotropic class is strictly lower than the minimax risk over the isotropic class:
+		\begin{equation*}
+			\min_{\hat\tau \in \mathcal{L}} \sup_{f \in \mathcal{F}_{\mathrm{aniso}}(M, M)} \mathrm{MSE}(\hat\tau, f) < \min_{\hat\tau \in \mathcal{L}} \sup_{f \in \mathcal{F}_{\mathrm{iso}}(M\sqrt{2})} \mathrm{MSE}(\hat\tau, f).
+		\end{equation*}
+		The weak inequality is mechanical from $\mathcal{F}_{\mathrm{aniso}}(M,M) \subset \mathcal{F}_{\mathrm{iso}}(M\sqrt{2})$.
+		Strict inequality holds because the anisotropic class has directional structure that the minimax estimator can exploit (segmentation), while the isotropic minimax estimator cannot benefit from segmentation (fungibility).
+		This establishes that the anisotropic class, which is more appropriate for covariate adjustment, yields a better minimax estimator.
+		\item \textbf{AMSE comparison on a common parameter space.}
+		Construct a common parameter space that starts from the anisotropic class and adds a smoothness constraint on the conditional density:
+		\begin{equation*}
+			\mathcal{F}^R(M_x, M_z, L) \defeq \Bigl\{ (m, f_{Z|X}) \;\Big|\; \abs{\partial m / \partial x} \leq M_x,\; \abs{\partial m / \partial z} \leq M_z,\; \abs{\partial f_{Z|X}(z|x) / \partial x} \leq L \Bigr\}.
+		\end{equation*}
+		The primitives are the anisotropic bounds on $m$ plus the density constraint.
+		The pooled bound $M_P$ is a \emph{derived} quantity via the triangle inequality:
+		\begin{equation*}
+			\abs{\bar{m}'(x)} \leq M_x + \text{(compositional term depending on $M_z$, $L$)} \defeq M_P.
+		\end{equation*}
+		This is the direct analog of $M_P = M_L + C_{\Delta m} L$ in the groups paper.
+		Then show that on this common space:
+		\begin{equation*}
+			\overline{AMSE}(\hat\tau_{\mathrm{seg}}) \leq \overline{AMSE}(\hat\tau_{\mathrm{base}}).
+		\end{equation*}
+		The segmented estimator's bias depends on the primitives $M_x$ and $M_z \cdot \delta$; the base RD's bias depends on the inflated $M_P$.
+		Strict inequality whenever the compositional channel is active (analogous to Theorem~6 in the groups paper).
+	\end{enumerate}
 \end{itemize}

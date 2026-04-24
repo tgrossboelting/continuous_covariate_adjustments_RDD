@@ -1,0 +1,120 @@
+\section{Setup and Notation}\label{sec:setup}
+
+This section introduces the setup, notation, and estimators used throughout the paper.
+Let $Y_i$ denote the outcome variable, $X_i$ the running variable, and $T_i \defeq \ind\{X_i \geq c\}$ the treatment indicator under a sharp regression discontinuity design with cutoff $c$.
+Observed outcomes relate to potential outcomes via $Y_i = Y_i(0) + [Y_i(1) - Y_i(0)] T_i$, where $Y_i(0)$ is the baseline outcome and $Y_i(1) - Y_i(0)$ the unit-level treatment effect.
+In addition to the running variable, each unit carries a continuous predetermined covariate $Z_i \in \mathcal{Z} \subseteq \mathbb{R}$.
+
+\begin{assumption}[Predetermined Covariate]\label{as:predetermined}
+	The covariate is predetermined, i.e., realized before treatment assignment and invariant to it: $Z_i(1) = Z_i(0)$ for all $i$.
+\end{assumption}
+
+This paper studies covariate adjustment for a single continuous predetermined covariate $Z_i$ in the standard RD setup.
+The key concern is that the conditional density $f_{Z|X}(z|x)$ may vary with the running variable, so that the composition of units along $Z$ changes as one moves away from the cutoff.
+When this compositional variation interacts with heterogeneity in the regression function across $z$, pooling all observations introduces additional smoothing bias beyond what arises from the outcome regression alone.
+
+A leading motivating example is geographic regression discontinuity designs, where $X_i$ measures distance to a treatment boundary and $Z_i$ denotes position along that boundary.
+In this setting, the conditional density of $Z$ given $X$ can vary dramatically: urban centers generate sharp density peaks at specific locations along the boundary, while rural areas are sparsely populated.
+As distance to the boundary changes, the relative weight of these dense and sparse regions shifts, creating steep compositional gradients.
+However, the mechanism is not specific to geography --- any RD application in which a continuous covariate has a conditional density that varies with the running variable faces the same issue.
+
+\subsection{Regression Functions and Target Parameter}\label{sec:setup:regression}
+
+Define the long regression functions conditional on both the running variable and the covariate:
+\begin{align}
+	m(x,z) &\defeq \E\left[Y_i(0) \given X_i = x,\, Z_i = z\right],\\
+	\tau(x,z) &\defeq \E\left[Y_i(1) - Y_i(0) \given X_i = x,\, Z_i = z\right].
+\end{align}
+These are the group-specific baseline outcome and treatment effect functions from the long regression model
+\begin{equation}\label{eq:long_regression}
+	Y_i = m(X_i, Z_i) + \tau(X_i, Z_i)\, T_i + e_i,
+\end{equation}
+with $\E[e_i \mid X_i, Z_i] = 0$.
+
+The pooled (short) regression functions that average over the covariate are
+\begin{align}
+	\bar{m}(x) &\defeq \E\left[m(X_i, Z_i) \given X_i = x\right] = \int m(x,z)\, f_{Z|X}(z|x)\, dz,\\
+	\bar{\tau}(x) &\defeq \E\left[\tau(X_i, Z_i) \given X_i = x\right] = \int \tau(x,z)\, f_{Z|X}(z|x)\, dz,
+\end{align}
+where $f_{Z|X}(z|x)$ is the conditional density of $Z_i$ given $X_i = x$.
+The pooled regression model is then
+\begin{equation}\label{eq:pooled_regression}
+	Y_i = \bar{m}(X_i) + \bar{\tau}(X_i)\, T_i + u_i,
+\end{equation}
+where $u_i$ absorbs the covariate-driven heterogeneity.
+
+The canonical RD parameter, the average treatment effect at the cutoff, can be written as a weighted average of covariate-specific treatment effects:
+\begin{equation}\label{eq:tau_rd}
+	\tau(c) \defeq \bar{\tau}(c) = \int \tau(c,z)\, f_{Z|X}(z|c)\, dz.
+\end{equation}
+More generally, this paper considers convex weighted averages of covariate-specific treatment effects along the boundary:
+\begin{equation}\label{eq:tau_w}
+	\tau_w \defeq \int \tau(c,z)\, w(z)\, dz,
+\end{equation}
+for a known, nonnegative weight function $w$ satisfying $\int w(z)\, dz = 1$.
+Since $w$ is chosen by the researcher rather than estimated, it does not contribute to the estimation problem.
+The canonical RD parameter corresponds to $w(z) = f_{Z|X}(z|c)$.
+
+
+\subsection{Pooled Estimation --- Base RD}\label{sec:setup:base}
+
+The standard approach to estimating $\tau(c)$ is the base RD estimator, which pools all observations regardless of the covariate.
+For local constant estimation ($q = 0$), this reduces to comparing sample means within a bandwidth $h$ of the cutoff:
+\begin{equation}\label{eq:base_rd}
+	\hat{\tau}(h) = \frac{\sum_{i:\, X_i \geq c} K_h(X_i)\, Y_i}{\sum_{i:\, X_i \geq c} K_h(X_i)} - \frac{\sum_{i:\, X_i < c} K_h(X_i)\, Y_i}{\sum_{i:\, X_i < c} K_h(X_i)},
+\end{equation}
+where $K_h(X_i) \defeq K\!\left(\frac{X_i - c}{h}\right)$ for a kernel function $K$ with bounded support.
+With a uniform kernel, this is simply the difference in sample means within the window $[c - h,\, c + h]$.
+
+The base RD estimator implicitly targets the pooled regression function $\bar{m}(x) + \bar{\tau}(x) \ind\{x \geq c\}$.
+Its smoothing bias therefore depends on the derivatives of $\bar{m}$ and $\bar{\tau}$, which inherit cross-terms from covariate heterogeneity and compositional changes, as discussed in \cref{sec:setup:pooling_bias}.
+
+
+\subsection{Segmented Estimation --- Covariate-Adjusted RD}\label{sec:setup:segmented}
+
+To avoid pooling across different values of the continuous covariate, I propose a segmented estimator.
+The idea is to partition the covariate space $\mathcal{Z}$ into $J$ segments $\{S_1, \ldots, S_J\}$ and estimate the treatment effect separately within each segment using a local constant base RD estimator, then form a weighted average.
+
+\paragraph{Segmentation.}
+Let $\{S_j\}_{j=1}^J$ be a partition of $\mathcal{Z}$ into intervals of width $\delta$.
+A natural choice, which I adopt throughout, is to set the segment width equal to the bandwidth: $\delta = h$.
+This creates $h \times h$ ``squares'' in the $(X, Z)$-plane on each side of the cutoff.
+
+\paragraph{Within-segment estimation.}
+For each segment $S_j$, define the within-segment local constant RD estimator:
+\begin{equation}\label{eq:tau_j}
+	\hat{\tau}_j(h) = \frac{\sum_{i:\, X_i \geq c} K_h(X_i)\, \ind\{Z_i \in S_j\}\, Y_i}{\sum_{i:\, X_i \geq c} K_h(X_i)\, \ind\{Z_i \in S_j\}} - \frac{\sum_{i:\, X_i < c} K_h(X_i)\, \ind\{Z_i \in S_j\}\, Y_i}{\sum_{i:\, X_i < c} K_h(X_i)\, \ind\{Z_i \in S_j\}},
+\end{equation}
+which compares average outcomes on both sides of the cutoff among units in segment $S_j$.
+
+\paragraph{Aggregation.}
+The segmented RD estimator combines the within-segment estimates using chosen weights:
+\begin{equation}\label{eq:tau_seg}
+	\hat{\tau}_S(h) = \sum_{j=1}^{J} w_j\, \hat{\tau}_j(h),
+\end{equation}
+where the weights $w_j \geq 0$ satisfy $\sum_j w_j = 1$ and are chosen by the researcher to target the parameter $\tau_w$ in \cref{eq:tau_w}.
+
+\begin{remark}[Relation to Fixed Effects Estimation]\label{rem:fe}
+	For a fixed number of segments $J$, the segmented estimator \eqref{eq:tau_seg} is closely related to a fixed effects (FE) estimator that includes segment indicators.
+	By the Frisch--Waugh--Lovell theorem \parencite[see also][for the extension to standard errors]{ding_frischwaughlovell_2021}, a regression of $Y_i$ on $T_i$ and segment dummies $\ind\{Z_i \in S_j\}$ within the bandwidth yields the same treatment effect estimate as the weighted average \eqref{eq:tau_seg} with specific weights.
+	In particular, the OLS fixed effects estimator corresponds to weights that are proportional to the product of the within-segment treated and control sample sizes, i.e., inverse propensity score (variance-minimizing) weights \parencite{negi_revisiting_2021}.
+	The segmented estimator \eqref{eq:tau_seg} generalizes this by allowing arbitrary convex weight choices.
+\end{remark}
+
+
+\subsection{Pooling Bias with Continuous Covariates}\label{sec:setup:pooling_bias}
+
+To see how pooling across a continuous covariate induces bias, consider the derivatives of the pooled regression function.
+Taking the first derivative of $\bar{m}(x) = \int m(x,z)\, f_{Z|X}(z|x)\, dz$ yields:
+\begin{equation}\label{eq:mbar_deriv}
+	\bar{m}'(x) = \int \frac{\partial m(x,z)}{\partial x}\, f_{Z|X}(z|x)\, dz + \int m(x,z)\, \frac{\partial f_{Z|X}(z|x)}{\partial x}\, dz.
+\end{equation}
+The first term reflects the average within-covariate-value slope of the regression function.
+The second term arises from compositional changes: as $x$ varies, the conditional distribution of $Z$ shifts, reweighting the regression function.
+Even if $m(x,z)$ is smooth in $x$ for every $z$, the pooled function $\bar{m}(x)$ can exhibit additional curvature due to changes in $f_{Z|X}(z|x)$.
+
+For the local constant estimator, the smoothing bias depends on $\bar{m}'(x)$.
+Steep or irregular conditional densities $f_{Z|X}(z|x)$ --- as arise in geographic settings with highly uneven population density --- inflate this derivative and thereby increase the pooling bias.
+The segmented estimator mitigates this mechanism: within each segment $S_j$, the estimator targets the conditional mean $\E\left[Y_i(0) \given X_i = x,\, Z_i \in S_j\right]$, which averages over only a narrow range of $Z$-values.
+This reduces the compositional term, since $m(x,z)$ varies by at most $M_z \cdot \delta$ within a segment of width $\delta$.
+Unlike the discrete case, where stratification fully eliminates pooling bias, segments of positive width retain a residual compositional contribution that vanishes as $\delta \to 0$.

@@ -1,0 +1,192 @@
+\section{Overview: Smoothness Classes and Covariate Adjustment}\label{sec:overview}
+
+This section presents the central theoretical argument of the paper.
+The choice of smoothness class determines whether covariate adjustment can reduce worst-case bias in regression discontinuity designs.
+I establish a general negative result under isotropic (pooled) smoothness and contrast it with the positive results obtainable under anisotropic (separated) smoothness.
+The discrete groups setting and the continuous covariate setting are then developed as two applications of this principle.
+
+
+\subsection{The General Principle}\label{sec:overview:principle}
+
+Consider an RDD with running variable $X$, outcome $Y$, and a predetermined covariate $Z$.
+The regression function $m(x,z) = \E[Y \mid X = x, Z = z]$ is bivariate; the pooled regression $\bar{m}(x) = \E[Y \mid X = x]$ integrates over $Z$.
+
+\paragraph{Target parameter.}
+Following \textcite{imbens_optimized_2019}, I consider a convex weighted average treatment effect as the target parameter:
+\begin{equation*}
+	\tau_w \defeq \int \tau(c, z)\, w(z)\, dz,
+\end{equation*}
+where $w(z)$ is a researcher-chosen weight function (e.g., uniform over the support of $Z$).
+This choice has two key advantages.
+First, it places the analysis directly in the framework of optimized RD designs, where \textcite{imbens_optimized_2019} recommend estimating convex weighted average treatment effects using the minimax estimator.
+Second, it eliminates the need to estimate the conditional density $f_{Z|X}(z|c)$: the covariate-adjusted estimator averages segment-specific estimates $\hat\tau_j$ with \emph{known} weights $w_j$, requiring no density estimation.
+By contrast, the base RD estimator implicitly targets $\bar{m}(x) = \int m(x,z) f_{Z|X}(z|x)\, dz$, whose bias inherently depends on the density through the compositional channel.
+
+The question is: \emph{under what conditions on the smoothness of $m(x,z)$ can covariate adjustment reduce worst-case bias?}
+
+
+\subsection{Negative Result: Isotropic / Pooled Smoothness}\label{sec:overview:negative}
+
+Under an isotropic smoothness class, a single bound constrains the joint variation of $m(x,z)$:
+\begin{equation*}
+	\norm{\nabla m}_2 \leq M, \qquad \text{i.e.,} \quad \left(\frac{\partial m}{\partial x}\right)^2 + \left(\frac{\partial m}{\partial z}\right)^2 \leq M^2.
+\end{equation*}
+Equivalently, in the pooled formulation used by standard RD inference (e.g., RDHonest), a single constant $M_P$ bounds the derivative of the pooled regression:
+$\abs{\bar{m}'(x)} \leq M_P$.
+
+Under either formulation, the curvature budget is \emph{fungible} across directions.
+Any estimator that controls for $Z$ --- thereby becoming insensitive to $z$-variation --- simply prompts the worst-case function to reallocate its entire curvature budget to the $x$-direction.
+The worst-case function sets $\partial m / \partial z = 0$ and $\partial m / \partial x = M$, which does not vary in $z$ at all.
+Against such a function, the $Z$-information is useless, and the worst-case bias equals that of the base RD estimator.
+
+\begin{theorem}[Informal: Covariate Adjustment is Pointless under Isotropic Smoothness]\label{thm:negative_informal}
+	Under the isotropic Lipschitz class $\mathcal{F}_1^{\mathrm{iso}}(M)$, for any linear estimator $\hat\tau$ that may depend on $(Y_i, X_i, Z_i)$:
+	\begin{equation*}
+		\wcb(\hat\tau, \mathcal{F}_1^{\mathrm{iso}}(M)) \geq \wcb(\hat\tau^*_{\mathrm{base}}, \mathcal{F}_1^{\mathrm{iso}}(M)),
+	\end{equation*}
+	where $\hat\tau^*_{\mathrm{base}}$ is the minimax optimal base RD estimator that ignores $Z$.
+	No covariate-adjusted estimator can achieve lower worst-case bias.
+\end{theorem}
+
+The proof follows from constructing the worst-case function: for any estimator $\hat\tau$, the adversary chooses $f^*(x,z) = M \cdot x$ (or the appropriate worst-case profile in $x$ alone), which is constant in $z$.
+Against this function, $Z$ carries no information, so all $Z$-adjustment is wasted.
+
+
+\subsection{Positive Result: Anisotropic / Separated Smoothness}\label{sec:overview:positive}
+
+Under the anisotropic class, smoothness in each direction is bounded separately:
+\begin{equation*}
+	\abs*{\frac{\partial m}{\partial x}} \leq M_x, \qquad \abs*{\frac{\partial m}{\partial z}} \leq M_z.
+\end{equation*}
+The $M_z$ budget \emph{cannot} be redirected into the $x$-direction.
+When covariate adjustment neutralizes the $z$-channel of the bias, the $M_z$ budget is stranded: it can only generate residual bias proportional to the resolution of the adjustment (segment width $\delta$ or kernel bandwidth $g$), which is small.
+The worst-case bias of the adjusted estimator therefore depends primarily on $M_x$, yielding a strict improvement over the base RD whenever $M_z > 0$ and the compositional channel is active.
+
+This is the right framework for studying covariate adjustment: the smoothness of $m$ in $x$ is a property of the data-generating process that should not respond to the researcher's estimation strategy.
+The anisotropic class respects this; the isotropic class does not.
+
+
+\subsection{Common Parameter Space}\label{sec:overview:common}
+
+To formally compare the base RD and covariate-adjusted estimators, I construct a common parameter space that starts from the anisotropic primitives and adds a constraint on the conditional density:
+\begin{equation*}
+	\mathcal{F}^R(M_x, M_z, L) \defeq \Bigl\{ (m, f_{Z|X}) \;\Big|\; \abs{\partial m / \partial x} \leq M_x,\; \abs{\partial m / \partial z} \leq M_z,\; f_{Z|X} \text{ satisfies smoothness bound } L \Bigr\}.
+\end{equation*}
+The pooled bound $M_P$ is a \emph{derived} quantity, obtained via the triangle inequality applied to $\bar{m}'(x) = \int \frac{\partial m}{\partial x} f\, dz + \int m \frac{\partial f}{\partial x}\, dz$:
+\begin{equation*}
+	M_P \leq M_x + \text{(compositional term depending on $M_z$ and $L$)}.
+\end{equation*}
+This parallels the construction $M_P = M_L + C_{\Delta m} L$ in the discrete groups setting.
+
+\paragraph{Asymmetric role of the density constraint.}
+The density constraint $L$ enters the common parameter space only because the base RD needs it: its bias depends on the pooled regression $\bar{m}(x) = \int m(x,z) f_{Z|X}(z|x)\, dz$, whose derivative involves the compositional term $\int m(x,z) \frac{\partial f}{\partial x}(z|x)\, dz$.
+Without a bound on how the density varies with $x$, the base RD's worst-case bias is unbounded.
+
+The covariate-adjusted estimator, by contrast, does not need the density constraint at all.
+Because the target parameter $\tau_w = \int \tau(c,z)\, w(z)\, dz$ uses researcher-chosen weights $w(z)$, the segmented estimator averages $\hat\tau_j$ with known weights --- no density estimation required.
+Its worst-case bias depends only on the anisotropic primitives:
+\begin{equation*}
+	\wcb(\hat\tau_{\mathrm{seg}}) \sim M_x \cdot h + M_z \cdot \delta.
+\end{equation*}
+The density plays no role.
+This contrasts sharply with the base RD, whose bias depends on the inflated $M_P(M_x, M_z, L)$.
+The comparison is therefore asymmetric: the density constraint is a burden only for the pooled approach.
+
+This also eliminates the weight estimation bias term $h_z^p L C_{\Delta\tau} B_{p,q}^{int} / p!$ that appears in the groups paper (Proposition~3) from estimating $\hat{g}(c) = f_{Z|X}(1|c)$.
+With known weights, that entire source of bias vanishes.
+
+
+\subsection{Main Theoretical Results}\label{sec:overview:results}
+
+The paper establishes three theoretical results of increasing depth.
+
+\paragraph{Result 1: Function class inclusion.}
+The isotropic and anisotropic classes are related by strict nesting (\cref{sec:appendix:isotropic}):
+\begin{equation*}
+	\mathcal{F}_1^{\mathrm{iso}}(M) \subsetneq \mathcal{F}_1^{\mathrm{aniso}}(M, M) \subsetneq \mathcal{F}_1^{\mathrm{iso}}(M\sqrt{2}).
+\end{equation*}
+This is mechanical but foundational: it establishes that the anisotropic class is a strict refinement of the isotropic class --- neither too large nor too small --- and that results under the anisotropic class remain valid for any DGP satisfying isotropic smoothness.
+
+\paragraph{Result 2: Strict minimax risk ordering.}
+The minimax risk over the anisotropic class is strictly lower than over the corresponding isotropic class:
+\begin{equation*}
+	\min_{\hat\tau \in \mathcal{L}} \sup_{f \in \mathcal{F}_{\mathrm{aniso}}(M, M)} \mathrm{MSE}(\hat\tau, f) \;<\; \min_{\hat\tau \in \mathcal{L}} \sup_{f \in \mathcal{F}_{\mathrm{iso}}(M\sqrt{2})} \mathrm{MSE}(\hat\tau, f).
+\end{equation*}
+The weak inequality follows from Result~1 (monotonicity of minimax risk in the function class).
+The strict inequality follows because the anisotropic class has directional structure that the minimax estimator can exploit: segmentation (or a similar mechanism) reduces worst-case bias by stranding the $M_z$ budget, which is impossible under the isotropic class due to fungibility (\cref{sec:overview:negative}).
+
+\paragraph{Result 3: Quantifying the minimax risk reduction.}
+The MSE reduction from using the anisotropic class can be characterized explicitly.
+\begin{itemize}
+	\item \emph{Upper bound on aniso minimax risk.}
+	The segmented estimator is a feasible linear estimator over $\mathcal{F}_{\mathrm{aniso}}(M_x, M_z)$.
+	Its worst-case MSE provides an upper bound on the minimax risk:
+	\begin{equation*}
+		\min_{\hat\tau \in \mathcal{L}} \sup_{f \in \mathcal{F}_{\mathrm{aniso}}} \mathrm{MSE}(\hat\tau, f) \;\leq\; \sup_{f \in \mathcal{F}_{\mathrm{aniso}}} \mathrm{MSE}(\hat\tau_{\mathrm{seg}}, f).
+	\end{equation*}
+	The right-hand side is computable: the worst-case bias is $\wcb(\hat\tau_{\mathrm{seg}}) \sim M_x \cdot h + M_z \cdot \delta$ and the variance follows from within-segment estimation with independent segments.
+
+	\item \emph{Lower bound on iso minimax risk.}
+	The minimax risk over $\mathcal{F}_{\mathrm{iso}}(M\sqrt{2})$ is characterized by Armstrong and Kolesár (2020) and Imbens and Wager (2019).
+	The worst-case bias scales with $M\sqrt{2}$ in the leading term.
+
+	\item \emph{The gap.}
+	With $M_x = M_z = M$, the isotropic worst-case bias scales with $M\sqrt{2}$ while the segmented estimator's bias scales with $M$ in the dominant ($x$-direction) term.
+	This gives a factor of $\sqrt{2}$ reduction in the leading bias, translating to a quantifiable MSE improvement.
+
+	More generally, for $M_x \neq M_z$, the reduction depends on the ratio $M_z / M_x$:
+	\begin{equation*}
+		\text{MSE reduction} = \Phi(M_z / M_x),
+	\end{equation*}
+	where $\Phi$ is increasing in $M_z / M_x$.
+	When $M_z / M_x$ is large (strong $z$-variation relative to $x$-variation), the compositional channel dominates and the gain from segmentation is largest.
+	When $M_z = 0$ (no covariate variation), there is no compositional bias and the two classes coincide: $\Phi(0) = 0$.
+\end{itemize}
+
+This triple --- inclusion, ordering, quantification --- provides a complete characterization of what the anisotropic framework buys relative to the isotropic framework for covariate adjustment in RDDs.
+
+
+\subsection{Technical Contributions Beyond the Mechanical Results}\label{sec:overview:technical}
+
+Results~1--3 are conceptually important but technically light: the nesting, ordering, and quantification follow from known minimax machinery applied to different constraint sets.
+The following results require genuine technical work.
+
+\paragraph{General negative theorem (formal).}
+The informal \cref{thm:negative_informal} must be made rigorous: for \emph{any} linear estimator $\hat\tau = \sum_i w_i(X_i, Z_i) Y_i$ whose weights may depend on $Z$, the worst-case bias over $\mathcal{F}_1^{\mathrm{iso}}(M)$ is at least as large as the worst-case bias of the minimax optimal base RD estimator that ignores $Z$.
+The difficulty is that the worst-case function depends on the weight structure --- one must show that the adversary can \emph{always} concentrate curvature in $x$ regardless of how cleverly the estimator exploits $Z$-information.
+This requires constructing, for each weight vector $w$, a function $f^* \in \mathcal{F}_1^{\mathrm{iso}}(M)$ that is constant in $z$ and achieves the maximal bias.
+This is a clean, quotable result: \emph{under isotropic smoothness, covariate adjustment is provably pointless for any linear estimator}.
+
+\paragraph{Modulus of continuity under the anisotropic class.}
+\textcite{armstrong_simple_2020} characterize minimax optimal estimators through the modulus of continuity of the target functional over the smoothness class.
+Under the isotropic class, the constraint set in gradient space is a disk; under the anisotropic class, it is a rectangle.
+Computing the modulus of continuity for the anisotropic class --- and showing how it differs from the isotropic case --- would connect directly to the Armstrong--Kolesár framework.
+This gives the \emph{exact} minimax risk under the anisotropic class, not just the upper bound from the segmented estimator.
+
+\paragraph{Characterizing the minimax optimal estimator under the anisotropic class.}
+Solving the Imbens--Wager / Armstrong--Kolesár weight optimization problem with the rectangular constraint (rather than the disk) would reveal:
+\begin{enumerate}
+	\item The exact form of the minimax optimal weights --- does the optimal estimator under the anisotropic class resemble segmentation, or does it take a different form?
+	\item The sharp minimax constant, not just the rate.
+	\item Whether the segmented estimator has a gap relative to the minimax optimum, and if so, how large.
+\end{enumerate}
+This is the deepest result and could constitute a standalone contribution.
+For the present paper, characterizing the minimax estimator for the special case of local constant estimation with uniform kernel (the setting used throughout) may be a feasible target.
+
+
+\subsection{Two Applications}\label{sec:overview:applications}
+
+\paragraph{Application 1: Discrete groups.}
+When $Z$ is discrete, the covariate-adjusted estimator is the Stratified RD estimator, which estimates group-specific treatment effects $\tau(c, z)$ and averages them.
+With a convex weighted average target, the weights are chosen by the researcher (e.g., equal weights across groups), eliminating the need to estimate $f_{Z|X}(z|c)$.
+Stratification fully eliminates the compositional channel (groups are exactly separated).
+The common parameter space $\mathcal{F}^R(\mathbf{M}, \mathbf{C}, \mathbf{L})$ yields worst-case AMSE dominance of the Stratified RD over the base RD.
+Under treatment effect homogeneity and differing smoothness orders for $m(x,z)$ and $g(x)$, the Stratified RD achieves a better convergence rate.
+The canonical CATE $\tau(c) = \sum_z \tau(c,z) f_{Z|X}(z|c)$ requires estimating $f_{Z|X}$ and introduces additional weight estimation bias --- this is left as an extension.
+
+\paragraph{Application 2: Continuous covariates.}
+When $Z$ is continuous, the covariate-adjusted estimator is the segmented estimator, which partitions the $Z$-space into intervals, runs base RD within each segment, and averages with known weights $w_j$.
+No density estimation is required.
+Segmentation reduces but does not fully eliminate the compositional channel (segments have positive width $\delta > 0$).
+The residual within-segment compositional bias is $O(M_z \cdot \delta)$, which is small for narrow segments.
+The common parameter space $\mathcal{F}^R(M_x, M_z, L)$ yields a worst-case AMSE comparison analogous to the discrete case, with the density constraint binding only for the base RD.

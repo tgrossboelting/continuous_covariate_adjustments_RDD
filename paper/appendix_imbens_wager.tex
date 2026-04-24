@@ -1,0 +1,86 @@
+\section{Relation to Optimized Regression Discontinuity Designs}\label{sec:appendix:iw}
+
+This appendix discusses the relationship between the segmented estimator and the optimized RD estimator of \textcite{imbens_optimized_2019}, focusing on why the choice of smoothness class determines whether segmentation can improve inference.
+
+
+\subsection*{The Imbens--Wager Smoothness Class}
+
+\textcite{imbens_optimized_2019} assume that the conditional response functions satisfy a bounded second derivative condition.
+In the multivariate case with $X_i \in \mathbb{R}^k$, this takes the form $\|\nabla^2 \mu_w(x)\| \leq B$ for $w \in \{0,1\}$, where $\|\cdot\|$ denotes the operator norm (largest absolute eigenvalue of the Hessian).
+This is an isotropic smoothness assumption: it constrains curvature in all directions jointly through a single constant $B$.
+
+The present paper works with a first-order (Lipschitz) condition rather than a second-order condition, motivated by the use of the local constant estimator.
+The isotropic Lipschitz analog is $\mathcal{F}_1^{\mathrm{iso}}(M)$ defined in \cref{sec:appendix:isotropic}.
+The arguments below apply at both orders.
+
+
+\subsection*{Why Segmentation Cannot Improve on Pooling under the Isotropic Class}
+
+Under the isotropic class, the gradient of $f(x,z)$ is constrained to lie in a disk:
+\begin{equation*}
+	\left(\frac{\partial f}{\partial x}\right)^2 + \left(\frac{\partial f}{\partial z}\right)^2 \leq M^2.
+\end{equation*}
+The curvature budget is \emph{fungible} across directions.
+Segmentation controls the $z$-channel of the bias by restricting comparisons to narrow segments, making the estimator insensitive to variation in $z$.
+However, once the $z$-channel is shut down, the worst-case function simply reallocates its entire curvature budget to the $x$-direction: setting $\partial f / \partial z = 0$ and $\partial f / \partial x = M$.
+The resulting worst-case bias is $h \cdot M \cdot B_{1,0}$, which is the same as the worst-case bias of the pooled estimator --- because the pooled estimator's worst case also concentrates curvature in whichever direction maximizes the bias.
+
+In other words, under the isotropic class, segmentation does not reduce worst-case bias: any curvature removed from the compositional channel reappears in the smoothing channel.
+
+
+\subsection*{Why Anisotropic Smoothness is Necessary}
+
+Under the anisotropic class $\mathcal{F}_1^{\mathrm{aniso}}(M_x, M_z)$, the partial derivative bounds are \emph{separate}:
+\begin{equation*}
+	\abs*{\frac{\partial f}{\partial x}} \leq M_x, \qquad \abs*{\frac{\partial f}{\partial z}} \leq M_z.
+\end{equation*}
+The adversary cannot redirect the $M_z$ budget into the $x$-direction.
+When segmentation neutralizes the $z$-channel, the worst-case bias falls from a quantity depending on both $M_x$ and $M_z$ (under pooling) to one depending primarily on $M_x$ (under segmentation).
+The $M_z$ budget is stranded --- it can only generate within-segment compositional variation proportional to $M_z \cdot \delta$, which is small for narrow segments.
+
+This is precisely why the anisotropic class is the natural framework for studying the benefits of covariate adjustment via segmentation: it is the weakest class under which controlling for the covariate direction yields a strict improvement in worst-case bias.
+
+
+\subsection*{Minimax Optimal Estimation}
+
+\begin{definition}[Minimax Optimal Linear Estimator]\label{def:minimax}
+	Let $\mathcal{L}$ denote the class of linear estimators $\hat\tau = \sum_{i=1}^n w_i Y_i$.
+	For a linear estimator with fixed weights, the worst-case mean squared error over a function class $\mathcal{F}$ is
+	\begin{equation}\label{eq:minimax_mse}
+		\sup_{f \in \mathcal{F}} \mathrm{MSE}(\hat\tau, f) = \wcb^2(\hat\tau, \mathcal{F}) + \Var(\hat\tau),
+	\end{equation}
+	where $\wcb(\hat\tau, \mathcal{F}) = \sup_{f \in \mathcal{F}} \abs{\E[\hat\tau] - \tau(f)}$ is the worst-case bias.
+	The variance does not depend on $f$ because $\hat\tau$ is linear with fixed weights.
+	The minimax optimal linear estimator over $\mathcal{F}$ is
+	\begin{equation}\label{eq:minimax_estimator}
+		\hat\tau^*_{\mathcal{F}} = \argmin_{\hat\tau \in \mathcal{L}} \left[\wcb^2(\hat\tau, \mathcal{F}) + \Var(\hat\tau)\right].
+	\end{equation}
+\end{definition}
+
+\textcite{imbens_optimized_2019} characterize $\hat\tau^*$ for the isotropic class (with a second-order smoothness condition).
+Their estimator is minimax optimal among all linear estimators under that class.
+
+
+\subsection*{The Anisotropic Class as the Natural Framework for Covariate Adjustment}
+
+The key question is not which smoothness class is ``correct,'' but which class captures the structure relevant for studying covariate adjustment.
+
+\paragraph{Controlling $z$ should not worsen $x$.}
+When an estimator controls for the $z$-direction --- restricting comparisons to observations with similar $z$-values --- one would not expect the regression function to become harder to estimate in the $x$-direction.
+The smoothness of $m(x,z)$ in $x$ is a property of the data-generating process, not something that responds to the researcher's estimation strategy.
+The anisotropic class respects this: $\abs{\partial f / \partial x} \leq M_x$ holds independently of what happens in the $z$-direction.
+The isotropic class violates it: controlling for $z$ frees up curvature budget that the worst-case function reallocates to $x$, making the $x$-direction effectively harder.
+
+\paragraph{Minimax implications.}
+The nesting $\mathcal{F}_1^{\mathrm{aniso}}(M, M) \subsetneq \mathcal{F}_1^{\mathrm{iso}}(M\sqrt{2})$ (\cref{sec:appendix:isotropic}) implies that the minimax risk under the anisotropic class is weakly lower:
+\begin{equation}\label{eq:minimax_comparison}
+	\min_{\hat\tau \in \mathcal{L}} \sup_{f \in \mathcal{F}_{\mathrm{aniso}}(M, M)} \mathrm{MSE}(\hat\tau, f) \;\leq\; \min_{\hat\tau \in \mathcal{L}} \sup_{f \in \mathcal{F}_{\mathrm{iso}}(M\sqrt{2})} \mathrm{MSE}(\hat\tau, f).
+\end{equation}
+This inequality is mechanical (monotonicity of minimax risk in the function class).
+What is not mechanical is \emph{why} the inequality should be strict: the anisotropic class has more structure --- two separate directional bounds --- that the minimax estimator can exploit.
+Under $\mathcal{F}_{\mathrm{iso}}(M\sqrt{2})$, segmentation is pointless because the curvature budget is fungible; the minimax estimator ignores $z$.
+Under $\mathcal{F}_{\mathrm{aniso}}(M, M)$, the separate bounds prevent curvature reallocation, so the minimax estimator can incorporate $z$-information via segmentation or a similar mechanism, achieving a strictly lower worst-case MSE whenever $M > 0$.
+
+\paragraph{Practical consequence.}
+The segmented estimator is not minimax optimal under the anisotropic class, but it reduces worst-case bias relative to pooling (\cref{sec:bias_comparison}) and is simple to implement --- it corresponds to the segment fixed effects already common in applied work.
+Characterizing the exact minimax estimator under the anisotropic class is an open problem; the present paper establishes that the anisotropic class is the appropriate framework and that segmentation yields a strict improvement within it.

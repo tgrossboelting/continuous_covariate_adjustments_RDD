@@ -1,0 +1,49 @@
+\section{Isotropic Smoothness Class}\label{sec:appendix:isotropic}
+
+This appendix defines the isotropic Lipschitz class and relates it to the anisotropic class used in the main text.
+The results of this paper are stated under the anisotropic class $\mathcal{F}_1^{\mathrm{aniso}}(M_x, M_z)$; extending them to the isotropic class is left for future work.
+
+\begin{definition}[Isotropic Lipschitz Class]\label{def:isotropic}
+	The isotropic Lipschitz class with constant $M > 0$ is
+	\begin{equation}\label{eq:isotropic}
+		\mathcal{F}_1^{\mathrm{iso}}(M) \defeq \bigl\{ f : \mathbb{R}^2 \to \mathbb{R} \;\big|\; \abs{f(x,z) - f(x',z')} \leq M \norm{(x,z) - (x',z')}_2 \;\; \forall\, (x,z),\, (x',z') \bigr\}.
+	\end{equation}
+\end{definition}
+
+If $f$ is differentiable, this is equivalent to requiring $\norm{\nabla f(x,z)}_2 \leq M$, i.e.,
+\begin{equation}\label{eq:iso_gradient}
+	\left(\frac{\partial f}{\partial x}\right)^2 + \left(\frac{\partial f}{\partial z}\right)^2 \leq M^2.
+\end{equation}
+The gradient norm constraint couples the two partial derivatives: a large $\partial f / \partial x$ forces a small $\partial f / \partial z$, and vice versa.
+The directional derivative along any unit vector $\vec{v} = (v_1, v_2)$ is bounded uniformly:
+\begin{equation}\label{eq:iso_directional}
+	\abs{\nabla f \cdot \vec{v}} \leq \norm{\nabla f}_2 \norm{\vec{v}}_2 \leq M.
+\end{equation}
+
+
+\subsection*{Nesting}
+
+Setting $z = z'$ or $x = x'$ in \eqref{eq:isotropic} gives $\abs{\partial f / \partial x} \leq M$ and $\abs{\partial f / \partial z} \leq M$, so:
+\begin{equation}\label{eq:iso_subset_aniso}
+	\mathcal{F}_1^{\mathrm{iso}}(M) \subseteq \mathcal{F}_1^{\mathrm{aniso}}(M, M).
+\end{equation}
+The inclusion is strict.
+The isotropic class requires the gradient to lie in a disk of radius $M$; the anisotropic class with $(M, M)$ requires it to lie in a square of side $2M$.
+The square strictly contains the disk.
+
+Conversely, the anisotropic class embeds in a larger isotropic class:
+\begin{equation}\label{eq:aniso_subset_iso}
+	\mathcal{F}_1^{\mathrm{aniso}}(M_x, M_z) \subseteq \mathcal{F}_1^{\mathrm{iso}}\!\bigl(\sqrt{M_x^2 + M_z^2}\bigr).
+\end{equation}
+In summary:
+\begin{equation*}
+	\mathcal{F}_1^{\mathrm{iso}}(M) \subsetneq \mathcal{F}_1^{\mathrm{aniso}}(M, M) \subsetneq \mathcal{F}_1^{\mathrm{iso}}(M\sqrt{2}).
+\end{equation*}
+
+
+\subsection*{Segmentation under the Isotropic Class}
+
+Under the isotropic class, the curvature budget is fungible across directions: $(\partial f / \partial x)^2 + (\partial f / \partial z)^2 \leq M^2$.
+If segmentation neutralizes the $z$-channel of the bias, the worst-case function reallocates its entire curvature budget to $x$, setting $\partial f / \partial z = 0$ and $\partial f / \partial x = M$.
+This means segmentation cannot reduce the worst-case bias below that of the pooled estimator under the isotropic class.
+See \cref{sec:appendix:iw} for a detailed discussion.

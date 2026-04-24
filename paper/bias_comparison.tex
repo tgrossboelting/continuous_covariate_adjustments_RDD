@@ -1,0 +1,117 @@
+\section{Worst-Case Bias Comparison}\label{sec:bias}
+
+This section compares the asymptotic worst-case bias of the pooled and segmented estimators.
+The main result shows that segmentation reduces worst-case bias whenever the conditional density $f_{Z|X}(z|x)$ varies with $x$.
+Unlike the discrete-covariate case, where stratification fully eliminates pooling bias, segmentation with segments of positive width $\delta > 0$ only \emph{reduces} the compositional term --- within each segment, the conditional density can still vary with $x$, generating residual pooling bias.
+
+Throughout, I consider the local constant estimator ($q = 0$) with a uniform kernel and equal segment weights $w_j = 1/S$.
+
+
+\subsection{Worst-Case Bias of the Pooled Estimator}\label{sec:bias:pooled}
+
+The base RD estimator \eqref{eq:base_rd} targets the pooled regression function $\bar{m}(x) = \int m(x,z)\, f_{Z|X}(z|x)\, dz$.
+By \textcite{armstrong_simple_2020}, the worst-case bias of the local constant estimator with bandwidth $h$ and uniform kernel over a Lipschitz class with constant $M_P$ is
+\begin{equation}\label{eq:bias_pooled}
+	\wcb(\hat{\tau}(h)) = h\, M_P\, B_{1,0}
+\end{equation}
+where $B_{1,0} = \frac{1}{2}$ is the kernel constant for the local constant estimator with uniform kernel, and $M_P$ bounds $\abs{\bar{m}'(x)}$ and $\abs{\bar{m}'(x) + \bar{\tau}'(x)}$.
+
+The bound $M_P$ must be chosen to be valid for the pooled regression function.
+From the derivative decomposition \eqref{eq:mbar_deriv},
+\begin{equation}\label{eq:MP_decomp}
+	\bar{m}'(x) = \int \frac{\partial m}{\partial x}(x,z)\, f_{Z|X}(z|x)\, dz + \int m(x,z)\, \frac{\partial f_{Z|X}}{\partial x}(z|x)\, dz.
+\end{equation}
+The first term is bounded by $M_x$ (the Lipschitz constant of $m$ in $x$).
+The second term reflects compositional changes and depends on the heterogeneity of $m(x,z)$ across $z$ and the rate of change of $f_{Z|X}$ in $x$.
+
+Applying the triangle inequality:
+\begin{equation}\label{eq:MP_bound}
+	M_P \leq M_x + \sup_x \abs*{\int m(x,z)\, \frac{\partial f_{Z|X}}{\partial x}(z|x)\, dz} \eqdef M_x + \Delta_{\mathrm{comp}}.
+\end{equation}
+The term $\Delta_{\mathrm{comp}}$ is the full compositional bias contribution.
+It vanishes if and only if either the regression function is constant in $z$ (no heterogeneity) or $f_{Z|X}(z|x)$ does not depend on $x$ (no compositional changes).
+
+
+\subsection{Worst-Case Bias of the Segmented Estimator}\label{sec:bias:segmented}
+
+The segmented estimator with equal weights is $\hat{\tau}_S(h) = \frac{1}{S} \sum_{j=1}^{S} \hat{\tau}_j(h)$.
+Within segment $S_j$, the estimator $\hat{\tau}_j(h)$ is a local constant RD estimator applied to the subsample $\{i : Z_i \in S_j\}$.
+This estimator implicitly targets the within-segment pooled regression function
+\begin{equation}\label{eq:m_j}
+	\bar{m}_j(x) \defeq \frac{\int_{S_j} m(x,z)\, f_{Z|X}(z|x)\, dz}{\int_{S_j} f_{Z|X}(z|x)\, dz}.
+\end{equation}
+Unlike the discrete case, where stratification fully conditions on the covariate value, the within-segment function $\bar{m}_j(x)$ still averages over a range of $z$-values of width $\delta$.
+Its derivative inherits a within-segment compositional term:
+\begin{equation}\label{eq:m_j_deriv}
+	\bar{m}_j'(x) = \underbrace{\frac{\int_{S_j} \frac{\partial m}{\partial x}(x,z)\, f_{Z|X}(z|x)\, dz}{\int_{S_j} f_{Z|X}(z|x)\, dz}}_{\text{within-segment smoothing}} + \underbrace{\text{within-segment compositional term}}_{\text{reduced but not eliminated}}.
+\end{equation}
+The first term is bounded by $M_x$.
+The within-segment compositional term depends on how much $m(x,z)$ varies across $S_j$ in the $z$-direction, which is at most $M_z \cdot \delta$ under the anisotropic class $\mathcal{F}_1^{\mathrm{aniso}}(M_x, M_z)$.
+Consequently, the within-segment compositional contribution scales with $\delta$:
+\begin{equation}\label{eq:delta_comp_j}
+	\abs{\bar{m}_j'(x)} \leq M_x + \Delta_{\mathrm{comp},j}(\delta),
+\end{equation}
+where $\Delta_{\mathrm{comp},j}(\delta) \to 0$ as $\delta \to 0$, with the rate depending on $M_z$ and the density gradient.
+
+
+\subsection{Bias Comparison}\label{sec:bias:comparison}
+
+\begin{proposition}[Worst-Case Bias Reduction from Segmentation]\label{prop:bias_comparison}
+	Assume $m(x,z) \in \mathcal{F}_1^{\mathrm{aniso}}(M_x, M_z)$.
+	Then for any bandwidth $h > 0$ and segment width $\delta > 0$,
+	\begin{equation}\label{eq:bias_comparison}
+		\wcb(\hat{\tau}_S(h)) \leq \wcb(\hat{\tau}(h)),
+	\end{equation}
+	with strict inequality whenever $\Delta_{\mathrm{comp}} > \Delta_{\mathrm{comp},j}(\delta)$ for some $j$, i.e., whenever segmentation reduces the compositional term relative to full pooling.
+\end{proposition}
+
+The magnitude of the bias reduction depends on the segment width $\delta$.
+With $\delta = h$, the within-segment compositional term is of order $M_z \cdot h$, making the residual pooling bias of order $h^2 \cdot M_z$ --- which is higher order relative to the leading smoothing bias term $h \cdot M_x$.
+Full pooling, by contrast, has a compositional term of order $h \cdot \Delta_{\mathrm{comp}}$ that enters the leading bias.
+
+
+\subsection{Worst-Case Function}\label{sec:bias:worst_case}
+
+To build intuition for the source and magnitude of pooling bias, consider the worst-case function that maximizes the compositional term.
+
+\paragraph{Isolating pooling bias.}
+Setting $\frac{\partial m}{\partial x}(x,z) = 0$ eliminates the standard smoothing bias and isolates the compositional component.
+Under this restriction, $m(x,z) = m(z)$ depends only on the covariate, and the pooled regression function becomes
+\begin{equation}\label{eq:mbar_pure_comp}
+	\bar{m}(x) = \int m(z)\, f_{Z|X}(z|x)\, dz.
+\end{equation}
+Despite $m$ being constant in $x$, the pooled function $\bar{m}(x)$ varies with $x$ through the changing density $f_{Z|X}(z|x)$.
+Its derivative is
+\begin{equation}\label{eq:mbar_prime_pure}
+	\bar{m}'(x) = \int m(z)\, \frac{\partial f_{Z|X}}{\partial x}(z|x)\, dz = \Cov_{Z|X}\!\left(m(Z),\; \frac{\partial \log f_{Z|X}(Z|x)}{\partial x} \;\bigg|\; X = x\right),
+\end{equation}
+which is the covariance between the regression function and the score of the conditional density.
+This quantity is large when $m(z)$ and $\frac{\partial f_{Z|X}}{\partial x}$ are strongly associated.
+
+\paragraph{Maximizing heterogeneity.}
+Under the anisotropic smoothness class, $m(z)$ is Lipschitz in $z$ with constant $M_z$.
+The worst case sets the $z$-derivative at its bound:
+\begin{equation}\label{eq:worst_case_m}
+	m^*(z) = M_z \cdot z,
+\end{equation}
+so that $m$ increases linearly and maximally in $z$.
+
+\paragraph{Worst-case density.}
+Given $m^*(z) = M_z \cdot z$, the compositional term $\bar{m}'(x) = M_z \int z\, \frac{\partial f_{Z|X}}{\partial x}(z|x)\, dz$ is maximized when $\frac{\partial f_{Z|X}}{\partial x}(z|x)$ is positively associated with $z$: the density should shift mass toward high $z$ as $x$ increases (or equivalently, shift mass away from high $z$ as $x$ decreases).
+
+Concretely, the worst-case density concentrates mass at high values of $z$ on one side of the cutoff and shifts this mass toward low $z$ on the other side.
+In the $(x,z)$-plane, this corresponds to a density that is highest in the upper-left region (high $z$, low $x$) and declines toward the lower-right region (low $z$, high $x$), with the steepest possible gradient.
+
+\paragraph{Geographic interpretation.}
+This worst case has a natural geographic analog.
+Suppose a city is located along the treatment boundary at a specific position (high $z$).
+Close to the boundary (small $|x|$), most observations come from the city, so $f_{Z|X}(z|x)$ is concentrated near the city's location.
+Further from the boundary (larger $|x|$), the city's influence wanes and the population is more dispersed or concentrated elsewhere.
+If outcomes $m(z)$ differ between urban and rural locations, pooling across the boundary mixes these compositional shifts into the estimated treatment effect, generating pooling bias.
+Segmentation mitigates this by restricting comparisons to units at similar positions along the boundary.
+
+\paragraph{Effect of segmentation on the worst case.}
+Under segmentation with segment width $\delta$, the worst-case function $m^*(z) = M_z \cdot z$ can vary by at most $M_z \cdot \delta$ within each segment.
+The within-segment compositional term is therefore bounded by a quantity proportional to $M_z \cdot \delta$ times the within-segment density gradient.
+As $\delta \to 0$, this term vanishes --- but for any finite $\delta > 0$, residual pooling bias remains.
+The practical question is whether $\delta = h$ makes the residual term small enough to be higher-order relative to the leading smoothing bias.
