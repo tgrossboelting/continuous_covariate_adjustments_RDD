@@ -1,0 +1,74 @@
+\documentclass[12pt]{article}
+
+\input{preamble}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%% --- Title Page ---
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{Placeholder Title}
+
+\author{
+Tobias~Großbölting\thanks{Universität Mannheim. Email: \href{tgrossbo@mail.uni-mannheim.de}{tgrossbo@mail.uni-mannheim.de}.}
+%\and Soonwoo~Kwon\thanks{Brown University. Email: \href{mailto:soonwoo_kwon@brown.edu}{soonwoo\_kwon@brown.edu}.}
+%\and Michael~Pollmann\thanks{Duke University. Email: \href{mailto:michael.pollmann@duke.edu}{michael.pollmann@duke.edu}.}
+}
+
+
+
+\begin{document}
+
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%% --- Abstract & Keywords ---
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\input{abstract} 
+
+\vspace{0.1in}
+\noindent\textbf{Keywords:} Key1, Key2\\
+\vspace{0in}\\
+\noindent\textbf{JEL Codes:} C14\\
+
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%% --- Main Document ---
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\input{introduction}
+
+\input{literature}
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%% --- Bibliography ---
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\onehalfspacing
+%\doublespacing
+
+\printbibliography
+
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%% --- APPENDIX ---
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Changes in settings:
+% Changing section numbering to alphabetical
+\renewcommand\thesection{\Alph{section}}
+\renewcommand\thesubsection{\thesection.\Roman{subsection}}
+
+% Resetting section counter to 0
+\setcounter{section}{0}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\appendix
+\section*{Appendix}
+
+\input{notation}
+
+
+\end{document}
