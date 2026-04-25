@@ -1,4 +1,111 @@
-\section{Literature}
+\section{Literature}\label{sec:literature}
+
+
+\subsection{Core References: Isotropic and Anisotropic Smoothness Classes}\label{sec:lit:core}
+
+The following table summarizes the key references for the isotropic--anisotropic distinction that is central to this paper.
+
+\begin{center}
+\small
+\begin{tabular}{p{4.5cm}p{10.5cm}}
+\toprule
+\textbf{Reference} & \textbf{Contribution and relevance} \\
+\midrule
+\textcite{nikolskii_approximation_1975} &
+Foundational definition of Nikol'skii spaces, the classical anisotropic function classes. Smoothness is controlled per-coordinate via finite differences applied in each direction separately. The Nikol'skii class is inherently rectangular: it constrains each coordinate direction independently, with no coupling across directions. \\[6pt]
+
+\textcite{stone_optimal_1980} &
+Establishes minimax optimal rates for nonparametric regression under general smoothness conditions, including anisotropic classes with direction-dependent smoothness orders $(s_1, \ldots, s_d)$. The optimal rate involves the harmonic mean $\bar{s}$. Treats isotropic and anisotropic rates but does not discuss the geometric relationship (disk vs.\ rectangle) or the coupling interpretation. \\[6pt]
+
+\textcite{ibragimov_statistical_1981} &
+Foundational minimax estimation theory on anisotropic Nikol'skii classes for density estimation. Smoothness parameters, norm indices, and constants can vary across coordinate directions. Establishes the asymptotic framework for minimax estimation on rectangular function classes. \\[6pt]
+
+\textcite{donoho_geometrizing_1991} &
+Foundational framework for minimax estimation over convex function classes, connecting rates of convergence to the geometry of the function class. \commentT{Verify: does this paper discuss anisotropic classes or the constraint set geometry?} \\[6pt]
+
+\textcite{donoho_statistical_1994} &
+Establishes the modulus-of-continuity framework for exact minimax estimation. The minimax linear estimator optimally trades off bias against variance; the bias is governed by the support function of the constraint set. This is the key technical machinery for the present paper's minimax constant results. \\[6pt]
+
+\textcite{tsybakov_introduction_2009} &
+Standard textbook on minimax theory. Defines isotropic Hölder and Nikol'skii classes; develops minimax lower bounds (Chapter~2) and adaptation (Chapter~3). Does \emph{not} discuss anisotropic classes in detail, nor the geometric interpretation of constraint sets. Useful as a reference for the isotropic baseline. \\[6pt]
+
+\textcite{bertin_exact_2004} &
+Determines the \emph{exact} asymptotic minimax constant (not just the rate) for estimation in sup-norm over anisotropic Hölder classes in the Gaussian white noise model. Most directly relevant reference for computing $\mathfrak{R}^*_{\mathrm{aniso}}(M_x, M_z)$ and the ratio $\rho(M_x, M_z)$. \commentT{Priority: read carefully for the exact constant formula.} \\[6pt]
+
+\textcite{bhattacharya_anisotropic_2014} &
+Most explicit conceptual motivation for anisotropic classes found in the literature: ``the assumption of isotropy would lead to loss of efficiency which would be more and more accentuated in higher dimensions.'' Discusses multi-bandwidth Gaussian processes that adapt to anisotropic smoothness. Does not make the geometric/maximality argument of the present paper. \\[6pt]
+
+\textcite{hoffmann_random_2002} &
+Random normalizing factors for anisotropic regression. Shows that when a function depends on only a subset of coordinates, effective rates improve. Works with anisotropic Nikol'skii classes. \commentT{Verify: check for conceptual discussion of isotropy vs.\ anisotropy.} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+
+\subsection{Connection to Fréchet--Hoeffding Bounds in Copula Theory}\label{sec:lit:frechet}
+
+The maximality of the rectangle (\cref{prop:coupling_agnostic}) has a structural parallel in copula theory.
+Given marginal distributions $F_1$ and $F_2$, the set of all joint distributions with those marginals is the \emph{Fréchet class} $\mathcal{F}(F_1, F_2)$.
+The Fréchet--Hoeffding bounds \parencite[Chapter~2]{nelsen_introduction_2006} characterize the extremes of this class: the upper and lower bounds on the joint CDF given the marginals.
+The \emph{independence copula} $C(u,v) = uv$ --- the product of the marginals --- plays the role of ``no coupling'': it is the unique copula that imposes no dependence between the two variables.
+
+The analogy to the present setting is precise:
+\begin{center}
+\small
+\begin{tabular}{lll}
+\toprule
+& \textbf{Copula theory} & \textbf{Smoothness classes} \\
+\midrule
+Marginals & $F_1, F_2$ (marginal distributions) & $M_x, M_z$ (per-partial bounds) \\
+No coupling & Independence copula $C = uv$ & Rectangle $[-M_x, M_x] \times [-M_z, M_z]$ \\
+Coupling & Copula $C \neq uv$ & Convex $\mathcal{C} \subsetneq$ rectangle \\
+Maximal class & Fréchet class $\mathcal{F}(F_1, F_2)$ & Rectangle (Cartesian product of marginals) \\
+\bottomrule
+\end{tabular}
+\end{center}
+In both cases, the ``no coupling'' object is the Cartesian product of the marginal objects, and any departure from independence/no-coupling restricts the joint structure.
+The rectangle is to gradient constraint sets what the independence copula is to joint distributions: the unique maximal element consistent with the marginals that imposes no additional dependence structure.
+
+This analogy suggests that the present paper's results may generalize beyond gradient-constrained classes to any setting where a multivariate constraint is decomposable into marginal constraints, and the researcher must choose between imposing joint structure (coupling) or respecting marginal independence.
+
+
+\subsection{Novelty Assessment}\label{sec:lit:novelty}
+
+The result that the anisotropic (rectangular) class is the unique coupling-agnostic class (\cref{prop:coupling_agnostic}) --- and the characterization of isotropic classes as inherently imposing coupling (\cref{cor:iso_is_coupling}) --- appear to be absent from the existing literature.
+The nonparametric literature studies isotropic and anisotropic classes as separate objects, derives rates for each, and occasionally motivates anisotropic classes as ``more realistic'' \parencite{bhattacharya_anisotropic_2014}, but does not:
+\begin{enumerate}
+	\item formally state that the rectangle is maximal among convex sets with given marginal projections,
+	\item use the language of ``coupling'' to describe what the isotropic class imposes,
+	\item identify the isotropic class as never coupling-agnostic (the trilemma of \cref{cor:coupling_restricts,cor:iso_inflates,cor:iso_is_coupling}), or
+	\item draw the analogy to the Fréchet--Hoeffding bounds and the independence copula.
+\end{enumerate}
+The underlying mathematical ingredients (class nesting, monotonicity of minimax risk, support functions, Cartesian products of intervals) are elementary; the contribution is their synthesis into a characterization result and the identification that the standard default in nonparametric estimation silently imports a coupling assumption.
+
+\commentT{TO DO: Verify novelty against Donoho and Liu (1991), Korostelev and Korostelev (2011), Giné and Nickl (2016), and any other sources that discuss the geometry of smoothness classes in gradient space.}
+
+
+\subsection{Bias-Aware Inference and RDD}\label{sec:lit:rdd}
+
+\begin{itemize}
+	\item \textcite{armstrong_simple_2020}: Bias-aware inference using the modulus of continuity. Characterizes minimax optimal estimators for linear functionals under convex smoothness classes. Uses isotropic classes throughout. The present paper's technical core extends this framework to anisotropic (rectangular) constraint sets.
+	\item \textcite{imbens_optimized_2019}: Optimized RDD estimators using the operator norm constraint on the Hessian --- the isotropic (rotationally invariant) smoothness class at order~2. The present paper argues that replacing this with anisotropic per-partial bounds yields strictly better minimax constants.
+\end{itemize}
+
+
+\subsection{Additional References}\label{sec:lit:additional}
+
+\begin{itemize}
+	\item \textcite{donoho_geometrizing_1991}: Foundational framework connecting minimax rates to the geometry of function classes. \commentT{Check whether the disk vs.\ rectangle geometry is discussed.}
+	\item Korostelev and Korostelev (2011), \emph{Mathematical Statistics: Asymptotic Minimax Theory} --- textbook on minimax theory. \commentT{Check treatment of isotropic vs.\ anisotropic classes.}
+	\item Wasserman (2006), \emph{All of Nonparametric Statistics} --- widely used textbook. Uses isotropic classes as default. \commentT{Check whether anisotropic classes are mentioned.}
+	\item Giné and Nickl (2016), \emph{Mathematical Foundations of Infinite-Dimensional Statistical Models} --- comprehensive modern treatment. \commentT{Check chapters on Gaussian white noise model and smoothness classes for anisotropic discussion.}
+	\item Yang and Barron (1999), ``Information-Theoretic Determination of Minimax Rates of Convergence'' --- general minimax rate results using metric entropy. \commentT{Check treatment of constraint sets.}
+	\item Birgé (2001), ``An Alternative Point of View on Lepski's Method'' --- alternative approach to adaptive estimation. \commentT{Check for discussion of smoothness class choice.}
+	\item Cattaneo and Farrell (2013), ``Optimal Convergence Rates, Bahadur Representation, and Asymptotic Normality of Partitioning Estimators,'' \emph{Journal of Econometrics}, 174(2), 127--143. Partition-based nonparametric estimators achieve the same convergence rates as kernel estimators with simpler inference (independence across cells). Relevant for the segmented estimator's variance structure.
+\end{itemize}
+
+
+\subsection{Detailed Notes}\label{sec:lit:detailed}
 
 \begin{itemize}
 	\item \textcite{armstrong_simple_2020}
