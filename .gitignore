@@ -88,3 +88,6 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# Claude Code local state
+.claude/

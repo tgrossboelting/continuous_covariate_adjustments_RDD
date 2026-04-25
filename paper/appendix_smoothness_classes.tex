@@ -1,0 +1,197 @@
+\section{Classical Smoothness Classes}\label{sec:appendix:smoothness_classes}
+
+This appendix collects the definitions of four classical smoothness classes used in nonparametric estimation theory, stated for functions $f : \mathbb{R}^d \to \mathbb{R}$.
+The central distinction is between \emph{isotropic} classes, which couple smoothness across directions, and \emph{anisotropic} classes, which constrain each direction independently.
+The main text works with the anisotropic Lipschitz class (\cref{def:anisotropic}); the definitions below provide context for the broader landscape.
+
+The source of coupling in the isotropic Hölder and Sobolev classes is the multi-index: constraining all derivatives of total order $\abs{\alpha} = s$ jointly forces trade-offs between mixed and pure partial derivatives.
+The Nikol'skii and Besov classes avoid this by construction --- they are defined via finite differences applied in each coordinate direction separately, making them intrinsically anisotropic.
+
+Throughout, $\alpha = (\alpha_1, \ldots, \alpha_d)$ is a multi-index with $\abs{\alpha} = \alpha_1 + \cdots + \alpha_d$, and $D^\alpha f = \partial^{\abs{\alpha}} f / \partial x_1^{\alpha_1} \cdots \partial x_d^{\alpha_d}$.
+
+
+\subsection{Hölder / Lipschitz Classes}\label{sec:appendix:holder}
+
+The Hölder class generalizes Lipschitz continuity to higher orders by requiring the highest-order derivatives to satisfy a Hölder condition.
+
+\begin{definition}[Isotropic Hölder Class]\label{def:holder_iso}
+	Let $s > 0$ and write $s = \lfloor s \rfloor + \beta$ where $\lfloor s \rfloor \in \mathbb{N}_0$ and $0 < \beta \leq 1$.
+	The isotropic Hölder class with smoothness $s$ and constant $M > 0$ is
+	\begin{equation*}
+		\mathcal{H}^s(M) \defeq \Bigl\{ f \in C^{\lfloor s \rfloor}(\mathbb{R}^d) \;\Big|\; \abs{D^\alpha f(x) - D^\alpha f(y)} \leq M \norm{x - y}_2^\beta \;\;\forall\, x, y,\; \forall\, \abs{\alpha} = \lfloor s \rfloor \Bigr\}.
+	\end{equation*}
+\end{definition}
+
+The case $s = 1$ ($\lfloor s \rfloor = 0$, $\beta = 1$) gives the Lipschitz class: $\abs{f(x) - f(y)} \leq M \norm{x - y}_2$ for all $x, y$.
+
+\begin{definition}[Anisotropic Hölder Class]\label{def:holder_aniso}
+	Let $\mathbf{s} = (s_1, \ldots, s_d)$ with $s_j > 0$, and let $M_j > 0$ for each $j$.
+	Write $s_j = \lfloor s_j \rfloor + \beta_j$ with $0 < \beta_j \leq 1$.
+	The anisotropic Hölder class is
+	\begin{equation*}
+		\mathcal{H}^{\mathbf{s}}(M_1, \ldots, M_d) \defeq \Bigl\{ f \;\Big|\; \abs{D_j^{\lfloor s_j \rfloor} f(x) - D_j^{\lfloor s_j \rfloor} f(x + t e_j)} \leq M_j \abs{t}^{\beta_j} \;\;\forall\, x, t,\; j = 1, \ldots, d \Bigr\},
+	\end{equation*}
+	where $D_j^k$ denotes the $k$-th partial derivative with respect to coordinate $j$ and $e_j$ is the $j$-th standard basis vector.
+\end{definition}
+
+Each coordinate direction has its own smoothness order $s_j$ and constant $M_j$.
+Variation in direction $j$ is constrained independently of all other directions.
+The anisotropic class used in the main text (\cref{def:anisotropic}) is $\mathcal{H}^{(1,1)}(M_x, M_z)$.
+
+\paragraph{The Imbens--Wager smoothness class.}
+\textcite{imbens_optimized_2019} work with a second-order isotropic condition: for $X_i \in \mathbb{R}^k$, they assume
+\begin{equation*}
+	\norm{\nabla^2 \mu_w(x)}_{\mathrm{op}} \leq B, \qquad w \in \{0, 1\},
+\end{equation*}
+where $\norm{\cdot}_{\mathrm{op}}$ denotes the operator norm (largest absolute eigenvalue of the Hessian).
+This bounds the second directional derivative uniformly: $\abs{D_{\vec{v}}^2 \mu_w(x)} \leq B$ for all unit vectors $\vec{v}$ and all $x$.
+The operator norm constraint couples second-order variation across all directions --- curvature budget is fungible.
+
+\paragraph{The IW class as the natural agnostic envelope at order 2.}
+The operator norm is rotationally invariant: the eigenvalues of $H$ do not change under rotation of the coordinate system.
+This makes the IW class the proper analog of the gradient disk at order 1 --- it is the unique rotationally invariant constraint on the Hessian, and therefore the natural agnostic envelope when the researcher is uncertain about the orientation of the smoothness structure.
+
+The isotropic Hölder class $\mathcal{H}^2(M)$ also imposes coupling, but it is \emph{not} rotationally invariant.
+It constrains each row of the Hessian to have $\ell_2$ norm at most $M$: in $d = 2$, $f_{xx}^2 + f_{xz}^2 \leq M^2$ and $f_{xz}^2 + f_{zz}^2 \leq M^2$.
+This is a coordinate-dependent condition --- it changes under rotation of the axes.
+The IW class is strictly contained in the Hölder class with the same constant:
+\begin{equation*}
+	\{ f : \norm{\nabla^2 f}_{\mathrm{op}} \leq B \} \subsetneq \mathcal{H}^2(B),
+\end{equation*}
+since $\norm{H}_{\mathrm{op}} \leq B$ implies each row has $\ell_2$ norm at most $B$ (via $\norm{H e_j}_2 \leq \norm{H}_{\mathrm{op}}$), but the converse fails.
+The isotropic Hölder class is therefore a looser, coordinate-dependent envelope that pays more than rotation invariance requires; it is included here for completeness.
+
+At order $s = 1$, the distinction vanishes: the gradient norm constraint $\norm{\nabla f}_2 \leq M$ is both the isotropic Hölder class and the unique rotationally invariant constraint.
+
+\paragraph{The cost of agnosticism.}
+The primitive object is a rectangle in derivative space: the DGP has bounded partials with some side lengths.
+The researcher knows these side lengths but may not know which side aligns with which coordinate axis, and may not know whether or how the partials are coupled.
+To cover all possible orientations and coupling structures, the researcher takes the rotationally invariant envelope --- a disk (order 1) or the operator norm ball (order 2) --- with an \emph{inflated} radius.
+This is the agnostic class from \cref{sec:overview:epistemology}.
+
+The inflation is the cost of agnosticism:
+\begin{itemize}
+	\item At order 1: $\mathcal{F}_1^{\mathrm{aniso}}(M, M) \subsetneq \mathcal{F}_1^{\mathrm{iso}}(M\sqrt{2})$.
+	The constant inflates from $M$ to $M\sqrt{2}$.
+	\item At order 2: the anisotropic primitive $(B_x, B_z)$ inflates to an operator norm bound of $\sqrt{B_x^2 + B_z^2}$.
+\end{itemize}
+Both the first-order isotropic class and the IW class are the rotationally invariant agnostic envelopes at their respective orders, and both pay the same type of inflation cost.
+The inflated constant gives the adversary more room, increasing worst-case bias and minimax risk.
+
+Any information the researcher has about the coupling structure --- or about which direction is smoother --- allows moving from the inflated agnostic class back to the tighter primitive, reducing the constant and improving inference.
+This is the central message of \cref{sec:overview:epistemology}: the coupled class is the price of ignorance, and resolving that ignorance strictly helps.
+
+\paragraph{Order-independent structure.}
+The table below shows the isotropic and anisotropic classes at orders 1 and 2, with the estimator naturally paired with each order:
+\begin{center}
+\begin{tabular}{lccc}
+	\toprule
+	& \textbf{Isotropic (coupled)} & \textbf{Anisotropic (separated)} & \textbf{Estimator} \\
+	\midrule
+	\textbf{Order 1} & $\norm{\nabla f}_2 \leq M$ & $\abs{\partial f / \partial x} \leq M_x$, $\abs{\partial f / \partial z} \leq M_z$ & Local constant \\
+	\textbf{Order 2} & $\norm{\nabla^2 f}_{\mathrm{op}} \leq B$ & $\abs{\partial^2 f / \partial x^2} \leq B_x$, $\abs{\partial^2 f / \partial z^2} \leq B_z$ & Local linear \\
+	\bottomrule
+\end{tabular}
+\end{center}
+At order 1, the isotropic constraint forces the gradient into a disk; at order 2, it forces the Hessian eigenvalues into an interval.
+In both cases, the curvature budget is fungible across directions, and covariate adjustment cannot reduce worst-case bias.
+The anisotropic version fixes each direction's budget independently, enabling covariate adjustment at any order.
+
+Note that the anisotropic class at order 2 places no constraint on the cross-partial $\partial^2 f / \partial x \partial z$.
+This is the analog of the anisotropic Lipschitz class placing independent bounds on $\partial f / \partial x$ and $\partial f / \partial z$ without coupling them.
+
+
+\subsection{Sobolev Classes}\label{sec:appendix:sobolev}
+
+Sobolev classes replace the pointwise (sup-norm) control of Hölder classes with an integrated ($L^p$-norm) control.
+
+\begin{definition}[Isotropic Sobolev Class]\label{def:sobolev_iso}
+	Let $s \in \mathbb{N}$ and $1 \leq q \leq \infty$.
+	The isotropic Sobolev class is
+	\begin{equation*}
+		W^{s,q}(M) \defeq \Bigl\{ f \in L^q(\mathbb{R}^d) \;\Big|\; \norm{D^\alpha f}_{L^q} \leq M \;\;\forall\, \abs{\alpha} = s \Bigr\}.
+	\end{equation*}
+\end{definition}
+
+\begin{definition}[Anisotropic Sobolev Class]\label{def:sobolev_aniso}
+	Let $\mathbf{s} = (s_1, \ldots, s_d)$ with $s_j \in \mathbb{N}$, and let $1 \leq q \leq \infty$.
+	The anisotropic Sobolev class is
+	\begin{equation*}
+		W^{\mathbf{s}, q}(M_1, \ldots, M_d) \defeq \Bigl\{ f \in L^q(\mathbb{R}^d) \;\Big|\; \norm{D_j^{s_j} f}_{L^q} \leq M_j,\;\; j = 1, \ldots, d \Bigr\}.
+	\end{equation*}
+\end{definition}
+
+The isotropic class constrains all partial derivatives of total order $\abs{\alpha} = s$ jointly with one constant --- including mixed partials like $\partial^2 f / \partial x \partial z$ --- coupling smoothness across directions through the multi-index.
+The anisotropic class constrains only pure partials $D_j^{s_j} f$ in each direction, with no coupling.
+Sobolev classes are natural for $L^2$ estimation (mean integrated squared error); Hölder classes are natural for pointwise estimation and worst-case bias bounds.
+
+
+\subsection{Nikol'skii Classes}\label{sec:appendix:nikolskii}
+
+Nikol'skii classes \parencite{nikolskii_approximation_1975} are a variant of Sobolev classes that use $L^p$-norms of finite differences rather than derivatives, allowing non-integer smoothness orders.
+
+\begin{definition}[Anisotropic Nikol'skii Class]\label{def:nikolskii}
+	Let $\mathbf{s} = (s_1, \ldots, s_d)$ with $s_j > 0$, and let $1 \leq q \leq \infty$.
+	The $r$-th difference operator in direction $j$ with step $t$ is
+	\begin{equation*}
+		\Delta_{j,t}^r f(x) \defeq \sum_{k=0}^{r} \binom{r}{k} (-1)^{r-k} f(x + k t e_j).
+	\end{equation*}
+	The anisotropic Nikol'skii class is
+	\begin{equation*}
+		H_q^{\mathbf{s}}(M_1, \ldots, M_d) \defeq \Bigl\{ f \in L^q(\mathbb{R}^d) \;\Big|\; \norm{\Delta_{j,t}^{\lceil s_j \rceil} f}_{L^q} \leq M_j \abs{t}^{s_j} \;\;\forall\, t \in \mathbb{R},\; j = 1, \ldots, d \Bigr\}.
+	\end{equation*}
+\end{definition}
+
+Nikol'skii classes are intrinsically anisotropic: each coordinate direction has its own smoothness order $s_j$.
+When $q = \infty$, the Nikol'skii class coincides with the Hölder class for integer smoothness orders.
+The isotropic version is obtained by setting $s_1 = \cdots = s_d$ and $M_1 = \cdots = M_d$.
+
+
+\subsection{Besov Classes}\label{sec:appendix:besov}
+
+Besov classes refine Nikol'skii classes by adding a secondary integrability parameter that controls how the modulus of smoothness integrates across scales.
+
+\begin{definition}[Anisotropic Besov Class]\label{def:besov}
+	Let $\mathbf{s} = (s_1, \ldots, s_d)$ with $s_j > 0$, and let $1 \leq q, r \leq \infty$.
+	The anisotropic Besov class $B_{q,r}^{\mathbf{s}}$ consists of functions $f \in L^q(\mathbb{R}^d)$ such that for each $j = 1, \ldots, d$:
+	\begin{equation*}
+		\norm{f}_{B_{q,r}^{s_j}(j)} \defeq \begin{cases}
+			\displaystyle \left( \int_0^\infty \left[ \abs{t}^{-s_j} \norm{\Delta_{j,t}^{\lceil s_j \rceil} f}_{L^q} \right]^r \frac{dt}{\abs{t}} \right)^{1/r} & \text{if } r < \infty, \\[10pt]
+			\displaystyle \sup_{t \neq 0}\; \abs{t}^{-s_j} \norm{\Delta_{j,t}^{\lceil s_j \rceil} f}_{L^q} & \text{if } r = \infty,
+		\end{cases}
+	\end{equation*}
+	is finite and bounded by $M_j$.
+\end{definition}
+
+The parameter $r$ controls the integration of the modulus of smoothness across scales: $r = \infty$ recovers the Nikol'skii class, while smaller $r$ imposes more uniform smoothness across scales.
+For the isotropic version ($s_1 = \cdots = s_d$), mixed-smoothness Besov classes additionally allow cross-directional smoothness interactions.
+
+
+\subsection{Relationships and Embeddings}\label{sec:appendix:embeddings}
+
+The four classes are related by the following embeddings (stated for the isotropic case with matching parameters):
+
+\begin{center}
+\begin{tabular}{lcl}
+	$\mathcal{H}^s(M)$ & $\hookrightarrow$ & $H_\infty^s(M)$ \quad (Hölder $\subseteq$ Nikol'skii with $q = \infty$) \\[3pt]
+	$B_{\infty, \infty}^s$ & $=$ & $H_\infty^s$ \quad (Nikol'skii $=$ Besov with $r = \infty$, $q = \infty$) \\[3pt]
+	$W^{s,q}(M)$ & $\hookrightarrow$ & $B_{q,\infty}^s(M) = H_q^s(M)$ \quad (Sobolev $\subseteq$ Nikol'skii) \\[3pt]
+	$B_{q,r_1}^s$ & $\hookrightarrow$ & $B_{q,r_2}^s$ \quad for $r_1 \leq r_2$ \quad (smaller $r$ is more restrictive)
+\end{tabular}
+\end{center}
+
+In the anisotropic case, each of these embeddings holds coordinate-by-coordinate.
+
+\paragraph{Minimax rates.}
+\textcite{stone_optimal_1980} shows that the minimax rate for estimating $f$ at a point under anisotropic smoothness $\mathbf{s} = (s_1, \ldots, s_d)$ is
+\begin{equation}\label{eq:stone_rate}
+	n^{-2\bar{s}/(2\bar{s}+1)}, \qquad \text{where } \bar{s} = \left(\frac{1}{d} \sum_{j=1}^d \frac{1}{s_j}\right)^{-1} \text{ is the harmonic mean.}
+\end{equation}
+The minimax optimal estimator uses direction-dependent bandwidths $h_j \asymp n^{-1/(2\bar{s}+1)} \cdot s_j / \bar{s}$, forming a rectangular kernel neighborhood.
+Under the isotropic class ($s_1 = \cdots = s_d = s$), this reduces to $n^{-2s/(2s+d)}$ with a spherical neighborhood.
+
+\paragraph{Relevance for the present paper.}
+The main text works with anisotropic Lipschitz smoothness ($s_j = 1$ for all $j$, different constants $M_j$) applied to the RDD boundary functional rather than pointwise function estimation.
+The choice of Lipschitz (order 1) is driven by the local constant estimator.
+Higher-order analogs (using local polynomial estimators of order $p$) would work with anisotropic Hölder classes of order $p + 1$.
+The key insight --- that separating smoothness parameters across directions enables covariate adjustment while coupling them prevents it --- applies at all orders.

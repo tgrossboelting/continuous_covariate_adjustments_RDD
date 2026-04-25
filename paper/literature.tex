@@ -4,6 +4,58 @@
 	\item \textcite{armstrong_simple_2020}
 	\item Cattaneo and Farrell (2013), ``Optimal Convergence Rates, Bahadur Representation, and Asymptotic Normality of Partitioning Estimators,'' \emph{Journal of Econometrics}, 174(2), 127--143.
 	Partition-based nonparametric estimators achieve the same convergence rates as kernel estimators with simpler inference (independence across cells).
+	\item \textbf{Anisotropic smoothness classes in nonparametric estimation.}
+	The anisotropic Lipschitz/Sobolev classes used in this paper are instances of Nikol'skii classes \parencite{nikolskii_approximation_1975}, which allow independent smoothness control in each coordinate direction.
+	\textcite{stone_optimal_1980} establishes minimax optimal rates for nonparametric regression under general smoothness conditions, including anisotropic classes: with smoothness orders $(p_1, \ldots, p_d)$ in $d$ dimensions, the optimal rate is $n^{-2\bar{p}/(2\bar{p}+1)}$ where $\bar{p}$ is the harmonic mean of the $p_j$.
+	Under anisotropic smoothness, the minimax optimal estimator uses direction-dependent bandwidths (rectangular kernel neighborhoods rather than spherical ones).
+	This is well-established for function estimation and density estimation; see \textcite{tsybakov_introduction_2009} for a textbook treatment of minimax theory (though the anisotropic case is not covered in detail there --- the main results are in the original papers).
+	\textbf{Rates vs.\ constants.}
+	Two distinct improvements arise from using anisotropic classes.
+	First, when the smoothness \emph{orders} differ across directions ($s_x \neq s_z$), the minimax rate improves: the anisotropic rate $n^{-2/(2 + 1/s_1 + 1/s_2)}$ is faster than the isotropic rate $n^{-2s_{\min}/(2s_{\min}+d)}$ because the smoother direction does not drag the rate down to that of the roughest direction.
+	Second, when the smoothness orders are equal but the \emph{constants} differ ($M_x \neq M_z$), the rate is unchanged but the minimax risk is strictly lower --- tighter confidence intervals at the same rate.
+	The present paper focuses on the second case (same order, different constants), but the rate improvement under treatment effect homogeneity (\cref{sec:overview:applications}) involves the first.
+	\item \textbf{Adaptation to unknown smoothness.}
+	In the general nonparametric literature, \emph{adaptation} refers to achieving near-optimal rates without prior knowledge of the smoothness parameters.
+	\textcite{stone_optimal_1980} establishes the benchmark minimax rates; the adaptive estimation literature asks whether these rates can be attained when $(s_1, \ldots, s_d)$ are unknown.
+	Key contributions include Lepski's method (Lepski 1991, 1992) for bandwidth selection that adapts to unknown pointwise smoothness, and Lepski, Mammen, and Spokoiny (1997) who extend adaptive estimation to anisotropic classes, showing that direction-dependent bandwidth selection can achieve the anisotropic rate up to logarithmic factors.
+	Kerkyacharian, Lepski, and Picard (2001) study adaptive estimation over anisotropic Besov classes using wavelet methods.
+	The adaptation problem is distinct from the present paper's contribution: adaptation concerns unknown smoothness \emph{orders}, while this paper concerns the choice between coupled (isotropic) and separated (anisotropic) smoothness \emph{classes} with known parameters.
+	However, the two are related in an extreme case: when $s_z \gg s_x$, the isotropic class with $s = s_x$ treats the $z$-direction as if it were as rough as $x$, wasting the additional smoothness entirely.
+	Covariate adjustment via segmentation is a form of exploiting anisotropic structure --- it uses narrow segments in $z$ (small bandwidth in the smooth direction) and a standard bandwidth in $x$ (the rough direction), which is precisely the rectangular kernel neighborhood that the anisotropic minimax estimator uses.
+	In this sense, covariate adjustment in RDDs can be viewed as adaptation to anisotropic smoothness structure applied to the boundary functional.
+	\item \textbf{What is new in the present paper} is not the anisotropic class itself, but its application to the RDD treatment effect estimation problem.
+	The RDD setting has fundamentally different structure from standard function estimation: the target is a boundary functional (the jump at the cutoff), data are available only on one side in $x$, and the covariate $z$ is fully observed.
+	The connection between the choice of smoothness class and whether covariate adjustment can reduce asymptotic bias has not been made in the RDD literature.
+	\item \textbf{Broader implications for nonparametric estimation theory.}
+	Beyond the RDD application, the gradient-constrained class framework (\cref{def:gradient_class}) and the characterization of the isotropic class as the unique coupling-invariant class (\cref{prop:iso_envelope}) appear to be new contributions to nonparametric estimation theory.
+	Isotropic smoothness classes are the \emph{default} throughout nonparametric estimation: the standard minimax results (\textcite{stone_optimal_1980}; Donoho and Liu, 1991), textbook treatments (\textcite{tsybakov_introduction_2009}; Wasserman, 2006; Korostelev and Korostelev, 2011), bias-aware inference (\textcite{armstrong_simple_2020}), and virtually all applied nonparametric work in econometrics use isotropic Hölder or Sobolev classes.
+	The standard justification is that the researcher ``does not know which direction is smoother.''
+	As argued in \cref{sec:overview:epistemology}, this justification conflates two distinct types of ignorance: unknown directional magnitudes (which justifies equal bounds --- a square, not a disk) and unknown coupling (which alone justifies the disk).
+	The isotropic class silently imports a coupling assumption that is strictly stronger than directional symmetry, and this coupling has a quantifiable cost in minimax risk (\cref{prop:iso_envelope}).
+
+	This observation is relevant far beyond RDDs.
+	In kernel density estimation (spherical vs.\ rectangular kernels), nonparametric regression (isotropic vs.\ anisotropic bandwidth selection), and functional estimation more broadly, the isotropic class is used as a default without explicit justification of the coupling it imposes.
+	The proposition shows that for \emph{any} of these problems, replacing the isotropic class with the anisotropic class (or any other class with known coupling structure) yields a strict minimax improvement.
+	The improvement is quantifiable: in the symmetric case ($M_x = M_z = M$), the inflation from $M$ to $M\sqrt{2}$ translates directly into wider confidence intervals and higher worst-case MSE.
+
+	The existing nonparametric literature studies specific classes (isotropic Hölder, anisotropic Nikol'skii, etc.) and derives rates for each, but does not unify them into a single framework parameterized by the constraint set $\mathcal{C}$, nor does it characterize the disk as the unique worst case among all convex constraint sets.
+	The result that \emph{any} known coupling structure --- not just the anisotropic special case --- yields a strict minimax improvement over the isotropic class is, to the best of our knowledge, new.
+	The underlying mathematical ingredients (class nesting, monotonicity of minimax risk, support functions) are well-known; the contribution is their synthesis into a characterization theorem and the identification of the ``two types of ignorance'' that the isotropic class conflates.
+	\textbf{To do:} Verify that the ``two types of ignorance'' distinction and the characterization of the isotropic class as the unique coupling-invariant class are absent from the following references.
+	If confirmed, \cref{prop:iso_envelope} constitutes a standalone contribution to nonparametric estimation theory --- potentially publishable in a top statistics journal (Annals of Statistics, JRSS-B) --- with implications for any problem where isotropic smoothness is currently the default.
+	\begin{itemize}
+		\item \textcite{tsybakov_introduction_2009}, \emph{Introduction to Nonparametric Estimation} --- the standard textbook on minimax theory. Check all chapters on multivariate estimation and smoothness classes.
+		\item Donoho and Liu (1991), ``Geometrizing Rates of Convergence, II/III,'' \emph{Annals of Statistics} --- foundational framework for minimax estimation over convex classes. Check whether the disk is characterized as a special case.
+		\item Korostelev and Korostelev (2011), \emph{Mathematical Statistics: Asymptotic Minimax Theory} --- textbook on minimax theory. Check treatment of isotropic vs.\ anisotropic classes.
+		\item \textcite{stone_optimal_1980}, ``Optimal Rates of Convergence for Nonparametric Estimators'' --- establishes minimax rates for anisotropic classes. Check whether the coupling interpretation is discussed.
+		\item \textcite{nikolskii_approximation_1975}, \emph{Approximation of Functions of Several Variables and Imbedding Theorems} --- the classic reference for anisotropic function classes. Check whether the relationship to isotropic classes is characterized.
+		\item Lepski, Mammen, and Spokoiny (1997), ``Optimal Spatial Adaptation to Inhomogeneous Smoothness'' --- adaptive estimation under anisotropic smoothness. Check whether the coupling/agnosticism distinction appears.
+		\item Yang and Barron (1999), ``Information-Theoretic Determination of Minimax Rates of Convergence'' --- general minimax rate results. Check treatment of constraint sets.
+		\item Birgé (2001), ``An Alternative Point of View on Lepski's Method'' --- check for discussion of smoothness class choice.
+		\item Giné and Nickl (2016), \emph{Mathematical Foundations of Infinite-Dimensional Statistical Models} --- comprehensive modern treatment. Check chapters on Gaussian white noise model and smoothness classes.
+		\item Wasserman (2006), \emph{All of Nonparametric Statistics} --- widely used textbook. Check treatment of isotropic assumptions.
+	\end{itemize}
+	The Imbens--Wager (2019) optimized RD and Armstrong--Kolesár (2020) bias-aware inference both use isotropic/pooled smoothness classes, under which covariate adjustment is provably pointless (\cref{sec:overview:negative}).
 	\item \textbf{Kernel smoothing in $z$ vs.\ partition (note):} An alternative to the disjoint partition is to smooth over $z$ with overlapping kernel windows, targeting the same $\tau_w$.
 	In the minimax framework under anisotropic smoothness, this likely offers no rate improvement: the worst-case bias scales as bandwidth $\times$ Lipschitz constant in either case ($\delta \cdot M_z$ for partitions, $g \cdot M_z$ for kernels).
 	The partition estimator has the advantage of independence across segments, giving simple variance expressions.

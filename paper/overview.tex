@@ -66,20 +66,201 @@ This is the right framework for studying covariate adjustment: the smoothness of
 The anisotropic class respects this; the isotropic class does not.
 
 
-\subsection{Common Parameter Space}\label{sec:overview:common}
+\subsection{Coupled vs.\ Separated Smoothness: A Unifying Perspective}\label{sec:overview:epistemology}
 
-To formally compare the base RD and covariate-adjusted estimators, I construct a common parameter space that starts from the anisotropic primitives and adds a constraint on the conditional density:
+The distinction between coupled and separated smoothness classes is the central conceptual contribution of the paper.
+It applies both to the bivariate function $m(x,z)$ (2D setting) and to the pooled regression $\bar{m}(x)$ (1D setting).
+The same epistemological argument governs both.
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+& \textbf{Coupled} & \textbf{Separated} \\
+\midrule
+\textbf{2D} (bivariate $m(x,z)$) & Isotropic: $\norm{\nabla m}_2 \leq M$ & Anisotropic: $\abs{\partial m / \partial x} \leq M_x,\; \abs{\partial m / \partial z} \leq M_z$ \\
+\textbf{1D} (pooled $\bar{m}(x)$) & Pooled: $\abs{\bar{m}'(x)} \leq M_P$ & Component-wise: $M_x, M_z, L$ separately \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+In both rows, the coupled class bundles distinct sources of variation into a single bound.
+The separated class keeps them apart, preserving the directional structure that covariate adjustment exploits.
+The coupled class arises from the separated class by collapsing --- via the gradient norm in 2D, or via the triangle inequality and integration in 1D --- and this collapse is lossy.
+
+
+\subsubsection*{2D: Isotropic vs.\ Anisotropic}
+
+\paragraph{Two types of ignorance.}
+The standard justification for the isotropic class in the nonparametric literature is that the researcher ``does not know which direction is smoother.''
+This justification conflates two distinct types of ignorance:
+\begin{enumerate}
+	\item \textbf{Unknown directional magnitudes:} the researcher does not know whether $M_x > M_z$ or $M_x < M_z$.
+	\item \textbf{Unknown coupling:} the researcher does not know whether a large $\partial m / \partial x$ constrains the feasible values of $\partial m / \partial z$.
+\end{enumerate}
+The first type of ignorance --- not knowing which direction is smoother --- justifies setting equal bounds: $M_x = M_z = M$.
+This gives the anisotropic class $\mathcal{F}_1^{\mathrm{aniso}}(M, M)$, whose constraint set in gradient space is a \emph{square}.
+The square is symmetric across directions: it treats both coordinates identically.
+Crucially, it does \emph{not} couple the partial derivatives --- each bound holds independently.
+
+The isotropic class $\mathcal{F}_1^{\mathrm{iso}}(M)$ imposes more than directional symmetry: it constrains the gradient to lie in a \emph{disk}, which is strictly contained in the square.
+The disk couples the partial derivatives --- $(\partial m / \partial x)^2 + (\partial m / \partial z)^2 \leq M^2$ --- so that a large value of one partial forces a small value of the other.
+This coupling is an additional assumption beyond symmetry, and it is this coupling that makes the curvature budget fungible and renders covariate adjustment pointless (\cref{sec:overview:negative}).
+
+The distinction matters: a researcher who is ignorant about directional magnitudes but believes the partial derivatives are independent should use the square, not the disk.
+Only a researcher who additionally believes the partials \emph{may be coupled} --- and is completely agnostic about the form of that coupling --- needs the disk.
+
+\paragraph{The isotropic class as an envelope of coupled-partial classes.}
+To see why, consider the coupling question explicitly.
+Any specific coupling model defines a constraint set in gradient space: a rectangle (no coupling, anisotropic), a diamond ($\ell_1$ coupling: $\abs{\partial m / \partial x} + \abs{\partial m / \partial z} \leq C$), or some other convex shape.
+If the researcher \emph{knows} the coupling structure, the appropriate smoothness class is the corresponding coupled-partial class.
+For any fixed coupling, this class is strictly contained in the isotropic class --- and therefore yields tighter inference (\cref{prop:iso_envelope}).
+
+The isotropic class arises when the researcher is \emph{agnostic} about the coupling:
+\begin{enumerate}
+	\item the researcher believes there may or may not be coupling between the partial derivatives,
+	\item the researcher does not know the form or strength of any coupling, and
+	\item this uncertainty can vary locally across the domain --- at each point, the coupling structure may differ.
+\end{enumerate}
+Under all three conditions, the feasible gradient set at each point is the envelope of all possible coupling structures consistent with the researcher's bounds.
+This envelope is a disk of radius $\sqrt{M_x^2 + M_z^2}$, recovering the isotropic class $\mathcal{F}_1^{\mathrm{iso}}(\sqrt{M_x^2 + M_z^2})$.
+Because the isotropic class contains every coupled-partial class (including the anisotropic class as the special case of no coupling), it represents maximal ignorance about the coupling structure.
+
+The cost of this agnosticism is the inflation from $M$ to $M\sqrt{2}$ (in the symmetric case): the disk of radius $M\sqrt{2}$ circumscribes the square of side $2M$.
+This inflation gives the adversary strictly more room, increasing worst-case bias and minimax risk.
+Any information about the coupling --- including the information that there is no coupling --- allows the researcher to shrink back from the inflated disk to a tighter class and recover the lost precision.
+
+\paragraph{Any resolved coupling beats the isotropic class.}
+The following proposition formalizes this claim.
+
+\begin{definition}[Gradient-constrained smoothness class]\label{def:gradient_class}
+	Let $\mathcal{C} \subset \mathbb{R}^2$ be a compact, convex set containing the origin.
+	The gradient-constrained smoothness class induced by $\mathcal{C}$ is
+	\begin{equation*}
+		\mathcal{F}(\mathcal{C}) \defeq \bigl\{ f : \mathbb{R}^2 \to \mathbb{R} \;\big|\; \nabla f(x,z) \in \mathcal{C} \;\; \text{for all } (x,z) \bigr\}.
+	\end{equation*}
+\end{definition}
+
+This definition nests all classes considered above.
+The isotropic class corresponds to $\mathcal{C} = B_2(R)$ (the disk of radius $R$), the anisotropic class to $\mathcal{C} = [-M_x, M_x] \times [-M_z, M_z]$ (a rectangle), and any coupling model to the appropriate convex shape.
+
+\begin{proposition}[The isotropic class is the unique coupling-invariant class]\label{prop:iso_envelope}
+	Let $R > 0$ and let $B_2(R) = \{ v \in \mathbb{R}^2 : \norm{v}_2 \leq R \}$.
+	\begin{enumerate}
+		\item \textbf{(Envelope.)} The isotropic class is the envelope of all coupled-partial classes with bounded gradient magnitude:
+		\begin{equation*}
+			\mathcal{F}(B_2(R)) = \bigcup \bigl\{ \mathcal{F}(\mathcal{C}) : \mathcal{C} \subseteq B_2(R),\; \mathcal{C} \text{ compact, convex, } 0 \in \mathcal{C} \bigr\}.
+		\end{equation*}
+		\item \textbf{(Strict improvement.)} For any compact convex $\mathcal{C} \subsetneq B_2(R)$ with $0 \in \mathcal{C}$ and nonempty interior:
+		\begin{equation*}
+			\min_{\hat\tau \in \mathcal{L}} \sup_{f \in \mathcal{F}(\mathcal{C})} \mathrm{MSE}(\hat\tau, f) \;<\; \min_{\hat\tau \in \mathcal{L}} \sup_{f \in \mathcal{F}(B_2(R))} \mathrm{MSE}(\hat\tau, f).
+		\end{equation*}
+	\end{enumerate}
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+	\emph{Part 1.}
+	The inclusion $\supseteq$ is immediate: for any $\mathcal{C} \subseteq B_2(R)$, $\mathcal{F}(\mathcal{C}) \subseteq \mathcal{F}(B_2(R))$.
+	For $\subseteq$: take any $f \in \mathcal{F}(B_2(R))$.
+	At each point $(x,z)$, $\nabla f(x,z)$ is a single vector in $B_2(R)$.
+	Set $\mathcal{C} = \{ \nabla f(x,z) : (x,z) \in \mathbb{R}^2 \}$, the image of the gradient map.
+	Its closed convex hull is a compact convex subset of $B_2(R)$, so $f \in \mathcal{F}(\overline{\mathrm{conv}}(\mathcal{C}))$, which appears in the union.
+
+	\emph{Part 2.}
+	The weak inequality $\leq$ follows from $\mathcal{F}(\mathcal{C}) \subsetneq \mathcal{F}(B_2(R))$ and monotonicity of minimax risk in the function class.
+	For strict inequality, it suffices to show that the worst-case bias is strictly lower over $\mathcal{F}(\mathcal{C})$ than over $\mathcal{F}(B_2(R))$.
+
+	Since $\mathcal{C} \subsetneq B_2(R)$ is compact and convex with nonempty interior, there exists a direction $\vec{v} \in \mathbb{R}^2$ with $\norm{\vec{v}}_2 = 1$ such that
+	\begin{equation*}
+		\sup_{g \in \mathcal{C}} \langle g, \vec{v} \rangle = h_{\mathcal{C}}(\vec{v}) < R = h_{B_2(R)}(\vec{v}),
+	\end{equation*}
+	where $h_{\mathcal{C}}$ denotes the support function of $\mathcal{C}$.
+	The support function gives the maximal directional derivative: for any $f \in \mathcal{F}(\mathcal{C})$, the directional derivative along $\vec{v}$ satisfies $D_{\vec{v}} f \leq h_{\mathcal{C}}(\vec{v}) < R$.
+
+	The worst-case bias of a linear estimator $\hat\tau$ over $\mathcal{F}(\mathcal{C})$ depends on the worst-case function, which maximizes the bias by concentrating its gradient in the direction that the estimator is most sensitive to.
+	Under $\mathcal{F}(B_2(R))$, the adversary can always achieve directional derivative $R$ in any direction.
+	Under $\mathcal{F}(\mathcal{C})$, at least one direction is strictly constrained: $h_{\mathcal{C}}(\vec{v}) < R$.
+	The minimax estimator over $\mathcal{F}(\mathcal{C})$ can exploit this directional heterogeneity --- either by orienting its weight structure to be most sensitive in the less-constrained directions, or by using information (e.g., segmentation) to neutralize the constrained direction.
+	In either case, the minimax estimator over $\mathcal{F}(\mathcal{C})$ achieves a strictly lower worst-case MSE than the minimax estimator over $\mathcal{F}(B_2(R))$, which cannot exploit any directional structure because the disk is rotationally symmetric.
+\end{proof}
+
+The proposition says: \emph{the isotropic class is the unique smoothness class that carries no information about the coupling structure.}
+Any departure from complete agnosticism --- in any direction, by any amount --- strictly reduces minimax risk and enables tighter inference.
+The anisotropic class, the $\ell_1$ class, and any other coupled-partial class are all special cases.
+
+\paragraph{Scope beyond RDD.}
+\Cref{def:gradient_class} and \cref{prop:iso_envelope} are stated for general gradient-constrained smoothness classes and make no reference to the RDD setting.
+Isotropic smoothness classes are the default throughout nonparametric estimation: the foundational minimax results \parencite{stone_optimal_1980}, standard textbook treatments \parencite{tsybakov_introduction_2009}, bias-aware inference \parencite{armstrong_simple_2020}, and virtually all applied nonparametric work in econometrics use isotropic Hölder or Sobolev classes.
+In each of these settings, the isotropic class silently imports the coupling assumption identified above --- and the ``two types of ignorance'' distinction (\cref{sec:overview:epistemology}) applies with full force.
+
+The proposition implies that for \emph{any} nonparametric estimation problem --- density estimation, regression function estimation, functional estimation --- replacing the isotropic class with a class that reflects known (or assumed) independence of the partial derivatives yields a strict minimax improvement.
+The improvement is quantifiable: in the symmetric case, the inflation from $M$ to $M\sqrt{2}$ translates directly into wider confidence intervals and higher worst-case MSE.
+This is not a small correction: the $\sqrt{2}$ factor enters the leading bias term, and the MSE scales with the square of the bias.
+
+The nonparametric literature has studied specific smoothness classes --- isotropic Hölder/Sobolev and anisotropic Nikol'skii/Besov (\cref{sec:appendix:smoothness_classes}) --- but does not unify them into a single framework parameterized by the constraint set $\mathcal{C}$, nor does it identify the isotropic class as the unique worst case arising from coupling agnosticism.
+The proposition fills this gap: it characterizes exactly what the isotropic assumption costs and what any departure from it buys.
+
+\paragraph{High-dimensional implications.}
+The cost of the isotropic assumption grows with the dimension $d$.
+In $\mathbb{R}^d$, the isotropic class constrains the gradient to lie in a $d$-dimensional ball of radius $R$; the anisotropic class constrains it to a $d$-dimensional box $[-M_1, M_1] \times \cdots \times [-M_d, M_d]$.
+In the symmetric case ($M_j = M$ for all $j$), the ball of radius $M\sqrt{d}$ circumscribes the box of side $2M$.
+The inflation factor is $\sqrt{d}$, which enters the leading bias term: for $d = 100$, this is a factor of $10$ in worst-case bias and potentially two orders of magnitude in worst-case MSE.
+Part of what the literature calls the ``curse of dimensionality'' under isotropic smoothness is therefore self-inflicted: the adversary exploits fungibility across $d$ directions, concentrating curvature in whichever direction the estimator is most sensitive to.
+Under the anisotropic class, the minimax estimator uses direction-dependent bandwidths that neutralize this reallocation, and the effective dimensionality may be lower if some directions are smoother than others.
+
+In nonparametric estimation, the connection to anisotropic classes is already explicit for some estimators.
+Wavelet estimators have been analyzed under anisotropic Besov classes, where they achieve adaptive minimax rates with direction-dependent resolution levels (Kerkyacharian, Lepski, and Picard, 2001).
+Kernel estimators with product kernels use direction-dependent bandwidths, which corresponds to rectangular neighborhoods in gradient space --- the anisotropic class.
+In both cases, the estimators exploit the separated structure of the anisotropic class to avoid the fungibility cost of the isotropic class.
+
+\paragraph{The anisotropic class as the natural default.}
+The anisotropic class corresponds to no coupling: the partial derivatives are independently bounded.
+This is the natural default when the researcher has no reason to believe that smoothness in $x$ constrains smoothness in $z$.
+In the RDD context, the running variable $X$ and the covariate $Z$ play fundamentally different roles --- the smoothness of $m$ in $x$ (the treatment assignment direction) has no obvious connection to its smoothness in $z$ (a predetermined characteristic).
+Absent a specific economic model that predicts coupling, independent bounds are the appropriate assumption.
+The isotropic class is justified only under complete agnosticism about coupling --- and even then, any resolution of that agnosticism leads to a class that enables tighter inference.
+
+
+\subsubsection*{1D: Pooled vs.\ Component-wise}
+
+The same logic applies when the bivariate function $m(x,z)$ is collapsed into the pooled regression $\bar{m}(x) = \int m(x,z) f_{Z|X}(z|x)\, dz$ by integrating over $Z$.
+
+\paragraph{The pooled class.}
+Standard RD inference (e.g., RDHonest, Armstrong and Kolesár 2020) places a single bound on the pooled derivative: $\abs{\bar{m}'(x)} \leq M_P$.
+This bundles three distinct sources of variation into one number:
 \begin{equation*}
-	\mathcal{F}^R(M_x, M_z, L) \defeq \Bigl\{ (m, f_{Z|X}) \;\Big|\; \abs{\partial m / \partial x} \leq M_x,\; \abs{\partial m / \partial z} \leq M_z,\; f_{Z|X} \text{ satisfies smoothness bound } L \Bigr\}.
+	\bar{m}'(x) = \underbrace{\int \frac{\partial m}{\partial x}(x,z)\, f(z|x)\, dz}_{\text{smoothing (bounded by } M_x\text{)}} + \underbrace{\int m(x,z)\, \frac{\partial f}{\partial x}(z|x)\, dz}_{\text{compositional (depends on } M_z, L\text{)}}.
 \end{equation*}
-The pooled bound $M_P$ is a \emph{derived} quantity, obtained via the triangle inequality applied to $\bar{m}'(x) = \int \frac{\partial m}{\partial x} f\, dz + \int m \frac{\partial f}{\partial x}\, dz$:
+The bound $M_P$ merges the smoothing contribution ($M_x$), the covariate variation ($M_z$), and the density variation ($L$) into a single opaque constant.
+The curvature budget is fungible: the adversary can allocate $M_P$ across sources however it wants, and the researcher cannot distinguish what fraction of $M_P$ is ``real'' smoothness vs.\ compositional variation vs.\ density effects.
+
+\paragraph{The component-wise class.}
+The separated approach states each belief directly:
+\begin{equation*}
+	\mathcal{F}^{\mathrm{cw}}(M_x, M_z, L) \defeq \Bigl\{ (m, f_{Z|X}) \;\Big|\; \abs{\partial m / \partial x} \leq M_x,\; \abs{\partial m / \partial z} \leq M_z,\; f_{Z|X} \text{ satisfies smoothness bound } L \Bigr\}.
+\end{equation*}
+The pooled bound $M_P$ is a \emph{derived} quantity, obtained via the triangle inequality:
 \begin{equation*}
 	M_P \leq M_x + \text{(compositional term depending on $M_z$ and $L$)}.
 \end{equation*}
-This parallels the construction $M_P = M_L + C_{\Delta m} L$ in the discrete groups setting.
+This parallels $M_P = M_L + C_{\Delta m} L$ in the discrete groups setting.
+
+\paragraph{Epistemological parallel.}
+The pooled class relates to the component-wise class exactly as the isotropic class relates to the anisotropic class:
+\begin{itemize}
+	\item The pooled class arises from the component-wise class by collapsing --- applying the triangle inequality to merge the separate bounds into $M_P$.
+	This collapse is lossy: it introduces fungibility across sources.
+	\item The pooled class is justified only if the researcher genuinely cannot distinguish the separate contributions --- i.e., if the allocation of $M_P$ across smoothing, compositional, and density channels is itself uncertain.
+	\item In practice, the researcher typically has separate knowledge about each source: the smoothness of outcomes ($M_x, M_z$) is distinct from the variation of the covariate distribution ($L$).
+	Collapsing them into $M_P$ discards this structure for no substantive reason.
+\end{itemize}
+
+The component-wise class is therefore the \emph{primitive}: it directly represents the researcher's beliefs about each component.
+The pooled class is a derived, coarsened version that loses information.
+This is why the ``common parameter space'' in the groups paper is not an ad hoc construction --- it is the natural starting point from which the pooled bound $M_P$ is derived.
+
 
 \paragraph{Asymmetric role of the density constraint.}
-The density constraint $L$ enters the common parameter space only because the base RD needs it: its bias depends on the pooled regression $\bar{m}(x) = \int m(x,z) f_{Z|X}(z|x)\, dz$, whose derivative involves the compositional term $\int m(x,z) \frac{\partial f}{\partial x}(z|x)\, dz$.
+The density constraint $L$ enters the component-wise class only because the base RD needs it: its bias depends on $\bar{m}(x)$, whose derivative involves the compositional term.
 Without a bound on how the density varies with $x$, the base RD's worst-case bias is unbounded.
 
 The covariate-adjusted estimator, by contrast, does not need the density constraint at all.
@@ -92,7 +273,7 @@ The density plays no role.
 This contrasts sharply with the base RD, whose bias depends on the inflated $M_P(M_x, M_z, L)$.
 The comparison is therefore asymmetric: the density constraint is a burden only for the pooled approach.
 
-This also eliminates the weight estimation bias term $h_z^p L C_{\Delta\tau} B_{p,q}^{int} / p!$ that appears in the groups paper (Proposition~3) from estimating $\hat{g}(c) = f_{Z|X}(1|c)$.
+This also eliminates the weight estimation bias term that appears in the groups paper (Proposition~3) from estimating $\hat{g}(c) = f_{Z|X}(1|c)$.
 With known weights, that entire source of bias vanishes.
 
 
