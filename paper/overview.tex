@@ -1,10 +1,252 @@
 \section{Overview: Smoothness Classes and Covariate Adjustment}\label{sec:overview}
 
-This section presents the central theoretical argument of the paper.
-The choice of smoothness class determines whether covariate adjustment can reduce worst-case bias in regression discontinuity designs.
-I establish a general negative result under isotropic (pooled) smoothness and contrast it with the positive results obtainable under anisotropic (separated) smoothness.
-The discrete groups setting and the continuous covariate setting are then developed as two applications of this principle.
+\subsection{Conceptual Framework: Gradient Constraints and the Geometry of Smoothness}\label{sec:overview:framework}
 
+\paragraph{Primitive bounds.}
+The starting point is a bivariate regression function $m(x,z)$ with bounded partial derivatives:
+\begin{equation*}
+	\abs*{\frac{\partial m}{\partial x}} \leq M_x, \qquad \abs*{\frac{\partial m}{\partial z}} \leq M_z.
+\end{equation*}
+These bounds come from separate substantive reasoning about each direction: $M_x$ and $M_z$ represent the researcher's assumed maximal partial derivatives of the conditional expectation in the $x$- and $z$-directions respectively.
+In gradient space $(\partial m / \partial x,\, \partial m / \partial z) \in \mathbb{R}^2$, these bounds define a \emph{rectangle} $[-M_x, M_x] \times [-M_z, M_z]$.
+The rectangle imposes no coupling between the partial derivatives --- each bound holds independently.
+This is the primitive information available to the researcher: per-partial bounds, nothing more.
+
+
+\paragraph{Coupling is additional information.}
+A coupling between the partial derivatives is a constraint that links them: knowing the value of $\partial m / \partial x$ restricts the feasible values of $\partial m / \partial z$, and vice versa.
+A \emph{linear} coupling takes the form $a \cdot \partial m / \partial x + b \cdot \partial m / \partial z \leq c$, forms a rotated and smaller rectangle inscribed in the original axis-aligned rectangle, producing a smaller set. \commentT{This needs revision.}
+A \emph{nonlinear} coupling --- such as the quadratic constraint $(\partial m / \partial x)^2 + (\partial m / \partial z)^2 \leq R^2$ defining a disk --- can produce other shapes.
+In all cases, the constraint set $\mathcal{C}$ must be \emph{convex} for the induced function class $\mathcal{F}(\mathcal{C}) = \{ f : \nabla f(x,z) \in \mathcal{C} \text{ for all } (x,z) \}$ to form a coherent smoothness class.
+The reason is fundamental: a smoothness class must be closed under convex combinations of functions.
+If $f, g \in \mathcal{F}(\mathcal{C})$, then $\nabla(\lambda f + (1-\lambda)g) = \lambda \nabla f + (1-\lambda) \nabla g$, and this convex combination of gradients lies in $\mathcal{C}$ if and only if $\mathcal{C}$ is convex.
+A non-convex constraint set would admit two ``smooth'' functions whose average is not smooth --- contradicting any reasonable notion of smoothness and breaking the minimax machinery that relies on convexity of the function class.
+
+Crucially, any coupling --- linear or nonlinear, as long as it respects the marginal bounds $M_x$ and $M_z$ --- produces a convex set $\mathcal{C}$ that is a \emph{subset} of the rectangle.
+This is immediate: if $\mathcal{C}$ has marginal projections contained in $[-M_x, M_x]$ and $[-M_z, M_z]$, then every point $(u, v) \in \mathcal{C}$ satisfies $\abs{u} \leq M_x$ and $\abs{v} \leq M_z$, so $(u, v) \in [-M_x, M_x] \times [-M_z, M_z]$.
+The rectangle is maximal: it is the largest convex set consistent with the primitive per-partial bounds.
+Adding coupling information can only shrink the constraint set below the rectangle, never enlarge it.
+
+This means that coupling is \emph{additional} information beyond the primitives --- it restricts the function class further.
+Such information is available only in specific models where the DGP implies a structural link between the partial derivatives.
+In most applications --- including density estimation, conditional expectation estimation, and the RDD setting --- the researcher has no substantive reason to impose coupling, and the rectangle is the appropriate constraint set.
+
+
+\paragraph{The inscribed isotropic class imposes unwarranted coupling.}
+The isotropic Lipschitz class $\mathcal{F}_1^{\mathrm{iso}}(M)$ constrains the gradient to lie in a disk of radius $M$:
+\begin{equation*}
+	\left(\frac{\partial m}{\partial x}\right)^2 + \left(\frac{\partial m}{\partial z}\right)^2 \leq M^2.
+\end{equation*}
+This disk is \emph{inscribed} in the rectangle $[-M, M]^2$: it is a strict subset ($B_2(M) \subsetneq [-M, M]^2$).
+The $\ell_2$ constraint couples the partial derivatives --- if one partial is large, the other must be small.
+This coupling is additional information beyond the primitive per-partial bounds, and it restricts the function class.
+
+In practice, this coupling is rarely justified.
+It would require a substantive argument that the smoothness of $m$ in $x$ constrains its smoothness in $z$, which is difficult to defend for most data-generating processes in standard applications such as density estimation or nonparametric regression. Only specific models, with strong theoretical justification, might justify such a coupling.
+The inscribed isotropic class is therefore \emph{too small}: it excludes functions that are consistent with the researcher's primitive bounds.
+
+
+\paragraph{The circumscribing isotropic class inflates the primitive bounds.}
+One might argue that the isotropic class is intended to be ``agnostic'' --- it does not privilege any direction and should therefore contain all functions satisfying the primitive bounds. Further, it is agnostic about whether or not coupling might be present.
+But for an isotropic class to contain the rectangle, the no coupling class, the disk must \emph{circumscribe} it:
+\begin{equation*}
+	[-M_x, M_x] \times [-M_z, M_z] \;\subseteq\; B_2\!\bigl(\sqrt{M_x^2 + M_z^2}\bigr).
+\end{equation*}
+This circumscribing disk has radius $R = \sqrt{M_x^2 + M_z^2}$, which is strictly larger than both $M_x$ and $M_z$.
+In the symmetric case ($M_x = M_z = M$), the radius is $M\sqrt{2}$ --- the hypotenuse of the square, not the side length.
+
+The problem is now clear: the circumscribing disk allows each partial derivative to take values up to $R = \sqrt{M_x^2 + M_z^2}$, when the researcher \emph{knows} the bounds are $M_x$ and $M_z$ respectively.
+The ``agnostic'' isotropic class secretly inflates the primitive bounds from the side lengths of the rectangle to the diameter of the circumscribing disk.
+This inflation is the price of forcing a rotationally symmetric constraint set to contain the rectangle.
+It is not agnosticism about coupling --- it is destruction of the primitive per-partial information.
+
+
+\paragraph{The anisotropic class is the true coupling-agnostic class.}
+The anisotropic class $\mathcal{F}_1^{\mathrm{aniso}}(M_x, M_z)$ uses exactly the primitive per-partial bounds and imposes no coupling.
+It is the unique class that:
+\begin{enumerate}
+	\item respects the researcher's primitive information ($\abs{\partial m / \partial x} \leq M_x$, $\abs{\partial m / \partial z} \leq M_z$) without inflating it, and
+	\item is agnostic about coupling --- it neither imposes nor rules out any coupling structure.
+\end{enumerate}
+Neither isotropic class achieves both properties.
+The inscribed isotropic class ($B_2(M) \subsetneq [-M_x, M_x] \times [-M_z, M_z]$) satisfies (2) in a vacuous sense --- it does not impose coupling beyond the $\ell_2$ constraint --- but fails (1): it excludes functions consistent with the primitives.
+The circumscribing isotropic class ($[-M_x, M_x] \times [-M_z, M_z] \subsetneq B_2(\sqrt{M_x^2 + M_z^2})$) contains the primitives but fails (2): it inflates the bounds, admitting functions that violate the researcher's per-partial information.
+
+The rectangle is therefore the correct starting point.
+The following definitions and proposition formalize this argument.
+
+
+\subsubsection{The Anisotropic Class as the Coupling-Agnostic Class}\label{sec:overview:coupling_agnostic}
+
+\begin{definition}[Primitive-consistent constraint set]\label{def:primitive_consistent}
+	Let $M_x, M_z > 0$.
+	A set $\mathcal{C} \subset \mathbb{R}^2$ is \emph{primitive-consistent} with bounds $(M_x, M_z)$ if $\mathcal{C}$ is compact, convex, contains the origin, and satisfies: for all $(u, v) \in \mathcal{C}$, $\abs{u} \leq M_x$ and $\abs{v} \leq M_z$.
+\end{definition}
+
+Primitive-consistency captures the minimal requirement that the constraint set respects the researcher's per-partial bounds.
+Any coupling --- linear, nonlinear, or $\ell_2$ --- that does not violate the marginal bounds $M_x$ and $M_z$ produces a primitive-consistent set.
+
+\begin{definition}[Coupling-agnostic constraint set]\label{def:coupling_agnostic}
+	A primitive-consistent set $\mathcal{C}$ is \emph{coupling-agnostic} with respect to bounds $(M_x, M_z)$ if it is maximal: there is no primitive-consistent $\mathcal{C}' \supsetneq \mathcal{C}$.
+\end{definition}
+
+A coupling-agnostic set imposes no restriction beyond the primitive per-partial bounds.
+Any strict subset of a coupling-agnostic set introduces a coupling --- an additional constraint linking the partial derivatives that is not implied by the marginal bounds alone.
+
+\begin{proposition}[The rectangle is the unique coupling-agnostic class]\label{prop:coupling_agnostic}
+	For any $M_x, M_z > 0$, the rectangle $[-M_x, M_x] \times [-M_z, M_z]$ is the unique coupling-agnostic constraint set with respect to bounds $(M_x, M_z)$.
+\end{proposition}
+
+\begin{proof}
+	The rectangle is primitive-consistent: it is compact, convex, contains the origin, and every $(u, v) \in [-M_x, M_x] \times [-M_z, M_z]$ satisfies $\abs{u} \leq M_x$ and $\abs{v} \leq M_z$ by construction.
+
+	For maximality, let $\mathcal{C}$ be any primitive-consistent set with respect to $(M_x, M_z)$.
+	Take any $(u, v) \in \mathcal{C}$.
+	By primitive-consistency, $\abs{u} \leq M_x$ and $\abs{v} \leq M_z$, so $(u, v) \in [-M_x, M_x] \times [-M_z, M_z]$.
+	Since $(u, v)$ was arbitrary, $\mathcal{C} \subseteq [-M_x, M_x] \times [-M_z, M_z]$.
+	The rectangle contains every primitive-consistent set, so it is the unique maximal element.
+\end{proof}
+
+
+\begin{corollary}[Coupling restricts]\label{cor:coupling_restricts}
+	Any primitive-consistent $\mathcal{C} \subsetneq [-M_x, M_x] \times [-M_z, M_z]$ imposes coupling: the induced function class satisfies $\mathcal{F}(\mathcal{C}) \subsetneq \mathcal{F}_1^{\mathrm{aniso}}(M_x, M_z)$.
+	This includes the inscribed isotropic class $\mathcal{F}_1^{\mathrm{iso}}(M)$ with $M \leq \min(M_x, M_z)$.
+\end{corollary}
+
+\begin{corollary}[Agnostic isotropic classes inflate]\label{cor:iso_inflates}
+	If an isotropic class $\mathcal{F}_1^{\mathrm{iso}}(R)$ contains the anisotropic class $\mathcal{F}_1^{\mathrm{aniso}}(M_x, M_z)$ --- that is, $[-M_x, M_x] \times [-M_z, M_z] \subseteq B_2(R)$ --- then $R \geq \sqrt{M_x^2 + M_z^2} > \max(M_x, M_z)$.
+	The isotropic class admits per-partial derivatives up to $R$, strictly exceeding the primitive bounds.
+	The coupling-agnostic class with these inflated bounds is the larger rectangle $[-R, R]^2 \supsetneq B_2(R)$, not the disk.
+\end{corollary}
+
+\begin{proof}
+	For $[-M_x, M_x] \times [-M_z, M_z] \subseteq B_2(R)$, the corners $(\pm M_x, \pm M_z)$ must lie in $B_2(R)$, so $M_x^2 + M_z^2 \leq R^2$, giving $R \geq \sqrt{M_x^2 + M_z^2} > \max(M_x, M_z)$.
+	The marginal projections of $B_2(R)$ are $[-R, R]$ on each axis, so $B_2(R)$ admits per-partial derivatives up to $R$.
+	By \cref{prop:coupling_agnostic}, the coupling-agnostic class with bounds $(R, R)$ is $[-R, R]^2$, which strictly contains $B_2(R)$.
+\end{proof}
+
+\begin{corollary}[Isotropic classes inherently impose coupling]\label{cor:iso_is_coupling}
+	For any $R > 0$, the isotropic class $\mathcal{F}_1^{\mathrm{iso}}(R)$ is a strict coupling subclass of its own agnostic envelope:
+	\begin{equation*}
+		B_2(R) \subsetneq [-R, R]^2.
+	\end{equation*}
+	The disk $B_2(R)$ is primitive-consistent with bounds $(R, R)$ but is not coupling-agnostic.
+	Therefore, every isotropic class inherently imposes coupling between the partial derivatives, regardless of the choice of $R$.
+\end{corollary}
+
+\begin{proof}
+	The disk $B_2(R)$ has marginal projections $[-R, R]$ on each axis, so it is primitive-consistent with bounds $(R, R)$.
+	By \cref{prop:coupling_agnostic}, the unique coupling-agnostic set with bounds $(R, R)$ is $[-R, R]^2$.
+	Since $B_2(R) \subsetneq [-R, R]^2$ (the point $(R, R)$ is in the rectangle but not the disk), the isotropic class is a strict subset of the coupling-agnostic class with the same marginal bounds.
+\end{proof}
+
+\bigskip
+
+The three corollaries expose the trilemma facing the isotropic class: it either imposes coupling (\cref{cor:coupling_restricts}), inflates the primitive bounds (\cref{cor:iso_inflates}), or both.
+In all cases, the isotropic class is never coupling-agnostic (\cref{cor:iso_is_coupling}).
+The anisotropic rectangle is the unique class that respects the primitive per-partial bounds without imposing or destroying information.
+
+The magnitude of the cost of using the circumscribing isotropic class instead is determined by the ratio of the minimax constants over the two classes, which is the subject of the next subsection.
+
+
+\subsection{The Technical Core: Support Functions and Minimax Constants}\label{sec:overview:technical_core}
+
+The preceding results establish that the anisotropic rectangle is the unique coupling-agnostic class and that any isotropic class either restricts or inflates relative to the primitives.
+The technical core of the paper makes this precise at the level of minimax risk.
+
+The geometry of the constraint set $\mathcal{C}$ enters the minimax problem through its \emph{support function}:
+\begin{equation*}
+	h_{\mathcal{C}}(v) = \sup\bigl\{ \langle u, v \rangle : u \in \mathcal{C} \bigr\}, \qquad v \in \mathbb{R}^2.
+\end{equation*}
+The support function gives the worst-case directional derivative: for any $f \in \mathcal{F}(\mathcal{C})$, the directional derivative along $v$ satisfies $D_v f \leq h_{\mathcal{C}}(v)$.
+For the rectangle, $h(v) = M_x \abs{v_1} + M_z \abs{v_2}$; for the disk of radius $R$, $h(v) = R \norm{v}_2$.
+
+The minimax risk for pointwise estimation over the isotropic Lipschitz class $\mathcal{F}(B_2(R))$ with constant $R = \sqrt{M_x^2 + M_z^2}$ is a classical result in nonparametric estimation theory.
+The exact asymptotic minimax MSE constant is characterized in \textcite{tsybakov_introduction_2009} (Chapter~2, for general Hölder classes) and, for the specific bias-variance tradeoff relevant to boundary estimation, in \textcite{donoho_statistical_1994}.
+Denote this constant by $\mathfrak{R}^*_{\mathrm{iso}}(M_x, M_z)$; it depends on $M_x$ and $M_z$ only through $R = \sqrt{M_x^2 + M_z^2}$.
+
+The central question is: what is the corresponding minimax constant $\mathfrak{R}^*_{\mathrm{aniso}}(M_x, M_z)$ over the anisotropic class $\mathcal{F}([-M_x, M_x] \times [-M_z, M_z])$?
+Because the rectangle is a strict subset of the disk,
+\begin{equation*}
+	\mathfrak{R}^*_{\mathrm{aniso}}(M_x, M_z) \;\leq\; \mathfrak{R}^*_{\mathrm{iso}}(M_x, M_z),
+\end{equation*}
+and the paper's technical core is to show that this inequality is \emph{strict} and to characterize the ratio
+\begin{equation*}
+	\rho(M_x, M_z) \;\defeq\; \frac{\mathfrak{R}^*_{\mathrm{iso}}(M_x, M_z)}{\mathfrak{R}^*_{\mathrm{aniso}}(M_x, M_z)} \;>\; 1.
+\end{equation*}
+This ratio is the cost of using the inflated isotropic class instead of the coupling-agnostic anisotropic class: the factor by which the minimax risk increases when the researcher uses the isotropic class instead of the anisotropic class.
+It depends on the geometry of $\mathcal{C}$ through the support function $h_{\mathcal{C}}$.
+
+The support function enters the minimax problem because it governs the worst-case directional derivative: for any $f \in \mathcal{F}(\mathcal{C})$, the directional derivative along $v$ satisfies $D_v f \leq h_{\mathcal{C}}(v)$.
+For the rectangle, $h(v) = M_x \abs{v_1} + M_z \abs{v_2}$; for the disk of radius $R$, $h(v) = R \norm{v}_2$.
+Following the modulus-of-continuity framework of \textcite{donoho_statistical_1994} and \textcite{armstrong_simple_2020}, the minimax linear estimator optimally trades off bias (governed by $h_{\mathcal{C}}$) against variance, and the exact asymptotic MSE constant is a functional of $h_{\mathcal{C}}$.
+
+\paragraph{What remains to be proved.}
+The maximality of the rectangle and the coupling characterization of isotropic classes are established in \cref{prop:coupling_agnostic,cor:coupling_restricts,cor:iso_inflates,cor:iso_is_coupling}.
+The following results require the minimax machinery.
+\begin{enumerate}
+	\item \textbf{Minimax constant for the anisotropic class.} Compute $\mathfrak{R}^*_{\mathrm{aniso}}(M_x, M_z)$ --- the exact asymptotic minimax MSE over $\mathcal{F}([-M_x, M_x] \times [-M_z, M_z])$.
+	The isotropic constant $\mathfrak{R}^*_{\mathrm{iso}}$ is known (see \textcite{tsybakov_introduction_2009}, Chapter~2; \textcite{donoho_statistical_1994}).
+	\item \textbf{Strict inequality.} Show that $\rho(M_x, M_z) > 1$ whenever both $M_x > 0$ and $M_z > 0$.
+	\item \textbf{Characterize the ratio.} Express $\rho(M_x, M_z)$ as an explicit function of $M_x$ and $M_z$ (or equivalently, of the support functions $h_{\mathrm{rect}}$ and $h_{\mathrm{disk}}$).
+	\item \textbf{Generalization to arbitrary convex $\mathcal{C}$.} For any compact convex $\mathcal{C}$ with $\mathcal{C} \subseteq [-M_x, M_x] \times [-M_z, M_z]$ (coupling subclass) or $[-M_x, M_x] \times [-M_z, M_z] \subseteq \mathcal{C} \subseteq B_2(R)$ (inflated class), the minimax constant $\mathfrak{R}^*(\mathcal{C})$ is monotone in $\mathcal{C}$ with respect to set inclusion, with strict monotonicity when the inclusions are strict.
+	This covers coupling subclasses (rotated rectangles, diamonds, ellipses inscribed in the rectangle) as well as inflated classes (circumscribing disk).
+	\item \textbf{Optimized RDD implementation.} Feed the anisotropic rectangular constraint into the Imbens--Wager / Armstrong--Kolesár weight optimization problem (replacing the isotropic gradient norm / operator norm constraint) and compute the resulting minimax optimal weights, worst-case MSE, and confidence intervals.
+	Compare to the standard isotropic solution on empirical RDD datasets to quantify the CI width reduction.
+\end{enumerate}
+
+
+\subsection{Application to Functionals: Optimized RDD}\label{sec:overview:functionals}
+
+The minimax risk reduction from using the anisotropic class is not limited to pointwise estimation of $m(x,z)$ --- it propagates to any functional defined on the function class.
+This is directly relevant for optimized regression discontinuity designs.
+
+In the framework of \textcite{imbens_optimized_2019}, the researcher estimates a weighted average treatment effect $\tau_w = \int \tau(c, z)\, w(z)\, dz$ using a linear estimator whose weights are chosen to minimize worst-case MSE over the smoothness class.
+The optimal weights, the worst-case risk, and the resulting confidence intervals all depend on the smoothness class through the support function $h_{\mathcal{C}}$.
+When the smoothness class is the isotropic disk, the curvature budget is fungible and the adversary can concentrate all variation in whichever direction the estimator is most sensitive to.
+When the smoothness class is the anisotropic rectangle, the budget is locked to each direction independently, and the minimax estimator exploits this directional structure.
+
+The practical consequence is that optimized RDD procedures (minimax MSE estimators, bias-aware confidence intervals) deliver \emph{shorter confidence intervals} and \emph{lower worst-case MSE} when computed over the anisotropic class rather than the isotropic class --- without any change in the data, the estimator, or the target parameter.
+The improvement comes entirely from correctly specifying the geometry of the smoothness class.
+
+
+\subsection{Connection to Covariate Adjustment}\label{sec:overview:covariate_adjustment}
+
+Covariate adjustment in RDD is the mechanism by which the researcher moves from the isotropic class to the anisotropic class in practice.
+Standard RD inference ignores the covariate $Z$ and works with the pooled regression $\bar{m}(x) = \E[Y \mid X = x]$.
+The smoothness of $\bar{m}$ bundles contributions from the $x$-direction (direct smoothness) and the $z$-direction (compositional variation through the covariate distribution).
+This bundling is exactly the fungibility that the isotropic class allows: the adversary can exploit both channels.
+
+By conditioning on $Z$ --- either through stratification (discrete $Z$) or segmentation (continuous $Z$) --- the researcher separates these channels.
+The covariate-adjusted estimator's worst-case risk depends on $M_x$ (the direct smoothness in $x$) and $M_z$ (the smoothness in $z$, which contributes only residual within-segment variation).
+The $M_z$ budget can no longer be redirected into the $x$-direction.
+This is the operational content of the anisotropic class: separating the curvature budget across directions.
+
+
+\subsection{Two Regression-Based Estimators}\label{sec:overview:estimators}
+
+The framework admits two natural estimator classes, each corresponding to a different smoothness order and a different local polynomial degree.
+
+\paragraph{Local constant estimator (order 1).}
+The smoothness class is the first-order anisotropic Lipschitz class: $\abs{\partial m / \partial x} \leq M_x$, $\abs{\partial m / \partial z} \leq M_z$.
+The gradient constraint set is the rectangle $[-M_x, M_x] \times [-M_z, M_z]$.
+The isotropic envelope is the gradient norm constraint $\norm{\nabla m}_2 \leq \sqrt{M_x^2 + M_z^2}$.
+The minimax constant over the rectangle, $\mathfrak{R}^*_{\mathrm{aniso}}(M_x, M_z)$, is strictly smaller than the known isotropic constant $\mathfrak{R}^*_{\mathrm{iso}}(M_x, M_z)$, and the ratio $\rho(M_x, M_z)$ quantifies the cost of using the isotropic class.
+The details of the worst-case risk comparison and the optimal bandwidth/segment-width tradeoff are developed in subsequent sections.
+
+\paragraph{Local linear estimator (order 2).}
+The smoothness class is the second-order anisotropic class: $\abs{\partial^2 m / \partial x^2} \leq B_x$, $\abs{\partial^2 m / \partial z^2} \leq B_z$.
+The isotropic envelope is the operator norm constraint $\norm{\nabla^2 m}_{\mathrm{op}} \leq B$ used by \textcite{imbens_optimized_2019}.
+The same inscription argument applies: the rectangle of second partials must be inscribed in the operator norm ball, and the ratio of the corresponding minimax constants is the cost of agnosticism at order 2.
+The local linear estimator with direction-dependent bandwidths exploits the anisotropic structure to achieve a strictly better minimax constant.
+The details are left for a companion section.
+
+\bigskip
+\noindent\rule{\textwidth}{0.4pt}
+\bigskip
+
+
+The remainder of this section develops the argument in detail: the general principle, the negative result under isotropic smoothness, the positive result under anisotropic smoothness, and the formal results.
 
 \subsection{The General Principle}\label{sec:overview:principle}
 
@@ -22,7 +264,7 @@ First, it places the analysis directly in the framework of optimized RD designs,
 Second, it eliminates the need to estimate the conditional density $f_{Z|X}(z|c)$: the covariate-adjusted estimator averages segment-specific estimates $\hat\tau_j$ with \emph{known} weights $w_j$, requiring no density estimation.
 By contrast, the base RD estimator implicitly targets $\bar{m}(x) = \int m(x,z) f_{Z|X}(z|x)\, dz$, whose bias inherently depends on the density through the compositional channel.
 
-The question is: \emph{under what conditions on the smoothness of $m(x,z)$ can covariate adjustment reduce worst-case bias?}
+The question is: \emph{under what conditions on the smoothness of $m(x,z)$ can covariate adjustment reduce worst-case risk?}
 
 
 \subsection{Negative Result: Isotropic / Pooled Smoothness}\label{sec:overview:negative}
@@ -37,7 +279,7 @@ $\abs{\bar{m}'(x)} \leq M_P$.
 Under either formulation, the curvature budget is \emph{fungible} across directions.
 Any estimator that controls for $Z$ --- thereby becoming insensitive to $z$-variation --- simply prompts the worst-case function to reallocate its entire curvature budget to the $x$-direction.
 The worst-case function sets $\partial m / \partial z = 0$ and $\partial m / \partial x = M$, which does not vary in $z$ at all.
-Against such a function, the $Z$-information is useless, and the worst-case bias equals that of the base RD estimator.
+Against such a function, the $Z$-information is useless, and the worst-case risk equals that of the base RD estimator.
 
 \begin{theorem}[Informal: Covariate Adjustment is Pointless under Isotropic Smoothness]\label{thm:negative_informal}
 	Under the isotropic Lipschitz class $\mathcal{F}_1^{\mathrm{iso}}(M)$, for any linear estimator $\hat\tau$ that may depend on $(Y_i, X_i, Z_i)$:
@@ -45,7 +287,7 @@ Against such a function, the $Z$-information is useless, and the worst-case bias
 		\wcb(\hat\tau, \mathcal{F}_1^{\mathrm{iso}}(M)) \geq \wcb(\hat\tau^*_{\mathrm{base}}, \mathcal{F}_1^{\mathrm{iso}}(M)),
 	\end{equation*}
 	where $\hat\tau^*_{\mathrm{base}}$ is the minimax optimal base RD estimator that ignores $Z$.
-	No covariate-adjusted estimator can achieve lower worst-case bias.
+	No covariate-adjusted estimator can achieve lower worst-case risk.
 \end{theorem}
 
 The proof follows from constructing the worst-case function: for any estimator $\hat\tau$, the adversary chooses $f^*(x,z) = M \cdot x$ (or the appropriate worst-case profile in $x$ alone), which is constant in $z$.
@@ -59,8 +301,8 @@ Under the anisotropic class, smoothness in each direction is bounded separately:
 	\abs*{\frac{\partial m}{\partial x}} \leq M_x, \qquad \abs*{\frac{\partial m}{\partial z}} \leq M_z.
 \end{equation*}
 The $M_z$ budget \emph{cannot} be redirected into the $x$-direction.
-When covariate adjustment neutralizes the $z$-channel of the bias, the $M_z$ budget is stranded: it can only generate residual bias proportional to the resolution of the adjustment (segment width $\delta$ or kernel bandwidth $g$), which is small.
-The worst-case bias of the adjusted estimator therefore depends primarily on $M_x$, yielding a strict improvement over the base RD whenever $M_z > 0$ and the compositional channel is active.
+When covariate adjustment neutralizes the $z$-channel, the $M_z$ budget is stranded: it can only generate residual variation proportional to the resolution of the adjustment (segment width $\delta$ or kernel bandwidth $g$), which is small.
+The worst-case risk of the adjusted estimator therefore depends primarily on $M_x$, yielding a strict improvement over the base RD whenever $M_z > 0$ and the compositional channel is active.
 
 This is the right framework for studying covariate adjustment: the smoothness of $m$ in $x$ is a property of the data-generating process that should not respond to the researcher's estimation strategy.
 The anisotropic class respects this; the isotropic class does not.
@@ -126,7 +368,7 @@ This envelope is a disk of radius $\sqrt{M_x^2 + M_z^2}$, recovering the isotrop
 Because the isotropic class contains every coupled-partial class (including the anisotropic class as the special case of no coupling), it represents maximal ignorance about the coupling structure.
 
 The cost of this agnosticism is the inflation from $M$ to $M\sqrt{2}$ (in the symmetric case): the disk of radius $M\sqrt{2}$ circumscribes the square of side $2M$.
-This inflation gives the adversary strictly more room, increasing worst-case bias and minimax risk.
+This inflation gives the adversary strictly more room, increasing minimax risk.
 Any information about the coupling --- including the information that there is no coupling --- allows the researcher to shrink back from the inflated disk to a tighter class and recover the lost precision.
 
 \paragraph{Any resolved coupling beats the isotropic class.}
@@ -167,7 +409,7 @@ The isotropic class corresponds to $\mathcal{C} = B_2(R)$ (the disk of radius $R
 
 	\emph{Part 2.}
 	The weak inequality $\leq$ follows from $\mathcal{F}(\mathcal{C}) \subsetneq \mathcal{F}(B_2(R))$ and monotonicity of minimax risk in the function class.
-	For strict inequality, it suffices to show that the worst-case bias is strictly lower over $\mathcal{F}(\mathcal{C})$ than over $\mathcal{F}(B_2(R))$.
+	For strict inequality, it suffices to show that the worst-case risk is strictly lower over $\mathcal{F}(\mathcal{C})$ than over $\mathcal{F}(B_2(R))$.
 
 	Since $\mathcal{C} \subsetneq B_2(R)$ is compact and convex with nonempty interior, there exists a direction $\vec{v} \in \mathbb{R}^2$ with $\norm{\vec{v}}_2 = 1$ such that
 	\begin{equation*}
@@ -176,7 +418,7 @@ The isotropic class corresponds to $\mathcal{C} = B_2(R)$ (the disk of radius $R
 	where $h_{\mathcal{C}}$ denotes the support function of $\mathcal{C}$.
 	The support function gives the maximal directional derivative: for any $f \in \mathcal{F}(\mathcal{C})$, the directional derivative along $\vec{v}$ satisfies $D_{\vec{v}} f \leq h_{\mathcal{C}}(\vec{v}) < R$.
 
-	The worst-case bias of a linear estimator $\hat\tau$ over $\mathcal{F}(\mathcal{C})$ depends on the worst-case function, which maximizes the bias by concentrating its gradient in the direction that the estimator is most sensitive to.
+	The worst-case risk of a linear estimator $\hat\tau$ over $\mathcal{F}(\mathcal{C})$ depends on the worst-case function, which maximizes the risk by concentrating its gradient in the direction that the estimator is most sensitive to.
 	Under $\mathcal{F}(B_2(R))$, the adversary can always achieve directional derivative $R$ in any direction.
 	Under $\mathcal{F}(\mathcal{C})$, at least one direction is strictly constrained: $h_{\mathcal{C}}(\vec{v}) < R$.
 	The minimax estimator over $\mathcal{F}(\mathcal{C})$ can exploit this directional heterogeneity --- either by orienting its weight structure to be most sensitive in the less-constrained directions, or by using information (e.g., segmentation) to neutralize the constrained direction.
@@ -194,7 +436,7 @@ In each of these settings, the isotropic class silently imports the coupling ass
 
 The proposition implies that for \emph{any} nonparametric estimation problem --- density estimation, regression function estimation, functional estimation --- replacing the isotropic class with a class that reflects known (or assumed) independence of the partial derivatives yields a strict minimax improvement.
 The improvement is quantifiable: in the symmetric case, the inflation from $M$ to $M\sqrt{2}$ translates directly into wider confidence intervals and higher worst-case MSE.
-This is not a small correction: the $\sqrt{2}$ factor enters the leading bias term, and the MSE scales with the square of the bias.
+This is not a small correction: the ratio of minimax constants $\rho(M_x, M_z)$ enters the worst-case MSE directly.
 
 The nonparametric literature has studied specific smoothness classes --- isotropic Hölder/Sobolev and anisotropic Nikol'skii/Besov (\cref{sec:appendix:smoothness_classes}) --- but does not unify them into a single framework parameterized by the constraint set $\mathcal{C}$, nor does it identify the isotropic class as the unique worst case arising from coupling agnosticism.
 The proposition fills this gap: it characterizes exactly what the isotropic assumption costs and what any departure from it buys.
@@ -203,7 +445,7 @@ The proposition fills this gap: it characterizes exactly what the isotropic assu
 The cost of the isotropic assumption grows with the dimension $d$.
 In $\mathbb{R}^d$, the isotropic class constrains the gradient to lie in a $d$-dimensional ball of radius $R$; the anisotropic class constrains it to a $d$-dimensional box $[-M_1, M_1] \times \cdots \times [-M_d, M_d]$.
 In the symmetric case ($M_j = M$ for all $j$), the ball of radius $M\sqrt{d}$ circumscribes the box of side $2M$.
-The inflation factor is $\sqrt{d}$, which enters the leading bias term: for $d = 100$, this is a factor of $10$ in worst-case bias and potentially two orders of magnitude in worst-case MSE.
+The inflation factor is $\sqrt{d}$, which enters the worst-case risk: for $d = 100$, this translates to potentially two orders of magnitude in worst-case MSE.
 Part of what the literature calls the ``curse of dimensionality'' under isotropic smoothness is therefore self-inflicted: the adversary exploits fungibility across $d$ directions, concentrating curvature in whichever direction the estimator is most sensitive to.
 Under the anisotropic class, the minimax estimator uses direction-dependent bandwidths that neutralize this reallocation, and the effective dimensionality may be lower if some directions are smoother than others.
 
@@ -260,17 +502,17 @@ This is why the ``common parameter space'' in the groups paper is not an ad hoc 
 
 
 \paragraph{Asymmetric role of the density constraint.}
-The density constraint $L$ enters the component-wise class only because the base RD needs it: its bias depends on $\bar{m}(x)$, whose derivative involves the compositional term.
-Without a bound on how the density varies with $x$, the base RD's worst-case bias is unbounded.
+The density constraint $L$ enters the component-wise class only because the base RD needs it: its risk depends on $\bar{m}(x)$, whose derivative involves the compositional term.
+Without a bound on how the density varies with $x$, the base RD's worst-case risk is unbounded.
 
 The covariate-adjusted estimator, by contrast, does not need the density constraint at all.
 Because the target parameter $\tau_w = \int \tau(c,z)\, w(z)\, dz$ uses researcher-chosen weights $w(z)$, the segmented estimator averages $\hat\tau_j$ with known weights --- no density estimation required.
-Its worst-case bias depends only on the anisotropic primitives:
+Its worst-case risk depends only on the anisotropic primitives:
 \begin{equation*}
 	\wcb(\hat\tau_{\mathrm{seg}}) \sim M_x \cdot h + M_z \cdot \delta.
 \end{equation*}
 The density plays no role.
-This contrasts sharply with the base RD, whose bias depends on the inflated $M_P(M_x, M_z, L)$.
+This contrasts sharply with the base RD, whose risk depends on the inflated $M_P(M_x, M_z, L)$.
 The comparison is therefore asymmetric: the density constraint is a burden only for the pooled approach.
 
 This also eliminates the weight estimation bias term that appears in the groups paper (Proposition~3) from estimating $\hat{g}(c) = f_{Z|X}(1|c)$.
@@ -294,7 +536,7 @@ The minimax risk over the anisotropic class is strictly lower than over the corr
 	\min_{\hat\tau \in \mathcal{L}} \sup_{f \in \mathcal{F}_{\mathrm{aniso}}(M, M)} \mathrm{MSE}(\hat\tau, f) \;<\; \min_{\hat\tau \in \mathcal{L}} \sup_{f \in \mathcal{F}_{\mathrm{iso}}(M\sqrt{2})} \mathrm{MSE}(\hat\tau, f).
 \end{equation*}
 The weak inequality follows from Result~1 (monotonicity of minimax risk in the function class).
-The strict inequality follows because the anisotropic class has directional structure that the minimax estimator can exploit: segmentation (or a similar mechanism) reduces worst-case bias by stranding the $M_z$ budget, which is impossible under the isotropic class due to fungibility (\cref{sec:overview:negative}).
+The strict inequality follows because the anisotropic class has directional structure that the minimax estimator can exploit: segmentation (or a similar mechanism) reduces worst-case risk by stranding the $M_z$ budget, which is impossible under the isotropic class due to fungibility (\cref{sec:overview:negative}).
 
 \paragraph{Result 3: Quantifying the minimax risk reduction.}
 The MSE reduction from using the anisotropic class can be characterized explicitly.
@@ -305,15 +547,14 @@ The MSE reduction from using the anisotropic class can be characterized explicit
 	\begin{equation*}
 		\min_{\hat\tau \in \mathcal{L}} \sup_{f \in \mathcal{F}_{\mathrm{aniso}}} \mathrm{MSE}(\hat\tau, f) \;\leq\; \sup_{f \in \mathcal{F}_{\mathrm{aniso}}} \mathrm{MSE}(\hat\tau_{\mathrm{seg}}, f).
 	\end{equation*}
-	The right-hand side is computable: the worst-case bias is $\wcb(\hat\tau_{\mathrm{seg}}) \sim M_x \cdot h + M_z \cdot \delta$ and the variance follows from within-segment estimation with independent segments.
+	The right-hand side is computable: the worst-case risk follows from $\wcb(\hat\tau_{\mathrm{seg}}) \sim M_x \cdot h + M_z \cdot \delta$ and the variance from within-segment estimation with independent segments.
 
 	\item \emph{Lower bound on iso minimax risk.}
 	The minimax risk over $\mathcal{F}_{\mathrm{iso}}(M\sqrt{2})$ is characterized by Armstrong and Kolesár (2020) and Imbens and Wager (2019).
-	The worst-case bias scales with $M\sqrt{2}$ in the leading term.
+	The worst-case risk scales with $\sqrt{M_x^2 + M_z^2}$ in the smoothness constant.
 
 	\item \emph{The gap.}
-	With $M_x = M_z = M$, the isotropic worst-case bias scales with $M\sqrt{2}$ while the segmented estimator's bias scales with $M$ in the dominant ($x$-direction) term.
-	This gives a factor of $\sqrt{2}$ reduction in the leading bias, translating to a quantifiable MSE improvement.
+	The ratio of minimax risks $\rho(M_x, M_z) = \mathfrak{R}^*_{\mathrm{iso}}(M_x, M_z) / \mathfrak{R}^*_{\mathrm{aniso}}(M_x, M_z) > 1$ quantifies the MSE reduction from using the anisotropic class.
 
 	More generally, for $M_x \neq M_z$, the reduction depends on the ratio $M_z / M_x$:
 	\begin{equation*}
@@ -333,9 +574,9 @@ Results~1--3 are conceptually important but technically light: the nesting, orde
 The following results require genuine technical work.
 
 \paragraph{General negative theorem (formal).}
-The informal \cref{thm:negative_informal} must be made rigorous: for \emph{any} linear estimator $\hat\tau = \sum_i w_i(X_i, Z_i) Y_i$ whose weights may depend on $Z$, the worst-case bias over $\mathcal{F}_1^{\mathrm{iso}}(M)$ is at least as large as the worst-case bias of the minimax optimal base RD estimator that ignores $Z$.
+The informal \cref{thm:negative_informal} must be made rigorous: for \emph{any} linear estimator $\hat\tau = \sum_i w_i(X_i, Z_i) Y_i$ whose weights may depend on $Z$, the worst-case risk over $\mathcal{F}_1^{\mathrm{iso}}(M)$ is at least as large as the worst-case risk of the minimax optimal base RD estimator that ignores $Z$.
 The difficulty is that the worst-case function depends on the weight structure --- one must show that the adversary can \emph{always} concentrate curvature in $x$ regardless of how cleverly the estimator exploits $Z$-information.
-This requires constructing, for each weight vector $w$, a function $f^* \in \mathcal{F}_1^{\mathrm{iso}}(M)$ that is constant in $z$ and achieves the maximal bias.
+This requires constructing, for each weight vector $w$, a function $f^* \in \mathcal{F}_1^{\mathrm{iso}}(M)$ that is constant in $z$ and achieves the maximal risk.
 This is a clean, quotable result: \emph{under isotropic smoothness, covariate adjustment is provably pointless for any linear estimator}.
 
 \paragraph{Modulus of continuity under the anisotropic class.}
