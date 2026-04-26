@@ -1,0 +1,41 @@
+\section*{To Do}\label{sec:todo}
+
+\begin{enumerate}
+
+	\item \textbf{Reach out to Armstrong and/or Kolesár.}
+	Connections: Christoph Rothe (supervisor) has worked with Kolesár; PGP (supervisor) has worked with Armstrong; Soonwoo Kwon (coauthor) has worked with Kolesár.
+	Show them the coupling-agnosticism result (Proposition + corollaries) and the connection to their modulus-of-continuity framework.
+	Ask whether the modulus computation for anisotropic constraint sets is tractable, and explore cooperation.
+
+	\item \textbf{Show that AK 2018 Appendix~B.1's $\mathcal{H}_y$ class is implicitly pooled/isotropic.}
+	The pooled regression function $\bar{m}(x) = \int m(x,z) f(z|x)\, dz$ has its derivative bounded by a single scalar $C_y$, which is fungible across the direct channel ($\partial m / \partial x$) and the compositional channel (through $\partial f / \partial x$).
+	Show formally that the anisotropic parameterization (separate $M_x$, $M_z$ plus density smoothness) yields a strictly smaller modulus $\omega(\delta; \mathcal{F}_{\mathrm{aniso}}) < \omega(\delta; \mathcal{H}_y)$, and hence strictly shorter CIs.
+	This is the central applied result connecting the Proposition to the AK framework.
+
+	\item \textbf{Compute the modulus of continuity for $\mathcal{F}(\mathcal{C}_{\mathrm{rect}})$ and $\mathcal{F}(\mathcal{C}_{\mathrm{disk}})$.}
+	The ratio $\omega(\delta; \mathcal{F}_{\mathrm{iso}}) / \omega(\delta; \mathcal{F}_{\mathrm{aniso}})$ gives the quantitative gain $\rho(M_x, M_z)$.
+	Three routes: (1) direct optimization over function spaces, (2) support function representation (most promising), (3) Gaussian white noise equivalence via \textcite{bertin_exact_2004}.
+
+	\item \textbf{Read \textcite{bertin_exact_2004} carefully.}
+	Exact asymptotic minimax constants for anisotropic Hölder classes.
+	Extract the formula for $\mathfrak{R}^*_{\mathrm{aniso}}(M_x, M_z)$.
+
+	\item \textbf{Derive multivariate bias formula and optimal weights.}
+	Generalize the univariate RDD formulas of \textcite{armstrong_optimal_2018} (eq.~11: worst-case bias; eq.~14: local polynomial weights) to the bivariate case $f(x, z)$ under the anisotropic constraint set.
+
+	\item \textbf{AMSE comparison on common parameter space.}
+	Construct $\mathcal{F}^R(M_x, M_z, L)$ with anisotropic bounds on $m$ plus density smoothness constraint.
+	Show $\overline{\mathrm{AMSE}}(\hat\tau_{\mathrm{seg}}) \leq \overline{\mathrm{AMSE}}(\hat\tau_{\mathrm{base}})$ with strict inequality when the compositional channel is active.
+
+	\item \textbf{Implement optimized RDD with rectangular constraint.}
+	Feed the anisotropic constraint set into the IK/AK weight optimization.
+	Demonstrate CI improvement in simulation or empirical application.
+
+	\item \textbf{Verify novelty against remaining references.}
+	Korostelev and Korostelev (2011), Giné and Nickl (2016), Wasserman (2006).
+	Confirm that the coupling-agnosticism characterization and the ``two types of ignorance'' distinction are absent.
+
+	\item \textbf{Verify bib entry details.}
+	Check page/volume numbers for Lepski (1991), LMS (1997), KLP (2001).
+
+\end{enumerate}

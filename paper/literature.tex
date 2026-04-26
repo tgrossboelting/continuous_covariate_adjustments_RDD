@@ -5,12 +5,23 @@
 
 The following table summarizes the key references for the isotropic--anisotropic distinction that is central to this paper.
 
-\begin{center}
-\small
-\begin{tabular}{p{4.5cm}p{10.5cm}}
+{\small
+\begin{longtable}{p{4.5cm}p{10.5cm}}
 \toprule
 \textbf{Reference} & \textbf{Contribution and relevance} \\
 \midrule
+\endfirsthead
+\toprule
+\textbf{Reference} & \textbf{Contribution and relevance} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{2}{r}{\emph{continued on next page}} \\
+\bottomrule
+\endfoot
+\bottomrule
+\endlastfoot
+
 \textcite{nikolskii_approximation_1975} &
 Foundational definition of Nikol'skii spaces, the classical anisotropic function classes. Smoothness is controlled per-coordinate via finite differences applied in each direction separately. The Nikol'skii class is inherently rectangular: it constrains each coordinate direction independently, with no coupling across directions. \\[6pt]
 
@@ -21,13 +32,13 @@ Establishes minimax optimal rates for nonparametric regression under general smo
 Foundational minimax estimation theory on anisotropic Nikol'skii classes for density estimation. Smoothness parameters, norm indices, and constants can vary across coordinate directions. Establishes the asymptotic framework for minimax estimation on rectangular function classes. \\[6pt]
 
 \textcite{donoho_geometrizing_1991} &
-Foundational framework for minimax estimation over convex function classes, connecting rates of convergence to the geometry of the function class. \commentT{Verify: does this paper discuss anisotropic classes or the constraint set geometry?} \\[6pt]
+Connects minimax estimation rates to the geometry of function classes via the modulus of continuity $\omega(\varepsilon)$. For \emph{linear} functionals over \emph{convex} classes, the minimax rate is determined by $\omega$ up to constants (Theorem~3.1, with $C = \sqrt{2}$). Provides the general machinery underlying the present paper's approach: since $\mathcal{F}(\mathcal{C})$ is convex (\cref{prop:coupling_agnostic}) and the RDD estimand is linear, this theorem applies directly. Does \emph{not} discuss anisotropic vs.\ isotropic classes, gradient constraint sets, or the rectangle vs.\ disk geometry. The ``geometrizing'' refers to the geometry of $\mathbf{F}$ in Hellinger space, not the shape of derivative bounds. \\[6pt]
 
 \textcite{donoho_statistical_1994} &
 Establishes the modulus-of-continuity framework for exact minimax estimation. The minimax linear estimator optimally trades off bias against variance; the bias is governed by the support function of the constraint set. This is the key technical machinery for the present paper's minimax constant results. \\[6pt]
 
 \textcite{tsybakov_introduction_2009} &
-Standard textbook on minimax theory. Defines isotropic Hölder and Nikol'skii classes; develops minimax lower bounds (Chapter~2) and adaptation (Chapter~3). Does \emph{not} discuss anisotropic classes in detail, nor the geometric interpretation of constraint sets. Useful as a reference for the isotropic baseline. \\[6pt]
+Standard textbook on minimax theory. Defines isotropic Hölder and Nikol'skii classes; develops minimax lower bounds via Le Cam, Fano, Assouad, and van Trees (Chapter~2) and asymptotic efficiency/adaptation via Pinsker's theorem (Chapter~3). Confirmed: does \emph{not} discuss anisotropic classes, the modulus of continuity in Donoho's sense, or the geometric interpretation of constraint sets. The term ``modulus of continuity'' does not appear in the index. Useful as a reference for the isotropic baseline and hypothesis-testing lower bound tools. \\[6pt]
 
 \textcite{bertin_exact_2004} &
 Determines the \emph{exact} asymptotic minimax constant (not just the rate) for estimation in sup-norm over anisotropic Hölder classes in the Gaussian white noise model. Most directly relevant reference for computing $\mathfrak{R}^*_{\mathrm{aniso}}(M_x, M_z)$ and the ratio $\rho(M_x, M_z)$. \commentT{Priority: read carefully for the exact constant formula.} \\[6pt]
@@ -37,9 +48,8 @@ Most explicit conceptual motivation for anisotropic classes found in the literat
 
 \textcite{hoffmann_random_2002} &
 Random normalizing factors for anisotropic regression. Shows that when a function depends on only a subset of coordinates, effective rates improve. Works with anisotropic Nikol'skii classes. \commentT{Verify: check for conceptual discussion of isotropy vs.\ anisotropy.} \\
-\bottomrule
-\end{tabular}
-\end{center}
+\end{longtable}
+}
 
 
 \subsection{Connection to Fréchet--Hoeffding Bounds in Copula Theory}\label{sec:lit:frechet}
@@ -68,6 +78,24 @@ The rectangle is to gradient constraint sets what the independence copula is to 
 
 This analogy suggests that the present paper's results may generalize beyond gradient-constrained classes to any setting where a multivariate constraint is decomposable into marginal constraints, and the researcher must choose between imposing joint structure (coupling) or respecting marginal independence.
 
+\paragraph{Analogy, not equivalence.}
+The structural parallel is suggestive, but the mathematical objects are different.
+In copula theory, the objects are probability measures on $[0,1]^2$ with given marginals --- an infinite-dimensional space.
+In the present setting, the objects are convex subsets of $\mathbb{R}^d$ with given marginal projections --- a finite-dimensional geometric problem.
+The Fréchet--Hoeffding machinery answers ``what joint distributions are consistent with these marginals?''
+The present paper answers ``what smoothness classes are consistent with these per-partial derivative bounds?''
+The \emph{structure} is parallel (Cartesian product $=$ no coupling $=$ maximal), but the \emph{payoff} is entirely different: the smoothness class formulation flows into minimax risk, confidence interval width, and estimator design via the modulus of continuity.
+No result in copula theory implies the minimax consequences derived here, and vice versa.
+
+\paragraph{Scope of generalizability.}
+The abstract principle --- that the Cartesian product of marginal constraints is the unique maximal set imposing no coupling --- applies whenever a researcher selects a multivariate smoothness class from per-coordinate primitive bounds.
+This includes density estimation (spherical vs.\ rectangular kernels), nonparametric regression (isotropic vs.\ anisotropic bandwidth selection), and functional estimation in Gaussian white noise models.
+In each of these settings, the isotropic class silently imports a coupling assumption with quantifiable consequences for minimax risk.
+The RDD application in this paper is one instance of the general principle; the coupling-agnosticism characterization (\cref{prop:coupling_agnostic}) and the resulting trilemma (\cref{cor:coupling_restricts,cor:iso_inflates,cor:iso_is_coupling}) apply to any of these problems.
+The generalizability signals that the result is fundamental rather than a technical curiosity specific to RDDs, while the novelty lies in identifying that this principle governs smoothness class selection and has concrete statistical consequences that the existing nonparametric literature has not articulated.
+
+\commentT{Both the copula result and our result reduce to the same abstract skeleton: ``the Cartesian product of sets is the unique maximal set whose coordinate projections equal the given marginals.'' This is essentially a set-theoretic tautology --- too elementary to publish on its own. The contribution in both cases is recognizing that the skeleton applies to a specific domain (joint distributions / smoothness classes) and deriving the domain-specific consequences (dependence structure / minimax risk). Neither subsumes the other's payoff. Analogous to how many results across optimization, statistics, and economics are ``instances of convex duality'' without being redundant.}
+
 
 \subsection{Novelty Assessment}\label{sec:lit:novelty}
 
@@ -87,7 +115,73 @@ The underlying mathematical ingredients (class nesting, monotonicity of minimax 
 \subsection{Bias-Aware Inference and RDD}\label{sec:lit:rdd}
 
 \begin{itemize}
-	\item \textcite{armstrong_simple_2020}: Bias-aware inference using the modulus of continuity. Characterizes minimax optimal estimators for linear functionals under convex smoothness classes. Uses isotropic classes throughout. The present paper's technical core extends this framework to anisotropic (rectangular) constraint sets.
+	\item \textcite{armstrong_optimal_2018}: The central technical reference for the present paper.
+	Derives finite-sample optimal CIs for a linear functional $Lf$ of a regression function $f$ lying in a convex function class $\mathcal{F}$, with normal errors and known variance.
+
+	\textbf{Abstract framework (Section~3).}
+	The general setup is $Y = Kf + \sigma\varepsilon$ with $f \in \mathcal{F}$ (convex), $K \colon \mathcal{F} \to \mathcal{Y}$ a linear operator, and $Lf$ a linear functional.
+	The key object is the \emph{ordered modulus of continuity}:
+	\begin{equation*}
+		\omega(\delta; \mathcal{F}, \mathcal{G}) = \sup\bigl\{Lg - Lf : \norm{K(g - f)} \leq \delta,\; f \in \mathcal{F},\; g \in \mathcal{G}\bigr\}.
+	\end{equation*}
+	Under centrosymmetry ($f \in \mathcal{F} \implies -f \in \mathcal{F}$), this simplifies to $\omega(\delta; \mathcal{F}) = \sup\{2Lf : \norm{Kf} \leq \delta/2, f \in \mathcal{F}\}$.
+	Theorem~3.1 and Corollary~3.1 show that the minimax one-sided CI has excess length $\omega(\delta; \mathcal{F})$, and no other $1-\alpha$ CI can improve on this.
+	This framework is completely dimension-free: $\mathcal{F}$ can be any convex subset of any vector space, univariate or multivariate.
+	In principle, replacing $\mathcal{F}$ with a smaller convex class (e.g., $\mathcal{F}_{\mathrm{aniso}} \subset \mathcal{F}_{\mathrm{iso}}$) yields a weakly smaller modulus and hence a weakly shorter CI.
+	The present paper's task is to compute this modulus for specific bivariate smoothness classes $\mathcal{F}(\mathcal{C})$ parameterized by the constraint set $\mathcal{C}$.
+
+	\textbf{RDD-specific formulas (Section~2).}
+	The applied results --- worst-case bias formula (eq.~11: $\wcb = C \sum_i \abs{w_i} \cdot \abs{x_i}^p$), optimal bandwidths $h_+, h_-$, triangular kernel, least favorable functions $f^*, g^*$ --- are all derived for the \emph{univariate} Taylor class $\mathcal{F}_{\mathrm{RDT},p}(C)$ with a scalar smoothness constant $C$.
+	These do not directly apply to the bivariate case; the multivariate bias formula, optimal weights, and least favorable functions would need to be re-derived.
+
+	\textbf{Appendix~B: Covariates.}
+	The general setup at the start of Appendix~B.1 is more informative than the specific procedure that follows.
+	They model:
+	\begin{equation*}
+		y_i = h_y(x_i) + u_i, \quad z_i = h_z(x_i) + v_i, \quad (u_i, v_i) \sim \mathcal{N}(0, \Sigma(x_i)),
+	\end{equation*}
+	with $h_y \in \mathcal{H}_y$, $h_z \in \mathcal{H}_z$ (convex smoothness classes), and $\mathcal{H}_z$ chosen so that $\lim_{x \downarrow 0} h_z(x) - \lim_{x \uparrow 0} h_z(x) = 0$ (covariates are continuous at the cutoff).
+	They state: ``Using our general results, one can compute optimal CIs and bounds for adaptation.''
+	This confirms that the abstract framework applies to the covariate case without modification.
+
+	However, the specific procedure in Appendix~B.1 is ad hoc: they partial out $z_i$ linearly (forming $\tilde{y}_i = y_i - z_i' \Sigma_{22}^{-1}\Sigma_{21}$) and reduce to a univariate RD on $\tilde{y}_i$.
+	The smoothness constant inflates from $C_y$ to $\tilde{C} \geq C_y + C_z \iota' \Sigma_{22}^{-1}\Sigma_{21}$ (footnote~8).
+	This approach treats the covariate adjustment as a preliminary transformation rather than working with the bivariate function directly.
+
+	Appendix~B.2 mentions the multivariate case $y_i = f(x_i, z_i) + u_i$ with $L_z f = \lim_{x \downarrow 0} f(x,z) - \lim_{x \uparrow 0} f(x,z)$, and says the analysis ``follows from a generalization of the results described in Section~2.2'' using multivariate local polynomial estimators, but does not work out the details.
+
+	\commentT{Key implication: the abstract machinery (Section~3, modulus of continuity) translates 1-to-1 to the multivariate case. The modulus $\omega(\delta; \mathcal{F}(\mathcal{C}))$ governs the optimal CI width for any convex constraint set $\mathcal{C}$. What needs to be computed is this modulus for $\mathcal{C} = \text{rectangle}$ vs.\ $\mathcal{C} = \text{disk}$. The ratio $\omega(\delta; \mathcal{F}_{\mathrm{iso}}) / \omega(\delta; \mathcal{F}_{\mathrm{aniso}})$ gives the quantitative gain $\rho(M_x, M_z)$ from using the anisotropic class.}
+
+	\commentT{Computing the modulus for the bivariate case. The modulus problem is:
+	$\omega(\delta) = \sup\{f(0^+, z) - f(0^-, z) - g(0^+, z) + g(0^-, z) : \norm{K(f - g)} \leq \delta,\; f, g \in \mathcal{F}(\mathcal{C})\}$.
+	Under centrosymmetry this reduces to $\omega(\delta) = \sup\{2(f(0^+, z) - f(0^-, z)) : \norm{Kf} \leq \delta/2,\; f \in \mathcal{F}(\mathcal{C})\}$.
+	For the rectangle $\mathcal{C} = [-M_x, M_x] \times [-M_z, M_z]$, the constraint $\abs{\partial f / \partial z} \leq M_z$ restricts how $f$ varies in $z$ but the functional $Lf$ is evaluated at a fixed $z$, so the $z$-direction constraint limits the ``reach'' of the adversary in $z$.
+	The least favorable function should vary maximally in $x$ (slope $M_x$) and exploit the $z$-direction only to the extent that observations at nearby $z$-values contribute to estimation.
+	For the disk $\mathcal{C} = \{(u,v) : u^2 + v^2 \leq M^2\}$, the adversary can trade off $x$-slope against $z$-slope, concentrating gradient in whichever direction is hardest to detect --- this is why the modulus is larger.
+	Three possible routes to compute this:
+	(1) Directly solve the modulus optimization problem for both classes --- this is a constrained optimization over function spaces, potentially tractable via calculus of variations or discretization.
+	(2) Use the support function representation: the worst-case bias of any linear estimator over $\mathcal{F}(\mathcal{C})$ is controlled by $h_{\mathcal{C}}(v)$ where $v$ is the ``direction'' of the estimator's sensitivity. For the rectangle $h(v) = M_x\abs{v_1} + M_z\abs{v_2}$; for the disk $h(v) = M\norm{v}_2$. The modulus inherits this structure.
+	(3) Reduce to a finite-dimensional problem via the Gaussian white noise equivalence and use known results for anisotropic classes (Bertin 2004).
+	Route (2) via the support function is the most promising --- it connects directly to the paper's existing framework and makes the dependence on $\mathcal{C}$ explicit.}
+
+	\commentT{On using Bertin (2004) for the exact constant --- three important points.
+	(1) \textbf{Model equivalence is free.} Brown and Low (1996) establish asymptotic equivalence between nonparametric regression and Gaussian white noise for estimation of linear functionals. Minimax rates \emph{and} leading constants transfer. AK 2018 themselves cite this equivalence (Section~3). So a constant computed in the white noise model applies to the regression/RDD setting.
+	(2) \textbf{But Bertin's constant is for the wrong loss function.} Bertin (2004) computes the exact minimax constant for estimation in \emph{sup-norm} --- estimating the entire function uniformly over its domain. Our problem is \emph{pointwise} estimation of a single linear functional (the RDD jump). These are different problems with different minimax constants; the sup-norm constant is typically larger because the estimator must perform well everywhere, not just at one point. So Bertin's constant does not directly give $\mathfrak{R}^*_{\mathrm{aniso}}(M_x, M_z)$ for our problem.
+	(3) \textbf{The ratio $\rho$ may not require exact constants.} If the modulus scales as $\omega(\delta; \mathcal{F}(\mathcal{C})) \propto h_{\mathcal{C}}(v^*)$ for some worst-case direction $v^*$, then the ratio $\rho = h_{\mathrm{disk}}(v^*) / h_{\mathrm{rect}}(v^*)$ is computable from the support functions alone, which are already in closed form: $h_{\mathrm{rect}}(v) = M_x\abs{v_1} + M_z\abs{v_2}$ and $h_{\mathrm{disk}}(v) = M\norm{v}_2$. This is the most promising route --- we may only need the \emph{ratio} of moduli, not the individual constants, and the ratio is governed by the support function geometry.}
+
+	\commentT{Critical observation: AK B.1's $\mathcal{H}_y$ class is implicitly isotropic/pooled.
+	Their $h_y(x) = \E[y \mid x] = \int m(x,z) f(z|x)\, dz = \bar{m}(x)$ is the pooled regression function.
+	Bounding $\abs{\bar{m}'(x)} \leq C_y$ with a single scalar is exactly the pooled/fungible bound from the groups paper.
+	The derivative decomposes as:
+	$\bar{m}'(x) = \int \frac{\partial m}{\partial x} f(z|x)\, dz + \int m(x,z) \frac{\partial f}{\partial x}(z|x)\, dz$.
+	Under the pooled bound $C_y$, the adversary can allocate curvature between the direct channel ($\partial m / \partial x$) and the compositional channel (through $\partial f / \partial x$) however they want --- this is the isotropic/fungibility logic.
+	The anisotropic alternative: separate bounds $\abs{\partial m / \partial x} \leq M_x$ and $\abs{\partial m / \partial z} \leq M_z$, together with a bound on the density derivative, give $M_P = M_x + \text{(compositional term)}$ as a \emph{derived} quantity.
+	The separated parameterization prevents curvature reallocation across channels.
+	Therefore: AK's CIs based on $\mathcal{H}_y$ are conservative for the underlying bivariate problem whenever the primitives are separated.
+	Our Proposition says the rectangle (separated bounds) is the unique coupling-agnostic class; AK's machinery says the modulus governs optimal CIs; combining them shows that AK's CIs can be strictly shortened by using the anisotropic class.
+	This is the central applied result of the paper.}
+
+	\item \textcite{armstrong_simple_2020}: Bias-aware inference using bias-corrected critical values. Derives honest CIs for scalar parameters in nonparametric regression using kernel or local polynomial estimators. Shows that using a critical value larger than $z_{1-\alpha/2}$ (to account for worst-case bias) yields CIs that are more efficient than both undersmoothing and explicit bias correction. Uses isotropic classes throughout. The present paper's applied results extend this approach to anisotropic constraint sets.
 	\item \textcite{imbens_optimized_2019}: Optimized RDD estimators using the operator norm constraint on the Hessian --- the isotropic (rotationally invariant) smoothness class at order~2. The present paper argues that replacing this with anisotropic per-partial bounds yields strictly better minimax constants.
 \end{itemize}
 
@@ -95,11 +189,16 @@ The underlying mathematical ingredients (class nesting, monotonicity of minimax 
 \subsection{Additional References}\label{sec:lit:additional}
 
 \begin{itemize}
-	\item \textcite{donoho_geometrizing_1991}: Foundational framework connecting minimax rates to the geometry of function classes. \commentT{Check whether the disk vs.\ rectangle geometry is discussed.}
+	\item \textcite{donoho_geometrizing_1991}: Foundational framework connecting minimax rates to the geometry of function classes. Confirmed: does \emph{not} discuss disk vs.\ rectangle geometry or anisotropic classes. The ``geometry'' refers to Hellinger distance between function classes, not the shape of derivative constraint sets.
 	\item Korostelev and Korostelev (2011), \emph{Mathematical Statistics: Asymptotic Minimax Theory} --- textbook on minimax theory. \commentT{Check treatment of isotropic vs.\ anisotropic classes.}
 	\item Wasserman (2006), \emph{All of Nonparametric Statistics} --- widely used textbook. Uses isotropic classes as default. \commentT{Check whether anisotropic classes are mentioned.}
 	\item Giné and Nickl (2016), \emph{Mathematical Foundations of Infinite-Dimensional Statistical Models} --- comprehensive modern treatment. \commentT{Check chapters on Gaussian white noise model and smoothness classes for anisotropic discussion.}
-	\item Yang and Barron (1999), ``Information-Theoretic Determination of Minimax Rates of Convergence'' --- general minimax rate results using metric entropy. \commentT{Check treatment of constraint sets.}
+	\item \textcite{yang_information-theoretic_1999}: General minimax rate results via metric entropy bounds and Fano's inequality.
+	Section~6.6 defines anisotropic classes $V(\mathbf{k}, \boldsymbol{\beta}, C)$ with different smoothness orders $\beta_i$ per coordinate and computes their $L_2$ metric entropy order $(1/\varepsilon)^{\sum_i \beta_i^{-1}}$, yielding the minimax rate $n^{-2\alpha/(2\alpha+1)}$ where $\alpha^{-1} = \sum_{i=1}^d \beta_i^{-1}$ (harmonic mean of directional smoothnesses).
+	However: (1) lists anisotropic classes as one example among many (Besov, Lipschitz, neural networks, etc.) without comparing them to isotropic counterparts or discussing any ``cost of isotropy'';
+	(2) works with \emph{integrated} risk (MISE in $L_2$ or $L_p$), not pointwise estimation of a linear functional --- a fundamentally different setting from the modulus-of-continuity framework used here;
+	(3) defines anisotropy via coordinate-wise derivative bounds (= the rectangle in gradient space) but never considers the disk alternative or the geometric question of which constraint set to use.
+	Does not contain the coupling-agnosticism characterization, the iso vs.\ aniso comparison, or the support function machinery.
 	\item Birgé (2001), ``An Alternative Point of View on Lepski's Method'' --- alternative approach to adaptive estimation. \commentT{Check for discussion of smoothness class choice.}
 	\item Cattaneo and Farrell (2013), ``Optimal Convergence Rates, Bahadur Representation, and Asymptotic Normality of Partitioning Estimators,'' \emph{Journal of Econometrics}, 174(2), 127--143. Partition-based nonparametric estimators achieve the same convergence rates as kernel estimators with simpler inference (independence across cells). Relevant for the segmented estimator's variance structure.
 \end{itemize}
@@ -152,12 +251,12 @@ The underlying mathematical ingredients (class nesting, monotonicity of minimax 
 	If confirmed, \cref{prop:iso_envelope} constitutes a standalone contribution to nonparametric estimation theory --- potentially publishable in a top statistics journal (Annals of Statistics, JRSS-B) --- with implications for any problem where isotropic smoothness is currently the default.
 	\begin{itemize}
 		\item \textcite{tsybakov_introduction_2009}, \emph{Introduction to Nonparametric Estimation} --- the standard textbook on minimax theory. Check all chapters on multivariate estimation and smoothness classes.
-		\item Donoho and Liu (1991), ``Geometrizing Rates of Convergence, II/III,'' \emph{Annals of Statistics} --- foundational framework for minimax estimation over convex classes. Check whether the disk is characterized as a special case.
+		\item Donoho and Liu (1991), ``Geometrizing Rates of Convergence, II/III,'' \emph{Annals of Statistics} --- foundational framework for minimax estimation over convex classes. Confirmed: disk vs.\ rectangle not discussed; paper works with generic convex $\mathbf{F}$ throughout.
 		\item Korostelev and Korostelev (2011), \emph{Mathematical Statistics: Asymptotic Minimax Theory} --- textbook on minimax theory. Check treatment of isotropic vs.\ anisotropic classes.
 		\item \textcite{stone_optimal_1980}, ``Optimal Rates of Convergence for Nonparametric Estimators'' --- establishes minimax rates for anisotropic classes. Check whether the coupling interpretation is discussed.
 		\item \textcite{nikolskii_approximation_1975}, \emph{Approximation of Functions of Several Variables and Imbedding Theorems} --- the classic reference for anisotropic function classes. Check whether the relationship to isotropic classes is characterized.
 		\item Lepski, Mammen, and Spokoiny (1997), ``Optimal Spatial Adaptation to Inhomogeneous Smoothness'' --- adaptive estimation under anisotropic smoothness. Check whether the coupling/agnosticism distinction appears.
-		\item Yang and Barron (1999), ``Information-Theoretic Determination of Minimax Rates of Convergence'' --- general minimax rate results. Check treatment of constraint sets.
+		\item \textcite{yang_information-theoretic_1999}, ``Information-Theoretic Determination of Minimax Rates of Convergence'' --- defines anisotropic classes (\S6.6) and computes their metric entropy and minimax rates, but does not compare iso vs.\ aniso or discuss constraint set geometry. Confirmed: no coupling-agnosticism discussion.
 		\item Birgé (2001), ``An Alternative Point of View on Lepski's Method'' --- check for discussion of smoothness class choice.
 		\item Giné and Nickl (2016), \emph{Mathematical Foundations of Infinite-Dimensional Statistical Models} --- comprehensive modern treatment. Check chapters on Gaussian white noise model and smoothness classes.
 		\item Wasserman (2006), \emph{All of Nonparametric Statistics} --- widely used textbook. Check treatment of isotropic assumptions.

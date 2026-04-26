@@ -1,0 +1,256 @@
+\section{The Modulus of Continuity and the Support Function}\label{sec:technical_core}
+
+This section develops the technical machinery connecting the gradient constraint set $\mathcal{C}$ to the minimax risk for pointwise estimation.
+The main result is that the modulus of continuity --- and hence the minimax risk --- depends on $\mathcal{C}$ only through its support function $h_{\mathcal{C}}$, and that replacing the isotropic disk with the anisotropic rectangle yields a strict improvement.
+
+
+\subsection{Setup: The Modulus of Continuity Framework}\label{sec:tc:modulus}
+
+We adopt the framework of \textcite{donoho_statistical_1994} and \textcite{armstrong_optimal_2018}.
+Let $\mathcal{F}$ be a convex subset of a function space, $K \colon \mathcal{F} \to \mathcal{Y}$ a linear operator mapping functions to an observation space $\mathcal{Y}$, and $Lf$ a linear functional to be estimated.
+We observe $Y = Kf + \sigma\varepsilon$, where $\varepsilon$ is standard Gaussian noise.
+
+The \emph{ordered modulus of continuity} between two convex sets $\mathcal{F}$ and $\mathcal{G}$ is
+\begin{equation}\label{eq:modulus_two_class}
+	\omega(\delta; \mathcal{F}, \mathcal{G}) = \sup\bigl\{ Lg - Lf : \norm{K(g - f)} \leq \delta,\; f \in \mathcal{F},\; g \in \mathcal{G} \bigr\}.
+\end{equation}
+When $\mathcal{F}$ is \emph{centrosymmetric} ($f \in \mathcal{F} \implies -f \in \mathcal{F}$), the single-class modulus simplifies to
+\begin{equation}\label{eq:modulus_single}
+	\omega(\delta; \mathcal{F}) = \sup\bigl\{ 2Lf : \norm{Kf} \leq \delta/2,\; f \in \mathcal{F} \bigr\}.
+\end{equation}
+By Theorem~3.1 and Corollary~3.1 of \textcite{armstrong_optimal_2018}, the minimax one-sided CI for $Lf$ has worst-case excess length equal to $\omega(\delta_\beta; \mathcal{F})$, and no other $1-\alpha$ CI can improve upon this.
+In particular, the minimax risk for estimating $Lf$ over $\mathcal{F}$ is governed by the modulus: all optimal bias--variance tradeoffs are parameterized by $\omega$.
+
+
+\subsection{Gradient-Constrained Classes and the Support Function}\label{sec:tc:support}
+
+For a compact convex set $\mathcal{C} \subset \mathbb{R}^d$ containing the origin, the gradient-constrained class is
+\begin{equation*}
+	\mathcal{F}(\mathcal{C}) = \bigl\{ f \colon \mathbb{R}^d \to \mathbb{R} \;\big|\; \nabla f(x) \in \mathcal{C} \text{ for all } x \bigr\}.
+\end{equation*}
+The \emph{support function} of $\mathcal{C}$ is
+\begin{equation*}
+	h_{\mathcal{C}}(v) = \sup\bigl\{ \langle u, v \rangle : u \in \mathcal{C} \bigr\}, \qquad v \in \mathbb{R}^d.
+\end{equation*}
+By standard convex duality, $\mathcal{C}$ is recovered from its support function:
+\begin{equation}\label{eq:C_from_h}
+	\mathcal{C} = \bigl\{ u \in \mathbb{R}^d : \langle u, v \rangle \leq h_{\mathcal{C}}(v) \text{ for all } v \in \mathbb{R}^d \bigr\}.
+\end{equation}
+
+\begin{lemma}[Gradient constraint via support function]\label{lem:gradient_support}
+	Let $\mathcal{C} \subset \mathbb{R}^d$ be compact and convex with $0 \in \mathcal{C}$.
+	Then $\nabla f(x) \in \mathcal{C}$ for all $x$ if and only if the directional derivative satisfies
+	\begin{equation}\label{eq:dir_deriv_bound}
+		D_v f(x) \leq h_{\mathcal{C}}(v) \qquad \text{for all } x \text{ and all } v \in \mathbb{R}^d.
+	\end{equation}
+\end{lemma}
+
+\begin{proof}
+	If $\nabla f(x) \in \mathcal{C}$, then $D_v f(x) = \langle \nabla f(x), v \rangle \leq \sup_{u \in \mathcal{C}} \langle u, v \rangle = h_{\mathcal{C}}(v)$.
+	Conversely, if \eqref{eq:dir_deriv_bound} holds for all $v$, then $\langle \nabla f(x), v \rangle \leq h_{\mathcal{C}}(v)$ for all $v$, which by \eqref{eq:C_from_h} implies $\nabla f(x) \in \mathcal{C}$.
+\end{proof}
+
+The support function also governs how much $f$ can change between two points.
+
+\begin{lemma}[Direction-dependent Lipschitz property]\label{lem:lipschitz}
+	If $f \in \mathcal{F}(\mathcal{C})$, then for any two points $x, x'$,
+	\begin{equation}\label{eq:lipschitz_onesided}
+		f(x') - f(x) \leq h_{\mathcal{C}}(x' - x).
+	\end{equation}
+	If in addition $\mathcal{C}$ is symmetric ($\mathcal{C} = -\mathcal{C}$), then
+	\begin{equation}\label{eq:lipschitz}
+		\abs{f(x') - f(x)} \leq h_{\mathcal{C}}(x' - x).
+	\end{equation}
+	Moreover, this bound is tight: for any displacement $d \in \mathbb{R}^d$, the function $f^*(x) = h_{\mathcal{C}}(x)$ satisfies $f^* \in \mathcal{F}(\mathcal{C})$ and $f^*(d) - f^*(0) = h_{\mathcal{C}}(d)$.
+\end{lemma}
+
+\begin{proof}
+	By the fundamental theorem of calculus along the segment from $x$ to $x'$,
+	\begin{equation*}
+		f(x') - f(x) = \int_0^1 \langle \nabla f(x + t(x'-x)),\, x' - x \rangle \, dt \leq \int_0^1 h_{\mathcal{C}}(x' - x) \, dt = h_{\mathcal{C}}(x' - x),
+	\end{equation*}
+	where the inequality uses \cref{lem:gradient_support}.
+	Applying the same argument to $x' \to x$ (with direction $x - x'$) and using $h_{\mathcal{C}}(x - x') = h_{\mathcal{C}}(-(x'-x)) = h_{-\mathcal{C}}(x'-x)$, we obtain the absolute value bound when $\mathcal{C}$ is symmetric ($\mathcal{C} = -\mathcal{C}$).
+
+	For tightness: the support function $h_{\mathcal{C}}$ is convex and positively homogeneous, so it is the pointwise supremum of linear functions and hence differentiable almost everywhere.
+	Where the subdifferential $\partial h_{\mathcal{C}}(x) \subset \mathcal{C}$ exists as a gradient, $\nabla h_{\mathcal{C}}(x) \in \mathcal{C}$, so $f^* = h_{\mathcal{C}} \in \mathcal{F}(\mathcal{C})$.
+\end{proof}
+
+\paragraph{Explicit support functions.}
+For the two constraint sets of interest in $d = 2$:
+\begin{alignat*}{2}
+	&\text{Rectangle } \mathcal{C}_{\mathrm{rect}} = [-M_x, M_x] \times [-M_z, M_z]: &\quad h_{\mathrm{rect}}(v) &= M_x \abs{v_1} + M_z \abs{v_2}, \\
+	&\text{Disk } \mathcal{C}_{\mathrm{disk}} = B_2(R),\; R = \sqrt{M_x^2 + M_z^2}: &\quad h_{\mathrm{disk}}(v) &= R \norm{v}_2.
+\end{alignat*}
+The rectangle's support function is a weighted $\ell_1$ norm of $v$; the disk's is a scaled $\ell_2$ norm.
+
+
+\subsection{The Modulus as a Functional of the Support Function}\label{sec:tc:modulus_functional}
+
+Combining the modulus framework (\cref{sec:tc:modulus}) with the gradient--support function equivalence (\cref{lem:gradient_support}), the modulus of continuity over $\mathcal{F}(\mathcal{C})$ can be written as
+\begin{equation}\label{eq:modulus_hC}
+	\omega(\delta; \mathcal{F}(\mathcal{C})) = \sup\bigl\{ 2Lf : \norm{Kf} \leq \delta/2,\; D_v f(x) \leq h_{\mathcal{C}}(v) \;\forall x, \forall v \bigr\}.
+\end{equation}
+The constraint set $\mathcal{C}$ enters \emph{only} through $h_{\mathcal{C}}$.
+Since the support function uniquely determines a compact convex set, the modulus is a functional of $h_{\mathcal{C}}$:
+\begin{equation*}
+	\omega(\delta; \mathcal{F}(\mathcal{C})) = \Omega(\delta,\, h_{\mathcal{C}}).
+\end{equation*}
+
+\begin{remark}
+	Centrosymmetry of $\mathcal{F}(\mathcal{C})$ holds whenever $\mathcal{C}$ is symmetric ($\mathcal{C} = -\mathcal{C}$): if $f \in \mathcal{F}(\mathcal{C})$ then $\nabla(-f) = -\nabla f \in -\mathcal{C} = \mathcal{C}$, so $-f \in \mathcal{F}(\mathcal{C})$.
+	Both the rectangle and the disk are symmetric, so the simplified modulus \eqref{eq:modulus_single} applies.
+\end{remark}
+
+
+\subsection{Worst-Case Bias via the Support Function}\label{sec:tc:wcb}
+
+We now generalize the worst-case bias formula of \textcite{armstrong_optimal_2018} (eq.~11) from univariate Taylor classes with a scalar smoothness constant to multivariate gradient-constrained classes.
+
+Consider a linear estimator $\hat{L} = a + \sum_{i=1}^n w_i Y_i$ for the functional $Lf = f(x_0)$ (pointwise evaluation), with observations $Y_i = f(x_i) + \sigma\varepsilon_i$ at design points $x_1, \ldots, x_n$.
+
+\begin{proposition}[Worst-case bias over $\mathcal{F}(\mathcal{C})$]\label{prop:wcb}
+	Let $\hat{L} = a + \sum_{i} w_i Y_i$ be an affine estimator of $Lf = f(x_0)$, with $\sum_i w_i = 1$ and $a = 0$ (unbiasedness for constant functions).
+	Then the worst-case bias over $\mathcal{F}(\mathcal{C})$ is
+	\begin{equation}\label{eq:wcb_general}
+		\wcb_{\mathcal{F}(\mathcal{C})}(\hat{L}) \defeq \sup_{f \in \mathcal{F}(\mathcal{C})} \bigl( \E[\hat{L}] - f(x_0) \bigr) = \sum_{i=1}^n w_i \, h_{\mathcal{C}}(x_i - x_0),
+	\end{equation}
+	where the supremum is attained by the function $f^*(x) = h_{\mathcal{C}}(x - x_0)$.
+
+	For symmetric $\mathcal{C}$, the maximum absolute bias is
+	\begin{equation}\label{eq:wcb_abs}
+		\sup_{f \in \mathcal{F}(\mathcal{C})} \abs{\E[\hat{L}] - f(x_0)} = \sum_{i=1}^n \abs{w_i} \, h_{\mathcal{C}}(x_i - x_0).
+	\end{equation}
+\end{proposition}
+
+\begin{proof}
+	For any $f \in \mathcal{F}(\mathcal{C})$,
+	\begin{equation*}
+		\E[\hat{L}] - f(x_0) = \sum_i w_i f(x_i) - f(x_0) = \sum_i w_i \bigl( f(x_i) - f(x_0) \bigr),
+	\end{equation*}
+	using $\sum_i w_i = 1$.
+	By \cref{lem:lipschitz}, $f(x_i) - f(x_0) \leq h_{\mathcal{C}}(x_i - x_0)$ for each $i$.
+
+	The bound is attained by $f^*(x) = h_{\mathcal{C}}(x - x_0)$, which satisfies $f^* \in \mathcal{F}(\mathcal{C})$ by \cref{lem:lipschitz}, and $f^*(x_i) - f^*(x_0) = h_{\mathcal{C}}(x_i - x_0)$.
+	Since $h_{\mathcal{C}}(x_i - x_0) \geq 0$ for all $i$ (as $0 \in \mathcal{C}$), $f^*$ simultaneously achieves the upper bound at every observation, so \eqref{eq:wcb_general} holds when all $w_i \geq 0$.
+
+	\commentT{The absolute value formula \eqref{eq:wcb_abs} and the attainment claim need revision for mixed-sign weights. The argument ``taking $w_i \geq 0$ terms at their upper bound and $w_i < 0$ terms at their lower bound'' requires a single function $f$ to simultaneously achieve $f(x_i) - f(x_0) = +h_{\mathcal{C}}(x_i - x_0)$ at positive-weight observations and $-h_{\mathcal{C}}(x_i - x_0)$ at negative-weight observations. But the inter-observation Lipschitz constraint $\abs{f(x_i) - f(x_j)} \leq h_{\mathcal{C}}(x_i - x_j)$ prevents this in general. Counterexample in 1D: $w_1 = 2$ at $x_1 = 1$, $w_2 = -1$ at $x_2 = 2$, $x_0 = 0$, Lipschitz constant $C = 1$. Formula gives $\sum \abs{w_i} C\abs{x_i} = 4$, but the actual wcb is $2$ (set $f(1) = 1, f(2) = 0$). The formula is an upper bound, not an equality. Note the contrast with AK's second-order case ($p = 2$): there, $f''$ can be freely sign-flipped at each point ($f''(x) = M\,\mathrm{sign}(w(x))$), making the $\abs{w_i}$ formula tight. For first-order (gradient) constraints, gradient choices propagate through the function values. Three options: (1) restrict to $w_i \geq 0$ (covers standard kernel estimators), (2) state the formula as an upper bound, (3) derive the correct formula as a linear program over $\Delta_i = f(x_i) - f(x_0)$ subject to $\abs{\Delta_i - \Delta_j} \leq h_{\mathcal{C}}(x_i - x_j)$.}
+\end{proof}
+
+\paragraph{Specialization to the rectangle and disk.}
+For the two constraint sets:
+\begin{align}
+	\wcb_{\mathrm{rect}}(\hat{L}) &= \sum_{i=1}^n \abs{w_i} \bigl( M_x \abs{x_i - x_0^{(1)}} + M_z \abs{z_i - x_0^{(2)}} \bigr), \label{eq:wcb_rect} \\
+	\wcb_{\mathrm{disk}}(\hat{L}) &= \sum_{i=1}^n \abs{w_i} \, R \sqrt{(x_i - x_0^{(1)})^2 + (z_i - x_0^{(2)})^2}, \label{eq:wcb_disk}
+\end{align}
+where $(x_0^{(1)}, x_0^{(2)})$ is the evaluation point and $R = \sqrt{M_x^2 + M_z^2}$.
+
+The rectangle's worst-case bias decomposes additively into $x$- and $z$-contributions.
+The disk's worst-case bias couples the two directions through the $\ell_2$ norm.
+
+\paragraph{Consistency with the univariate case.}
+If all observations lie on a line (e.g., $z_i = x_0^{(2)}$ for all $i$), then:
+\begin{equation*}
+	\wcb_{\mathrm{rect}} = M_x \sum_i \abs{w_i} \abs{x_i - x_0^{(1)}}, \qquad
+	\wcb_{\mathrm{disk}} = R \sum_i \abs{w_i} \abs{x_i - x_0^{(1)}},
+\end{equation*}
+recovering the univariate formula of \textcite{armstrong_optimal_2018} (eq.~11 with $p = 1$) with smoothness constants $M_x$ and $R$, respectively.
+
+
+\subsection{Monotonicity of the Modulus in the Constraint Set}\label{sec:tc:monotonicity}
+
+\begin{theorem}[Monotonicity]\label{thm:monotonicity}
+	Let $\mathcal{C}_1 \subseteq \mathcal{C}_2$ be compact convex sets in $\mathbb{R}^d$.
+	Then
+	\begin{equation}\label{eq:monotonicity}
+		\omega(\delta; \mathcal{F}(\mathcal{C}_1)) \leq \omega(\delta; \mathcal{F}(\mathcal{C}_2)) \qquad \text{for all } \delta > 0.
+	\end{equation}
+\end{theorem}
+
+\begin{proof}
+	$\mathcal{C}_1 \subseteq \mathcal{C}_2$ implies $\mathcal{F}(\mathcal{C}_1) \subseteq \mathcal{F}(\mathcal{C}_2)$.
+	The modulus \eqref{eq:modulus_single} is a supremum over $\mathcal{F}(\mathcal{C})$, so enlarging the feasible set cannot decrease the value.
+\end{proof}
+
+\begin{theorem}[Strict monotonicity]\label{thm:strict_monotonicity}
+	Let $\mathcal{C}_1 \subsetneq \mathcal{C}_2$ with $\mathcal{C}_1$ having nonempty interior.
+	Then for all $\delta > 0$,
+	\begin{equation}\label{eq:strict_monotonicity}
+		\omega(\delta; \mathcal{F}(\mathcal{C}_1)) < \omega(\delta; \mathcal{F}(\mathcal{C}_2)).
+	\end{equation}
+\end{theorem}
+
+\begin{proof}
+	Since $\mathcal{C}_1 \subsetneq \mathcal{C}_2$, there exists $u^* \in \mathcal{C}_2 \setminus \mathcal{C}_1$.
+	By the separation theorem, there exists a direction $v^* \in \mathbb{R}^d$ such that $h_{\mathcal{C}_2}(v^*) > h_{\mathcal{C}_1}(v^*)$.
+
+	Let $f^*_1$ be a function achieving the modulus for $\mathcal{F}(\mathcal{C}_1)$ at a given $\delta$.
+	Consider perturbations of $f^*_1$ that tilt the gradient into the direction $u^*$: since $u^* \in \mathcal{C}_2$, the perturbed function remains in $\mathcal{F}(\mathcal{C}_2)$ and can achieve a strictly larger value of $Lf$ while maintaining the constraint $\norm{Kf} \leq \delta/2$.
+
+	\commentT{This proof sketch needs to be made rigorous. The key step is constructing a perturbation of $f^*_1$ that exploits the extra gradient freedom in $\mathcal{C}_2 \setminus \mathcal{C}_1$ to strictly increase $Lf$ without violating the norm constraint. This should follow from the fact that $h_{\mathcal{C}_2}(v^*) > h_{\mathcal{C}_1}(v^*)$ allows a steeper directional derivative, which translates to a larger function value at the evaluation point.}
+\end{proof}
+
+\begin{corollary}[Strict improvement from anisotropic class]\label{cor:strict_improvement}
+	For any $M_x, M_z > 0$, with $R = \sqrt{M_x^2 + M_z^2}$,
+	\begin{equation*}
+		\omega\bigl(\delta; \mathcal{F}(\mathcal{C}_{\mathrm{rect}})\bigr) < \omega\bigl(\delta; \mathcal{F}(\mathcal{C}_{\mathrm{disk}})\bigr) \qquad \text{for all } \delta > 0.
+	\end{equation*}
+	Equivalently, $\rho(M_x, M_z) > 1$.
+\end{corollary}
+
+\begin{proof}
+	$\mathcal{C}_{\mathrm{rect}} \subsetneq \mathcal{C}_{\mathrm{disk}}$ whenever $M_x, M_z > 0$: the rectangle's corners $({\pm}M_x, {\pm}M_z)$ lie on the disk boundary, while the disk extends beyond the rectangle along the coordinate axes (e.g., $(R, 0)$ has $R > M_x$).
+	Apply \cref{thm:strict_monotonicity}.
+\end{proof}
+
+
+\subsection{Bounding the Ratio}\label{sec:tc:ratio}
+
+The ratio of minimax risks
+\begin{equation*}
+	\rho(M_x, M_z) = \frac{\omega(\delta; \mathcal{F}(\mathcal{C}_{\mathrm{disk}}))}{\omega(\delta; \mathcal{F}(\mathcal{C}_{\mathrm{rect}}))}
+\end{equation*}
+quantifies the cost of using the isotropic class instead of the coupling-agnostic anisotropic class.
+We bound $\rho$ using the pointwise support function ratio.
+
+\begin{definition}[Pointwise support function ratio]\label{def:sfr}
+	For $v \in \mathbb{R}^d \setminus \{0\}$, the pointwise support function ratio is
+	\begin{equation*}
+		r(v) \defeq \frac{h_{\mathrm{disk}}(v)}{h_{\mathrm{rect}}(v)} = \frac{R \norm{v}_2}{M_x \abs{v_1} + M_z \abs{v_2}}.
+	\end{equation*}
+\end{definition}
+
+\begin{lemma}[Range of the pointwise ratio]\label{lem:ratio_range}
+	For $M_x, M_z > 0$ and $R = \sqrt{M_x^2 + M_z^2}$:
+	\begin{enumerate}
+		\item $r(v) \geq 1$ for all $v \neq 0$, with equality if and only if $v$ is proportional to $(M_x, M_z)$.
+		\item $r(v)$ is maximized along the coordinate axes:
+		\begin{equation}\label{eq:ratio_axes}
+			r(e_1) = \frac{R}{M_x} = \sqrt{1 + \frac{M_z^2}{M_x^2}}, \qquad r(e_2) = \frac{R}{M_z} = \sqrt{1 + \frac{M_x^2}{M_z^2}}.
+		\end{equation}
+		\item In the symmetric case $M_x = M_z = M$: $r_{\max} = \sqrt{2}$ (on axes), $r_{\min} = 1$ (on diagonals).
+	\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+	On the unit circle $v = (\cos\theta, \sin\theta)$, the ratio becomes $r(\theta) = R / (M_x\abs{\cos\theta} + M_z\abs{\sin\theta})$.
+	By the Cauchy--Schwarz inequality,
+	\begin{equation*}
+		M_x\abs{v_1} + M_z\abs{v_2} \leq \sqrt{M_x^2 + M_z^2}\sqrt{v_1^2 + v_2^2} = R\norm{v}_2,
+	\end{equation*}
+	so $r(v) \geq 1$.
+	Equality in Cauchy--Schwarz holds if and only if $(\abs{v_1}, \abs{v_2}) \propto (M_x, M_z)$, i.e., $v$ is proportional to $(\pm M_x, \pm M_z)$.
+	At this direction, $M_x\abs{v_1} + M_z\abs{v_2} = (M_x^2 + M_z^2)\norm{v}_2/R = R\norm{v}_2$, confirming $r = 1$.
+
+	The maximum of $r$ corresponds to the minimum of the denominator $g(\theta) = M_x\cos\theta + M_z\sin\theta$ over $\theta \in [0, \pi/2]$.
+	The interior critical point $g'(\theta^*) = 0$ gives $\tan\theta^* = M_z/M_x$, at which $g(\theta^*) = R$ --- this is the \emph{maximum} of the denominator ($g'' < 0$), yielding $r = 1$.
+	The \emph{minimum} of the denominator occurs at the boundary: $\theta = 0$ gives $g = M_x$ and $r = R/M_x$; $\theta = \pi/2$ gives $g = M_z$ and $r = R/M_z$.
+\end{proof}
+
+\begin{remark}
+	The pointwise ratio is maximized along the coordinate axes and minimized along the direction $(M_x, M_z)$.
+	In the RDD context, the functional $Lf = f(x_0)$ has sensitivity concentrated along the running variable $x$.
+	The cost of agnosticism --- using the isotropic disk rather than the anisotropic rectangle --- is therefore largest precisely where the estimation problem has most sensitivity, scaling as $R/M_x = \sqrt{1 + M_z^2/M_x^2}$.
+\end{remark}
+
+\commentT{TO DO: (1) Investigate how the ``effective'' ratio $\rho$ depends on the design geometry. The modulus involves an optimization over both functions and the estimator structure, so $\rho$ is not simply a pointwise ratio but reflects the entire estimation problem. (2) Work out the explicit modulus for the Gaussian white noise model or a discretized design to pin down $\rho$ exactly. (3) The pointwise bounds $1 \leq r(v) \leq R/\min(M_x, M_z)$ suggest $1 < \rho \leq R/\min(M_x, M_z)$, but the upper bound may not be tight.}

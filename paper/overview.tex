@@ -90,8 +90,13 @@ Any coupling --- linear, nonlinear, or $\ell_2$ --- that does not violate the ma
 	A primitive-consistent set $\mathcal{C}$ is \emph{coupling-agnostic} with respect to bounds $(M_x, M_z)$ if it is maximal: there is no primitive-consistent $\mathcal{C}' \supsetneq \mathcal{C}$.
 \end{definition}
 
-A coupling-agnostic set imposes no restriction beyond the primitive per-partial bounds.
-Any strict subset of a coupling-agnostic set introduces a coupling --- an additional constraint linking the partial derivatives that is not implied by the marginal bounds alone.
+\begin{definition}[Coupling]\label{def:coupling}
+	A primitive-consistent set $\mathcal{C}$ with respect to bounds $(M_x, M_z)$ \emph{imposes coupling} if $\mathcal{C} \subsetneq [-M_x, M_x] \times [-M_z, M_z]$.
+	That is, there exist gradient pairs $(u, v)$ permitted by the marginal bounds ($\abs{u} \leq M_x$, $\abs{v} \leq M_z$) that $\mathcal{C}$ forbids: membership in $\mathcal{C}$ restricts the feasible values of one partial derivative given the other.
+\end{definition}
+
+A coupling-agnostic set imposes no restriction beyond the primitive per-partial bounds; equivalently, it does not impose coupling.
+Any strict subset of a coupling-agnostic set introduces coupling --- an additional constraint linking the partial derivatives that is not implied by the marginal bounds alone.
 
 \begin{proposition}[The rectangle is the unique coupling-agnostic class]\label{prop:coupling_agnostic}
 	For any $M_x, M_z > 0$, the rectangle $[-M_x, M_x] \times [-M_z, M_z]$ is the unique coupling-agnostic constraint set with respect to bounds $(M_x, M_z)$.
