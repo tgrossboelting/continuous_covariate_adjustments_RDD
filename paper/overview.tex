@@ -86,6 +86,16 @@ The following definitions and proposition formalize this argument.
 Primitive-consistency captures the minimal requirement that the constraint set respects the researcher's per-partial bounds.
 Any coupling --- linear, nonlinear, or $\ell_2$ --- that does not violate the marginal bounds $M_x$ and $M_z$ produces a primitive-consistent set.
 
+\begin{definition}[Primitive-consistent constraint set --- implicit form]\label{def:primitive_consistent_implicit}
+	Let $\phi : \mathbb{R}^2 \to \mathbb{R}$ be a convex function with $\phi(0) \leq 1$.
+	The sublevel set $\mathcal{C}_\phi = \{ g \in \mathbb{R}^2 : \phi(g) \leq 1 \}$ is primitive-consistent with bounds $(M_x, M_z)$ if $\mathcal{C}_\phi \subseteq [-M_x, M_x] \times [-M_z, M_z]$.
+\end{definition}
+
+\Cref{def:primitive_consistent,def:primitive_consistent_implicit} are equivalent characterizations: convexity of $\phi$ ensures $\mathcal{C}_\phi$ is convex, and the sublevel set condition delivers compactness and the marginal bounds.
+The rectangle corresponds to $\phi(g) = \max(\abs{g_1}/M_x,\, \abs{g_2}/M_z)$ (the scaled $\ell_\infty$ norm); the disk to $\phi(g) = \norm{g}_2 / R$ (the scaled $\ell_2$ norm).
+Every convex $\phi$ satisfying the inclusion defines a gradient constraint set, and every primitive-consistent set arises as a sublevel set of some convex $\phi$.
+\commentT{This implicit-function characterization links convex geometry to convex analysis.  The constraint set $\mathcal{C}$ is a convex body; its support function $h_{\mathcal{C}}(v) = \sup_{g \in \mathcal{C}} \langle g, v \rangle$ is the convex-analytic dual object.  The chain is: (1) the implicit function $\phi$ defines the geometry of $\mathcal{C}$ (convex geometry); (2) the support function $h_{\mathcal{C}}$ encodes the same set via its dual representation (convex analysis); (3) $h_{\mathcal{C}}$ is exactly the worst-case directional derivative, which enters the minimax bias.  So the shape of $\phi$ determines the minimax risk through $h_{\mathcal{C}}$.  Moreover, the gauge function $\gamma_{\mathcal{C}}(v) = \inf\{t > 0 : v \in t\mathcal{C}\}$ is the polar dual of $h_{\mathcal{C}}$, and if $\mathcal{C}$ is symmetric then $\gamma_{\mathcal{C}}$ is a norm whose unit ball is $\mathcal{C}$.  This means: choosing a gradient constraint set is equivalent to choosing a norm on gradient space, and the support function is the dual norm.  Rectangle $\leftrightarrow$ $\ell_\infty / \ell_1$ duality; disk $\leftrightarrow$ $\ell_2$ self-duality.  Develop this into a remark connecting to Rockafellar (1970) and Schneider (2014).}
+
 \begin{definition}[Coupling-agnostic constraint set]\label{def:coupling_agnostic}
 	A primitive-consistent set $\mathcal{C}$ is \emph{coupling-agnostic} with respect to bounds $(M_x, M_z)$ if it is maximal: there is no primitive-consistent $\mathcal{C}' \supsetneq \mathcal{C}$.
 \end{definition}

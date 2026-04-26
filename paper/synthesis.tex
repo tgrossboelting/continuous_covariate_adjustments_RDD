@@ -1,0 +1,525 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{General Argument}\label{sec:argument}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Primitive Information and the Rectangle}\label{sec:argument:primitives}
+
+Suppose a researcher observes data generated from a nonparametric regression function $m(x,z) = \E[Y \mid X = x, Z = z]$ and wishes to estimate it nonparametrically.
+To conduct minimax optimal inference, the researcher must choose a smoothness class --- a convex set of functions over which worst-case risk will be evaluated.
+A natural first step is to reason about bounds on the partial derivatives:
+\begin{equation*}
+	\abs*{\frac{\partial m}{\partial x}} \leq M_x, \qquad \abs*{\frac{\partial m}{\partial z}} \leq M_z.
+\end{equation*}
+These bounds are the researcher's \emph{primitive information}: substantive reasoning about the maximal rate of change in each direction.
+The task is to translate these bounds into a smoothness class $\mathcal{F}$ by choosing a \emph{gradient constraint set} $\mathcal{C} \subset \mathbb{R}^2$ --- a set of feasible gradient pairs $(\partial m / \partial x,\, \partial m / \partial z)$ --- and defining $\mathcal{F}(\mathcal{C}) = \{ f : \nabla f(x,z) \in \mathcal{C} \text{ for all } (x,z) \}$.
+
+The only structural requirement on $\mathcal{C}$ is convexity: if $f, g \in \mathcal{F}(\mathcal{C})$, then $\nabla(\lambda f + (1-\lambda)g) = \lambda \nabla f + (1-\lambda) \nabla g$ must lie in $\mathcal{C}$.
+Convexity of $\mathcal{C}$ is necessary and sufficient for the function class to be closed under convex combinations --- the minimal assumption for a coherent smoothness class and for the minimax machinery that relies on convexity of $\mathcal{F}$.
+Beyond convexity, the constraint set must respect the primitive information: any $(u,v) \in \mathcal{C}$ must satisfy $\abs{u} \leq M_x$ and $\abs{v} \leq M_z$.
+
+\begin{definition}[Primitive-consistent constraint set]\label{def:primitive_consistent}
+	Let $M_x, M_z > 0$.
+	A set $\mathcal{C} \subset \mathbb{R}^2$ is \emph{primitive-consistent} with bounds $(M_x, M_z)$ if $\mathcal{C}$ is compact, convex, contains the origin, and satisfies: for all $(u, v) \in \mathcal{C}$, $\abs{u} \leq M_x$ and $\abs{v} \leq M_z$.
+\end{definition}
+
+A natural choice for $\mathcal{C}$ is the rectangle $[-M_x, M_x] \times [-M_z, M_z]$: the Cartesian product of the two marginal bounds.
+It admits every gradient pair that is individually consistent with the primitives, without imposing any relationship between $\partial m / \partial x$ and $\partial m / \partial z$.
+This is the anisotropic class $\mathcal{F}_1^{\mathrm{aniso}}(M_x, M_z)$.
+
+
+\subsection{Coupling: Further Restricting the Constraint Set}\label{sec:argument:coupling}
+
+The researcher could further restrict the constraint set by imposing a joint restriction on the partial derivatives --- a constraint that links the feasible values of $\partial m / \partial x$ and $\partial m / \partial z$.
+Such a restriction takes the form of a convex function $\phi : \mathbb{R}^2 \to \mathbb{R}$ that carves out a subset of the rectangle:
+\begin{equation*}
+	\mathcal{C}_\phi = \bigl\{ g \in \mathbb{R}^2 : \phi(g) \leq 1 \bigr\} \;\subseteq\; [-M_x, M_x] \times [-M_z, M_z].
+\end{equation*}
+
+\begin{definition}[Constrained gradient set --- implicit form]\label{def:primitive_consistent_implicit}
+	Let $\phi : \mathbb{R}^2 \to \mathbb{R}$ be a convex function with $\phi(0) \leq 1$.
+	The sublevel set $\mathcal{C}_\phi = \{ g \in \mathbb{R}^2 : \phi(g) \leq 1 \}$ is primitive-consistent with bounds $(M_x, M_z)$ if $\mathcal{C}_\phi \subseteq [-M_x, M_x] \times [-M_z, M_z]$.
+\end{definition}
+
+The rectangle itself corresponds to $\phi(g) = \max(\abs{g_1}/M_x,\, \abs{g_2}/M_z)$ --- no additional restriction.
+The isotropic disk corresponds to $\phi(g) = \norm{g}_2 / R$ --- the quadratic constraint $(\partial m / \partial x)^2 + (\partial m / \partial z)^2 \leq R^2$, which forces a large value of one partial to be accompanied by a small value of the other.
+
+Such joint restrictions require substantive knowledge about the regression function: the researcher must have reason to believe that certain combinations of partial derivatives cannot occur.
+In most nonparametric settings --- including density estimation, conditional expectation estimation, and the RDD application of this paper --- such structural beliefs are difficult to justify.
+The default, absent strong model-specific reasoning, is to not restrict the partials beyond the primitive bounds.
+
+When the implicit function $\phi$ does impose a binding constraint --- so that $\mathcal{C}_\phi$ is a \emph{strict} subset of the rectangle --- the set of feasible functions shrinks.
+
+\begin{definition}[Coupling]\label{def:coupling}
+	A primitive-consistent set $\mathcal{C}$ with respect to bounds $(M_x, M_z)$ \emph{imposes coupling} if $\mathcal{C} \subsetneq [-M_x, M_x] \times [-M_z, M_z]$.
+	That is, there exist gradient pairs $(u, v)$ permitted by the marginal bounds ($\abs{u} \leq M_x$, $\abs{v} \leq M_z$) that $\mathcal{C}$ forbids: knowing the value of one partial restricts the feasible values of the other.
+\end{definition}
+
+Coupling is additional information about the regression function.
+A smaller constraint set means a smaller function class, and a smaller function class means the adversary in the minimax problem has fewer functions to choose from.
+Geometrically, coupling shrinks the set of possible functions that the estimator must guard against --- which improves estimation.
+This is the covering argument: a class $\mathcal{F}(\mathcal{C}_1) \subseteq \mathcal{F}(\mathcal{C}_2)$ is easier to estimate over, because the worst case is taken over a smaller set.
+
+The question is then: which primitive-consistent set uses only the primitive information --- and no coupling?
+The answer is the rectangle, and it is the only one.
+
+\begin{proposition}[The rectangle is the unique coupling-agnostic class]\label{prop:coupling_agnostic}
+	For any $M_x, M_z > 0$, the rectangle $[-M_x, M_x] \times [-M_z, M_z]$ is the unique primitive-consistent set that does not impose coupling.
+	We call this the \emph{coupling-agnostic} class.\footnote{The uniqueness of the rectangle has a structural parallel in copula theory. The Fréchet class $\mathcal{F}(F_1, F_2)$ of all joint distributions with marginals $F_1, F_2$ is bounded by the Fréchet--Hoeffding bounds, and the independence copula $C(u,v) = uv$ is the unique element imposing no dependence. The rectangle is to gradient constraint sets what the independence copula is to joint distributions: the Cartesian product of the marginal objects, imposing no cross-coordinate structure \parencite[cf.][Chapter~2]{nelsen_introduction_2006}.}
+\end{proposition}
+
+\begin{proof}
+	The rectangle is primitive-consistent by construction and does not impose coupling ($\mathcal{C} = [-M_x, M_x] \times [-M_z, M_z]$, not a strict subset of itself).
+	For uniqueness, let $\mathcal{C}$ be any primitive-consistent set.
+	For any $(u, v) \in \mathcal{C}$, primitive-consistency gives $\abs{u} \leq M_x$ and $\abs{v} \leq M_z$, so $(u, v) \in [-M_x, M_x] \times [-M_z, M_z]$.
+	Thus every primitive-consistent set is contained in the rectangle.
+	If $\mathcal{C}$ does not impose coupling, it is not a strict subset of the rectangle, so $\mathcal{C} = [-M_x, M_x] \times [-M_z, M_z]$.
+\end{proof}
+
+The rectangle is the largest primitive-consistent constraint set, which means the induced function class $\mathcal{F}_1^{\mathrm{aniso}}(M_x, M_z)$ is the \emph{smallest function class} the researcher can justify without coupling information.
+Any smaller constraint set requires coupling assumptions; any function class that avoids coupling but exceeds the rectangle must inflate the primitive bounds.
+The rectangle uses the primitive information fully and adds nothing beyond it.
+
+\begin{corollary}[Coupling restricts]\label{cor:coupling_restricts}
+	Any primitive-consistent $\mathcal{C} \subsetneq [-M_x, M_x] \times [-M_z, M_z]$ imposes coupling: the induced function class satisfies $\mathcal{F}(\mathcal{C}) \subsetneq \mathcal{F}_1^{\mathrm{aniso}}(M_x, M_z)$.
+	This includes the inscribed isotropic class $\mathcal{F}_1^{\mathrm{iso}}(M)$ with $M \leq \min(M_x, M_z)$.
+\end{corollary}
+
+\begin{corollary}[Agnostic isotropic classes inflate]\label{cor:iso_inflates}
+	If an isotropic class $\mathcal{F}_1^{\mathrm{iso}}(R)$ contains the anisotropic class --- that is, $[-M_x, M_x] \times [-M_z, M_z] \subseteq B_2(R)$ --- then $R \geq \sqrt{M_x^2 + M_z^2} > \max(M_x, M_z)$.
+	The isotropic class admits per-partial derivatives up to $R$, strictly exceeding the primitive bounds.
+\end{corollary}
+
+\begin{proof}
+	The corners $(\pm M_x, \pm M_z)$ must lie in $B_2(R)$, so $M_x^2 + M_z^2 \leq R^2$, giving $R \geq \sqrt{M_x^2 + M_z^2} > \max(M_x, M_z)$.
+	The marginal projections of $B_2(R)$ are $[-R, R]$ on each axis.
+	By \cref{prop:coupling_agnostic}, the coupling-agnostic class with bounds $(R, R)$ is $[-R, R]^2 \supsetneq B_2(R)$.
+\end{proof}
+
+\begin{corollary}[Isotropic classes inherently impose coupling]\label{cor:iso_is_coupling}
+	For any $R > 0$, $B_2(R) \subsetneq [-R, R]^2$.
+	The disk is primitive-consistent with bounds $(R, R)$ but not coupling-agnostic.
+	Every isotropic class inherently imposes coupling, regardless of $R$.
+\end{corollary}
+
+\begin{proof}
+	$B_2(R)$ has marginal projections $[-R, R]$, so it is primitive-consistent with bounds $(R, R)$.
+	By \cref{prop:coupling_agnostic}, the unique coupling-agnostic set with bounds $(R, R)$ is $[-R, R]^2$.
+	Since $(R, R) \notin B_2(R)$, the inclusion is strict.
+\end{proof}
+
+The three corollaries expose the trilemma: the isotropic class either imposes coupling (\cref{cor:coupling_restricts}), inflates the primitive bounds (\cref{cor:iso_inflates}), or both --- and is never coupling-agnostic (\cref{cor:iso_is_coupling}).
+From an information-theoretic perspective, the rectangle encodes exactly the researcher's primitive information and nothing more: any further restriction is an assumption, not a consequence of the data.
+
+
+\subsection{From Geometry to Minimax Risk}\label{sec:argument:risk}
+
+The geometry of the constraint set $\mathcal{C}$ enters the minimax problem through its \emph{support function}:
+\begin{equation*}
+	h_{\mathcal{C}}(v) = \sup\bigl\{ \langle u, v \rangle : u \in \mathcal{C} \bigr\}, \qquad v \in \mathbb{R}^2.
+\end{equation*}
+For the two constraint sets of interest:
+\begin{alignat*}{2}
+	&\text{Rectangle } [-M_x, M_x] \times [-M_z, M_z]: &\quad h_{\mathrm{rect}}(v) &= M_x \abs{v_1} + M_z \abs{v_2}, \\
+	&\text{Disk } B_2(R),\; R = \sqrt{M_x^2 + M_z^2}: &\quad h_{\mathrm{disk}}(v) &= R \norm{v}_2.
+\end{alignat*}
+
+The modulus of continuity --- the fundamental quantity governing minimax risk --- depends on $\mathcal{C}$ only through $h_{\mathcal{C}}$ (\cref{cor:modulus_functional} below).
+The chain from geometry to risk is:
+\begin{enumerate}
+	\item $\mathcal{C}_{\mathrm{rect}} \subsetneq \mathcal{C}_{\mathrm{disk}}$ (by \cref{prop:coupling_agnostic} and \cref{cor:iso_inflates}).
+	\item $\mathcal{F}(\mathcal{C}_{\mathrm{rect}}) \subseteq \mathcal{F}(\mathcal{C}_{\mathrm{disk}})$ (definitional: tighter gradient constraint $\implies$ smaller function class).
+	\item $\omega(\delta; \mathcal{F}(\mathcal{C}_{\mathrm{rect}})) \leq \omega(\delta; \mathcal{F}(\mathcal{C}_{\mathrm{disk}}))$ for all $\delta > 0$ (monotonicity of the modulus, \cref{thm:monotonicity}).
+	\item $R^*(\mathcal{F}(\mathcal{C}_{\mathrm{rect}})) \leq R^*(\mathcal{F}(\mathcal{C}_{\mathrm{disk}}))$ (minimax risk is governed by the modulus).
+\end{enumerate}
+The monotonicity proof goes directly through set inclusion --- no support function computation needed.
+The support function representation is explanatory: it shows \emph{why} the modulus is monotone (larger $\mathcal{C}$ means pointwise larger $h_{\mathcal{C}}$, which loosens the constraints in the modulus optimization) and will be used to characterize the exact ratio $\rho(M_x, M_z) = R^*(\mathcal{F}(\mathcal{C}_{\mathrm{disk}})) / R^*(\mathcal{F}(\mathcal{C}_{\mathrm{rect}})) > 1$.
+
+
+\subsection{Application to Optimized RDD}\label{sec:argument:rdd}
+
+Following \textcite{imbens_optimized_2019}, consider a convex weighted average treatment effect:
+\begin{equation*}
+	\tau_w \defeq \int \tau(c, z)\, w(z)\, dz,
+\end{equation*}
+where $w(z)$ is a researcher-chosen weight function.
+A standard linear RDD estimator uses weights $w_i = w(X_i)$ depending only on the running variable.
+A \emph{covariate-adjusted} estimator generalizes to weights $w_i = w(X_i, Z_i)$ that also depend on the covariate $Z_i$, allowing it to exploit the bivariate structure of the design.
+
+Under the isotropic class, covariate adjustment is pointless: the curvature budget is fungible, and the adversary reallocates the entire budget into $x$ (setting $\partial m / \partial z = 0$), rendering $Z$ uninformative.
+Under the anisotropic class, the $M_z$ budget cannot be redirected.
+Covariate adjustment neutralizes the $z$-channel, stranding the $M_z$ budget; worst-case risk depends primarily on $M_x$, yielding a strict improvement.
+
+The optimal weights, worst-case risk, and confidence intervals in the \textcite{imbens_optimized_2019} framework all depend on $h_{\mathcal{C}}$.
+Replacing the isotropic disk with the anisotropic rectangle yields strictly shorter confidence intervals and lower worst-case MSE --- without changing the data, the estimator form, or the target parameter.
+
+\paragraph{Pooling and the tuple function space.}
+The comparison of estimators that target different derived quantities of the same DGP requires a common parameter space.
+Define four function classes as tuples $(m,\, f_{Z|X},\, \bar{m})$ linked by consistency $\bar{m}(x) = \int m(x,z)\, f_{Z|X}(z \given x)\, dz$:
+\begin{align*}
+	\mathcal{F}^R(M_x, M_z, L) &\defeq \bigl\{ (m, f_{Z|X}, \bar{m}) : m \in \mathcal{F}_1^{\mathrm{aniso}}(M_x, M_z),\; f_{Z|X} \in \mathcal{F}_1(L),\; \text{consistency} \bigr\}, \\
+	\mathcal{F}^{\mathrm{aniso}}(M_x, M_z) &\defeq \bigl\{ (m, f_{Z|X}, \bar{m}) : m \in \mathcal{F}_1^{\mathrm{aniso}}(M_x, M_z) \bigr\}, \\
+	\mathcal{F}^{\mathrm{iso}}(R) &\defeq \bigl\{ (m, f_{Z|X}, \bar{m}) : m \in \mathcal{F}_1^{\mathrm{iso}}(R) \bigr\}, \\
+	\mathcal{F}^P(M_x^P) &\defeq \bigl\{ (m, f_{Z|X}, \bar{m}) : \bar{m} \in \mathcal{F}_1(M_x^P) \bigr\}.
+\end{align*}
+By the Leibniz rule, $\abs{\bar{m}'(x)} \leq M_x + M_z \cdot L \eqdef M_x^P$: the pooled Lipschitz constant is derived, not assumed.
+The inclusion chain is:
+\begin{equation*}
+	\mathcal{F}^R \;\subseteq\; \mathcal{F}^{\mathrm{aniso}} \;\subseteq\; \mathcal{F}^{\mathrm{iso}}, \qquad
+	\mathcal{F}^R \;\subseteq\; \mathcal{F}^{\mathrm{aniso}} \;\subseteq\; \mathcal{F}^P.
+\end{equation*}
+The segmented estimator's bias depends only on the $m$-component, so $R^*(\mathcal{F}^R) = R^*(\mathcal{F}^{\mathrm{aniso}})$: the density bound does not bind.
+The local constant estimator faces the inflated $M_x^P$, giving:
+\begin{equation*}
+	R^*(\mathcal{F}^R) \;=\; R^*(\mathcal{F}^{\mathrm{aniso}}) \;\leq\; \min\bigl\{ R^*(\mathcal{F}^{\mathrm{iso}}),\; R^*(\mathcal{F}^P) \bigr\}.
+\end{equation*}
+\commentT{Coupling and pooling are orthogonal information-loss mechanisms in the tuple space.  Coupling changes the shape of the $m$-cross-section (rectangle $\to$ disk); pooling projects from $(m, f_{Z|X})$ onto $\bar{m}$.  Both inflate the effective Lipschitz constant and increase minimax risk, but through different geometric operations.  Develop into a remark with a schematic figure.}
+
+
+\subsection{The Prevalence of Isotropic Assumptions}\label{sec:argument:prevalence}
+
+The isotropic class is the default throughout the nonparametric estimation literature --- and in the RDD literature specifically --- despite the coupling it silently imports.
+This subsection reviews the key examples and argues that the anisotropic class should be the default whenever the researcher reasons about smoothness from per-direction primitives.
+
+\paragraph{Imbens and Wager (2019).}
+The optimized RDD framework of \textcite{imbens_optimized_2019} assumes that the conditional response functions $\mu_w(x) = \E[Y_i(w) \mid X_i = x]$ have bounded second derivatives.
+In the univariate case ($X_i \in \mathbb{R}$), the assumption is $\abs{\mu''_w(x)} \leq B$ --- a scalar bound on a scalar quantity, where no iso\-tropic/aniso\-tropic distinction arises.
+In the multivariate extension (their Section~II.B), the assumption becomes
+\begin{equation*}
+	\norm{\nabla^2 \mu_w(x)} \leq B,
+\end{equation*}
+where $\norm{\cdot}$ is the operator norm (largest absolute eigenvalue of the Hessian).
+This is the second-order analog of the isotropic gradient norm constraint $\norm{\nabla f}_2 \leq M$.
+It couples the second partial derivatives: large curvature $\partial^2 \mu_w / \partial x^2$ in the running variable direction forces small curvature $\partial^2 \mu_w / \partial z^2$ in the covariate direction.
+The total curvature budget $B$ is fungible across directions.
+
+The anisotropic alternative at second order would impose separate bounds:
+\begin{equation*}
+	\abs*{\frac{\partial^2 \mu_w}{\partial x^2}} \leq B_x, \qquad \abs*{\frac{\partial^2 \mu_w}{\partial z^2}} \leq B_z, \qquad \abs*{\frac{\partial^2 \mu_w}{\partial x \partial z}} \leq B_{xz},
+\end{equation*}
+constraining the Hessian to lie in a rectangular region rather than a spectral norm ball.
+The arguments of \cref{sec:argument:primitives,sec:argument:coupling} apply at any differentiability order: the researcher's primitives are separate beliefs about curvature in each direction, and imposing a joint norm constraint introduces coupling that requires substantive justification.
+
+Under the Imbens--Wager isotropic class, the worst-case function responding to a covariate-adjusted estimator reallocates its entire curvature budget into the running variable direction $x$ (setting $\partial^2 \mu_w / \partial z^2 = 0$), rendering $Z$ uninformative.
+This is why covariate adjustment cannot improve minimax risk under their framework: the fungibility of the curvature budget makes the covariate irrelevant in the worst case.
+Under an anisotropic class, the $B_x$ budget cannot absorb the freed $B_z$ budget, and covariate adjustment yields a strict improvement.
+
+\paragraph{Armstrong and Kolesár (2018, 2020).}
+The bias-aware inference framework of \textcite{armstrong_optimal_2018} is dimension-free: the modulus of continuity governs optimal confidence intervals for any convex function class $\mathcal{F}$.
+However, their RDD-specific formulas (Section~2) and all worked examples use univariate Taylor classes $\mathcal{F}_{\mathrm{RDT},p}(C)$ with a scalar smoothness constant $C$.
+In the multivariate extension sketched in their Appendix~B, the smoothness class for $h_y(x) = \E[Y \mid X = x] = \bar{m}(x)$ is the pooled regression function --- bounding $\abs{\bar{m}'(x)} \leq C_y$ with a single scalar is exactly the pooled/fungible bound.
+Their framework is the right machinery for our problem; it is their choice of function class, not their methodology, that we improve upon.
+
+\paragraph{The standard justification and its conflation.}
+The typical justification for isotropic classes is that the researcher ``does not know which direction is smoother'' and therefore should not assume $M_x \neq M_z$.
+This reasoning is correct as far as it goes --- it motivates setting $M_x = M_z = M$ --- but it leads to a \emph{square} $[-M, M]^2$, not a disk $B_2(M)$.
+The isotropic class conflates two distinct types of ignorance:
+\begin{enumerate}
+	\item \emph{Unknown directional magnitudes}: the researcher does not know whether $x$ or $z$ is smoother.
+	This is addressed by setting $M_x = M_z$, yielding a square.
+	\item \emph{Unknown coupling}: the researcher does not know whether large $\partial f / \partial x$ coincides with large $\partial f / \partial z$.
+	Only this second type of ignorance justifies the disk, which forbids the corners $(\pm M, \pm M)$.
+\end{enumerate}
+The passage from square to disk requires a substantive belief that the partials cannot simultaneously take extreme values --- a coupling assumption.
+In the symmetric case ($M_x = M_z = M$), the disk inflates the effective per-partial bound from $M$ to $M\sqrt{2}$, widening confidence intervals by a factor that depends on the estimation geometry (\cref{lem:ratio_range}).
+
+\paragraph{Broader prevalence.}
+The isotropic default extends well beyond the RDD literature:
+\begin{itemize}
+	\item \emph{Textbook treatments:} \textcite{tsybakov_introduction_2009} and Wasserman (2006) present isotropic Hölder and Sobolev classes as the standard framework for minimax theory.
+	Anisotropic classes (Nikol'skii classes) appear in specialized treatments \parencite{nikolskii_approximation_1975,ibragimov_statistical_1981} but are not part of the standard toolkit.
+	\item \emph{Minimax rate theory:} \textcite{stone_optimal_1980} derives rates for anisotropic classes, but the geometric relationship between isotropic and anisotropic constraint sets --- and the cost of choosing one over the other --- is not discussed.
+	\item \emph{Kernel density estimation and nonparametric regression:} Spherical bandwidths (using $\norm{x - x'}_2$ as the distance metric) are standard, corresponding to the isotropic class. Rectangular bandwidths (direction-dependent) are the anisotropic analog.
+	\item \emph{Applied multivariate RDD:} When $X_i \in \mathbb{R}^k$, common practice reduces to a univariate problem by using $D_i = \norm{X_i - c}_2$ as a scalar running variable \parencite[e.g.,][]{keele_geographic_2015}, which inherits the isotropic structure.
+\end{itemize}
+In each case, the isotropic class silently imports a coupling assumption with a quantifiable cost in minimax risk.
+By \cref{prop:coupling_agnostic}, the coupling-agnostic alternative --- the rectangle --- is always available and always weakly better.
+The improvement is strict whenever the estimation problem has sensitivity in a direction where $h_{\mathrm{disk}} > h_{\mathrm{rect}}$, which by \cref{lem:ratio_range} holds along every direction except $(M_x, M_z)$ and its reflections.
+
+\commentT{Bhattacharya (2014) provides the most explicit conceptual motivation in the existing literature: ``the assumption of isotropy would lead to loss of efficiency which would be more and more accentuated in higher dimensions.''  But even this discussion motivates anisotropy on grounds of efficiency rather than identifying the coupling mechanism.  Our contribution is the coupling-agnosticism characterization: the rectangle is not just ``more efficient'' but the unique class that avoids unjustified coupling.}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Illustration}\label{sec:illustration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider a sharp RDD with $n = 6$ units at fixed design points $u_i = (x_i, z_i) \in [-1,1]^2$, with outcomes $Y_i = m(u_i) + \varepsilon_i$, $\varepsilon_i \sim (0, \sigma^2)$, and target $\tau = \lim_{x \downarrow 0} m(x,z) - \lim_{x \uparrow 0} m(x,z)$.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[scale=3.2]
+
+	% --- Coordinate axes ---
+	\draw[->, thick] (-1.15, 0) -- (1.15, 0) node[right] {$X$};
+	\draw[->, thick] (0, -1.15) -- (0, 1.15) node[above] {$Z$};
+
+	% --- Tick marks ---
+	\foreach \x in {-1, -0.5, 0.5, 1} {
+		\draw[thick] (\x, -0.03) -- (\x, 0.03);
+	}
+	\foreach \z in {-1, -0.5, 0.5, 1} {
+		\draw[thick] (-0.03, \z) -- (0.03, \z);
+	}
+
+	% --- Bounding box ---
+	\draw[gray, thin] (-1,-1) rectangle (1,1);
+
+	% --- Region labels ---
+	\node[gray, font=\small] at (-0.6, -0.15) {Control};
+	\node[gray, font=\small] at (0.6, -0.15) {Treatment};
+
+	% --- Sample units ---
+	% Top row: z = 0.5
+	\fill[blue!70!black] (-0.8, 0.5) circle (1.8pt);
+	\fill[blue!70!black] (-0.4, 0.5) circle (1.8pt);
+	\fill[red!70!black] (0.8, 0.5) circle (1.8pt);
+
+	% Bottom row: z = -0.5
+	\fill[blue!70!black] (-0.8, -0.5) circle (1.8pt);
+	\fill[red!70!black] (0.4, -0.5) circle (1.8pt);
+	\fill[red!70!black] (0.8, -0.5) circle (1.8pt);
+
+	% --- Unit labels ---
+	\node[above=3pt, blue!70!black, font=\footnotesize] at (-0.8, 0.5) {$u_1$};
+	\node[above=3pt, blue!70!black, font=\footnotesize] at (-0.4, 0.5) {$u_2$};
+	\node[above=3pt, red!70!black, font=\footnotesize] at (0.8, 0.5) {$u_3$};
+
+	\node[below=3pt, blue!70!black, font=\footnotesize] at (-0.8, -0.5) {$u_4$};
+	\node[below=3pt, red!70!black, font=\footnotesize] at (0.4, -0.5) {$u_5$};
+	\node[below=3pt, red!70!black, font=\footnotesize] at (0.8, -0.5) {$u_6$};
+
+\end{tikzpicture}
+\caption{Fixed design with $n = 6$ units. Control units (blue, $x_i < 0$) and treatment units (red, $x_i > 0$) are arranged in two rows at $z = \pm\tfrac{1}{2}$. The design is asymmetric: at $z = \tfrac{1}{2}$, two control units lie near the cutoff while only one treatment unit is available; at $z = -\tfrac{1}{2}$, the pattern reverses.}
+\label{fig:design}
+\end{figure}
+
+\paragraph{Estimators.}
+The local constant estimator assigns equal weight to all units on each side:
+\begin{equation}\label{eq:lc_estimator}
+	\hat\tau_{\mathrm{lc}} = \underbrace{\tfrac{1}{3}(Y_3 + Y_5 + Y_6)}_{\bar{Y}_T} - \underbrace{\tfrac{1}{3}(Y_1 + Y_2 + Y_4)}_{\bar{Y}_C}.
+\end{equation}
+This is a $w(X_i)$-only estimator: weights depend only on which side of the cutoff the unit falls.
+Its displacement vectors include a cross-row pair $(u_6, u_1)$ with $\Delta_3 = (1.6, -1)$, which compares units at different covariate values.
+
+The segmented estimator adjusts for $Z$ via stratum fixed effects:
+\begin{equation}\label{eq:seg_estimator}
+	\hat\tau_{\mathrm{seg}} = \frac{1}{2}\Bigl[Y_3 - \tfrac{1}{2}(Y_1 + Y_2)\Bigr] + \frac{1}{2}\Bigl[\tfrac{1}{2}(Y_5 + Y_6) - Y_4\Bigr].
+\end{equation}
+This is a $w(X_i, Z_i)$ estimator.
+All four within-stratum displacement vectors are purely horizontal: $\Delta = (1.6, 0)$ or $(1.2, 0)$.
+
+\paragraph{Worst-case bias under $M_x = 0$.}
+Under the anisotropic class with $M_x = 0$, every function is constant in $x$.
+The segmented estimator is \emph{exactly unbiased}: all displacements are horizontal, so the $M_z$ bound is orthogonal to the estimation direction.
+The local constant estimator has bias $\tfrac{1}{3} M_z$ from the cross pair.
+
+Under the isotropic class, the adversary can tilt the function into $x$ at the expense of $z$-variation, so the direction-specific information $M_x = 0$ cannot be exploited.
+The gap between the two classes is the cost of coupling.
+
+\commentT{Conjecture: $\mathcal{F}^{\mathrm{iso}} \subseteq \mathcal{F}^P$ in the tuple space.  The pooled class's derived bound is $\ell_1$-type ($M_x^P = M_x + M_z L$), while the isotropic coupling is $\ell_2$-type.  Since $\norm{v}_1 \geq \norm{v}_2$ for all $v$, this should follow.  To do: formalize.}
+
+\commentT{Compute explicit worst-case bias for both estimators under iso with $M_x = 0$ to quantify the gap.}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Technical Results}\label{sec:technical}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\subsection{Support Functions and Gradient-Constrained Classes}\label{sec:technical:support}
+
+\begin{definition}[Gradient-constrained smoothness class]\label{def:gradient_class}
+	Let $\mathcal{C} \subset \mathbb{R}^2$ be a compact, convex set containing the origin.
+	The gradient-constrained smoothness class induced by $\mathcal{C}$ is
+	\begin{equation*}
+		\mathcal{F}(\mathcal{C}) \defeq \bigl\{ f : \mathbb{R}^2 \to \mathbb{R} \;\big|\; \nabla f(x,z) \in \mathcal{C} \;\; \text{for all } (x,z) \bigr\}.
+	\end{equation*}
+\end{definition}
+
+The \emph{support function} of $\mathcal{C}$ is
+\begin{equation*}
+	h_{\mathcal{C}}(v) = \sup\bigl\{ \langle u, v \rangle : u \in \mathcal{C} \bigr\}, \qquad v \in \mathbb{R}^d.
+\end{equation*}
+By standard convex duality, $\mathcal{C}$ is recovered from $h_{\mathcal{C}}$:
+\begin{equation}\label{eq:C_from_h}
+	\mathcal{C} = \bigl\{ u \in \mathbb{R}^d : \langle u, v \rangle \leq h_{\mathcal{C}}(v) \text{ for all } v \in \mathbb{R}^d \bigr\}.
+\end{equation}
+
+\begin{lemma}[Gradient constraint via support function]\label{lem:gradient_support}
+	Let $\mathcal{C} \subset \mathbb{R}^d$ be compact and convex with $0 \in \mathcal{C}$.
+	Then $\nabla f(x) \in \mathcal{C}$ for all $x$ if and only if
+	\begin{equation}\label{eq:dir_deriv_bound}
+		D_v f(x) \leq h_{\mathcal{C}}(v) \qquad \text{for all } x \text{ and all } v \in \mathbb{R}^d.
+	\end{equation}
+\end{lemma}
+
+\begin{proof}
+	If $\nabla f(x) \in \mathcal{C}$, then $D_v f(x) = \langle \nabla f(x), v \rangle \leq \sup_{u \in \mathcal{C}} \langle u, v \rangle = h_{\mathcal{C}}(v)$.
+	Conversely, if \eqref{eq:dir_deriv_bound} holds for all $v$, then $\langle \nabla f(x), v \rangle \leq h_{\mathcal{C}}(v)$ for all $v$, which by \eqref{eq:C_from_h} implies $\nabla f(x) \in \mathcal{C}$.
+\end{proof}
+
+\begin{lemma}[Direction-dependent Lipschitz property]\label{lem:lipschitz}
+	If $f \in \mathcal{F}(\mathcal{C})$, then for any two points $x, x'$,
+	\begin{equation}\label{eq:lipschitz_onesided}
+		f(x') - f(x) \leq h_{\mathcal{C}}(x' - x).
+	\end{equation}
+	If in addition $\mathcal{C}$ is symmetric ($\mathcal{C} = -\mathcal{C}$), then $\abs{f(x') - f(x)} \leq h_{\mathcal{C}}(x' - x)$.
+	The bound is tight: $f^*(x) = h_{\mathcal{C}}(x) \in \mathcal{F}(\mathcal{C})$ achieves $f^*(d) - f^*(0) = h_{\mathcal{C}}(d)$.
+\end{lemma}
+
+\begin{proof}
+	By the fundamental theorem of calculus,
+	\begin{equation*}
+		f(x') - f(x) = \int_0^1 \langle \nabla f(x + t(x'-x)),\, x' - x \rangle \, dt \leq \int_0^1 h_{\mathcal{C}}(x' - x) \, dt = h_{\mathcal{C}}(x' - x),
+	\end{equation*}
+	using \cref{lem:gradient_support}.
+	For tightness: $h_{\mathcal{C}}$ is convex and positively homogeneous, hence differentiable a.e.\ with $\nabla h_{\mathcal{C}}(x) \in \mathcal{C}$ (as a subgradient), so $f^* = h_{\mathcal{C}} \in \mathcal{F}(\mathcal{C})$.
+\end{proof}
+
+
+\subsection{Modulus of Continuity}\label{sec:technical:modulus}
+
+In real analysis, the modulus of continuity of a function class $\mathcal{F}$ is
+\begin{equation*}
+	\omega(\delta; \mathcal{F}) = \sup\bigl\{ \abs{f(x) - f(y)} : \abs{x - y} \leq \delta,\; f \in \mathcal{F} \bigr\}.
+\end{equation*}
+It measures worst-case oscillation over $\delta$-intervals: for Lipschitz-$M$ functions, $\omega(\delta) = M\delta$.
+
+The statistical modulus \parencite{donoho_statistical_1994,armstrong_optimal_2018} generalizes this.
+Let $\mathcal{F}$ be convex, $K$ a linear observation operator, $Lf$ a linear functional.
+We observe $Y = Kf + \sigma\varepsilon$.
+The single-class modulus (for centrosymmetric $\mathcal{F}$) is
+\begin{equation}\label{eq:modulus_single}
+	\omega(\delta; \mathcal{F}) = \sup\bigl\{ 2Lf : \norm{Kf} \leq \delta/2,\; f \in \mathcal{F} \bigr\}.
+\end{equation}
+The parallel is exact: $\abs{x - y} \leq \delta$ becomes $\norm{K(g-f)} \leq \delta$ (distance in the data), and $\abs{f(x) - f(y)}$ becomes $Lg - Lf$ (gap in the target).
+By Theorem~3.1 of \textcite{armstrong_optimal_2018}, the minimax risk is governed by $\omega$: all optimal bias--variance tradeoffs are parameterized by the modulus.
+
+\begin{corollary}[Modulus as a functional of the support function]\label{cor:modulus_functional}
+	For a gradient-constrained class $\mathcal{F}(\mathcal{C})$, the modulus of continuity depends on $\mathcal{C}$ only through its support function $h_{\mathcal{C}}$:
+	\begin{equation*}
+		\omega(\delta; \mathcal{F}(\mathcal{C})) = \Omega(\delta,\, h_{\mathcal{C}}).
+	\end{equation*}
+\end{corollary}
+
+\begin{proof}
+	By \cref{lem:gradient_support}, $f \in \mathcal{F}(\mathcal{C})$ if and only if $D_v f(x) \leq h_{\mathcal{C}}(v)$ for all $x, v$.
+	Substituting into \eqref{eq:modulus_single}, the constraint on $f$ is expressed entirely in terms of $h_{\mathcal{C}}$.
+	Since $h_{\mathcal{C}}$ determines $\mathcal{C}$ uniquely (by \eqref{eq:C_from_h}), the modulus is a functional of $h_{\mathcal{C}}$.
+\end{proof}
+
+
+\subsection{Worst-Case Bias}\label{sec:technical:wcb}
+
+\begin{proposition}[Worst-case bias over $\mathcal{F}(\mathcal{C})$]\label{prop:wcb}
+	Let $\hat{L} = \sum_{i} w_i Y_i$ be a linear estimator of $Lf = f(x_0)$, with $\sum_i w_i = 1$.
+	Then the worst-case bias over $\mathcal{F}(\mathcal{C})$ is
+	\begin{equation}\label{eq:wcb_general}
+		\wcb_{\mathcal{F}(\mathcal{C})}(\hat{L}) \defeq \sup_{f \in \mathcal{F}(\mathcal{C})} \bigl( \E[\hat{L}] - f(x_0) \bigr) = \sum_{i=1}^n w_i \, h_{\mathcal{C}}(x_i - x_0),
+	\end{equation}
+	where the supremum is attained by $f^*(x) = h_{\mathcal{C}}(x - x_0)$.
+
+	For symmetric $\mathcal{C}$, the maximum absolute bias is
+	\begin{equation}\label{eq:wcb_abs}
+		\sup_{f \in \mathcal{F}(\mathcal{C})} \abs{\E[\hat{L}] - f(x_0)} = \sum_{i=1}^n \abs{w_i} \, h_{\mathcal{C}}(x_i - x_0).
+	\end{equation}
+\end{proposition}
+
+\begin{proof}
+	For any $f \in \mathcal{F}(\mathcal{C})$,
+	$\E[\hat{L}] - f(x_0) = \sum_i w_i (f(x_i) - f(x_0))$.
+	By \cref{lem:lipschitz}, $f(x_i) - f(x_0) \leq h_{\mathcal{C}}(x_i - x_0)$.
+	The bound is attained by $f^*(x) = h_{\mathcal{C}}(x - x_0) \in \mathcal{F}(\mathcal{C})$.
+	Since $h_{\mathcal{C}}(x_i - x_0) \geq 0$, $f^*$ achieves the upper bound at every observation when all $w_i \geq 0$.
+
+	\commentT{The absolute value formula \eqref{eq:wcb_abs} needs revision for mixed-sign weights.  The argument requires a single $f$ to simultaneously achieve $+h_{\mathcal{C}}$ at positive-weight and $-h_{\mathcal{C}}$ at negative-weight observations, but the inter-observation Lipschitz constraint prevents this in general.  Counterexample: $w_1 = 2$ at $x_1 = 1$, $w_2 = -1$ at $x_2 = 2$, $x_0 = 0$, Lipschitz $M = 1$; formula gives $4$, actual wcb is $2$.  Three options: (1) restrict to $w_i \geq 0$, (2) state as upper bound, (3) solve the constrained LP over $\Delta_i = f(x_i) - f(x_0)$.}
+\end{proof}
+
+Specializing to the two constraint sets:
+\begin{align}
+	\wcb_{\mathrm{rect}}(\hat{L}) &= \sum_{i} \abs{w_i} \bigl( M_x \abs{x_i - x_0^{(1)}} + M_z \abs{z_i - x_0^{(2)}} \bigr), \label{eq:wcb_rect} \\
+	\wcb_{\mathrm{disk}}(\hat{L}) &= \sum_{i} \abs{w_i} \, R \sqrt{(x_i - x_0^{(1)})^2 + (z_i - x_0^{(2)})^2}. \label{eq:wcb_disk}
+\end{align}
+The rectangle's worst-case bias decomposes additively; the disk's couples the directions through $\ell_2$.
+
+
+\subsection{Monotonicity of the Modulus}\label{sec:technical:monotonicity}
+
+\begin{theorem}[Monotonicity]\label{thm:monotonicity}
+	Let $\mathcal{C}_1 \subseteq \mathcal{C}_2$ be compact convex sets.
+	Then $\omega(\delta; \mathcal{F}(\mathcal{C}_1)) \leq \omega(\delta; \mathcal{F}(\mathcal{C}_2))$ for all $\delta > 0$.
+\end{theorem}
+
+\begin{proof}
+	$\mathcal{C}_1 \subseteq \mathcal{C}_2$ implies $\mathcal{F}(\mathcal{C}_1) \subseteq \mathcal{F}(\mathcal{C}_2)$.
+	The modulus \eqref{eq:modulus_single} is a supremum over $\mathcal{F}$; enlarging the feasible set cannot decrease the value.
+\end{proof}
+
+\begin{theorem}[Strict monotonicity]\label{thm:strict_monotonicity}
+	Let $\mathcal{C}_1 \subsetneq \mathcal{C}_2$ with $\mathcal{C}_1$ having nonempty interior.
+	Then $\omega(\delta; \mathcal{F}(\mathcal{C}_1)) < \omega(\delta; \mathcal{F}(\mathcal{C}_2))$ for all $\delta > 0$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+	Since $\mathcal{C}_1 \subsetneq \mathcal{C}_2$, there exists $u^* \in \mathcal{C}_2 \setminus \mathcal{C}_1$.
+	By the separation theorem, $h_{\mathcal{C}_2}(v^*) > h_{\mathcal{C}_1}(v^*)$ for some direction $v^*$.
+	The modulus-achieving function for $\mathcal{F}(\mathcal{C}_1)$ can be perturbed to tilt the gradient toward $u^*$, remaining in $\mathcal{F}(\mathcal{C}_2)$ while strictly increasing $Lf$.
+
+	\commentT{This proof sketch needs to be made rigorous.  The key step is constructing a perturbation that exploits the extra gradient freedom in $\mathcal{C}_2 \setminus \mathcal{C}_1$ to strictly increase $Lf$ without violating $\norm{Kf} \leq \delta/2$.  Core open problem.}
+\end{proof}
+
+\begin{corollary}[Strict improvement from anisotropic class]\label{cor:strict_improvement}
+	For any $M_x, M_z > 0$, with $R = \sqrt{M_x^2 + M_z^2}$,
+	\begin{equation*}
+		\omega\bigl(\delta; \mathcal{F}(\mathcal{C}_{\mathrm{rect}})\bigr) < \omega\bigl(\delta; \mathcal{F}(\mathcal{C}_{\mathrm{disk}})\bigr) \qquad \text{for all } \delta > 0.
+	\end{equation*}
+\end{corollary}
+
+\begin{proof}
+	$\mathcal{C}_{\mathrm{rect}} \subsetneq \mathcal{C}_{\mathrm{disk}}$: the corners $(\pm M_x, \pm M_z)$ lie on the disk boundary, but $(R, 0) \in \mathcal{C}_{\mathrm{disk}} \setminus \mathcal{C}_{\mathrm{rect}}$ since $R > M_x$.
+	Apply \cref{thm:strict_monotonicity}.
+\end{proof}
+
+
+\subsection{Bounding the Ratio}\label{sec:technical:ratio}
+
+\begin{definition}[Pointwise support function ratio]\label{def:sfr}
+	For $v \in \mathbb{R}^d \setminus \{0\}$:
+	\begin{equation*}
+		r(v) \defeq \frac{h_{\mathrm{disk}}(v)}{h_{\mathrm{rect}}(v)} = \frac{R \norm{v}_2}{M_x \abs{v_1} + M_z \abs{v_2}}.
+	\end{equation*}
+\end{definition}
+
+\begin{lemma}[Range of the pointwise ratio]\label{lem:ratio_range}
+	For $M_x, M_z > 0$ and $R = \sqrt{M_x^2 + M_z^2}$:
+	\begin{enumerate}
+		\item $r(v) \geq 1$ for all $v \neq 0$, with equality iff $v \propto (M_x, M_z)$.
+		\item $r$ is maximized along the coordinate axes:
+		$r(e_1) = R/M_x = \sqrt{1 + M_z^2/M_x^2}$, $r(e_2) = R/M_z$.
+		\item Symmetric case $M_x = M_z = M$: $r_{\max} = \sqrt{2}$ (axes), $r_{\min} = 1$ (diagonals).
+	\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+	On the unit circle $v = (\cos\theta, \sin\theta)$, $r(\theta) = R / (M_x\abs{\cos\theta} + M_z\abs{\sin\theta})$.
+	By Cauchy--Schwarz, $M_x\abs{v_1} + M_z\abs{v_2} \leq \sqrt{M_x^2 + M_z^2}\norm{v}_2 = R\norm{v}_2$, so $r(v) \geq 1$.
+	Equality holds iff $(\abs{v_1}, \abs{v_2}) \propto (M_x, M_z)$.
+	The maximum of $r$ corresponds to the minimum of $g(\theta) = M_x\cos\theta + M_z\sin\theta$ over $[0, \pi/2]$.
+	The interior critical point $g'(\theta^*) = 0$ gives $\tan\theta^* = M_z/M_x$, at which $g = R$ (the \emph{maximum} of $g$, yielding $r = 1$).
+	The minimum of $g$ is at the boundary: $\theta = 0$ gives $r = R/M_x$; $\theta = \pi/2$ gives $r = R/M_z$.
+\end{proof}
+
+\begin{remark}
+	The cost of using the isotropic disk is largest along the coordinate axes --- precisely where the RDD estimation problem has most sensitivity.
+	For estimation of $f(x_0)$, the dominant extrapolation direction is along $x$, where the ratio is $R/M_x = \sqrt{1 + M_z^2/M_x^2}$.
+\end{remark}
+
+
+\subsection{Open Problems}\label{sec:technical:open}
+
+\commentT{Open problem 1: Compute $\mathfrak{R}^*_{\mathrm{aniso}}(M_x, M_z)$ exactly.  The isotropic constant $\mathfrak{R}^*_{\mathrm{iso}}$ is known \parencite{tsybakov_introduction_2009,donoho_statistical_1994}.  The anisotropic constant requires computing the modulus of continuity for the rectangular constraint set.  Most promising route: support function representation + Bertin (2004) for exact constants over anisotropic Hölder classes.}
+
+\commentT{Open problem 2: Complete the proof of \cref{thm:strict_monotonicity} (strict monotonicity of the modulus under $\mathcal{F}_1 \subsetneq \mathcal{F}_2$).  Does strict monotonicity depend on the functional $L$ or hold for all linear functionals?  The weak version (\cref{thm:monotonicity}) is functional-independent; the strict version may require $L$ to have sensitivity in a direction where $h_{\mathcal{C}_2} > h_{\mathcal{C}_1}$.}
+
+\commentT{Open problem 3: Compute the exact ratio $\rho(M_x, M_z) = \mathfrak{R}^*_{\mathrm{iso}}(M_x, M_z) / \mathfrak{R}^*_{\mathrm{aniso}}(M_x, M_z)$.  The pointwise support function ratio bounds suggest $1 < \rho \leq R/\min(M_x, M_z)$, but $\rho$ depends on the full estimation problem (design geometry, functional), not just the pointwise ratio.  In the symmetric case $M_x = M_z$, the ratio should satisfy $1 < \rho \leq \sqrt{2}$.}
+
+

@@ -6,7 +6,32 @@ The main result is that the modulus of continuity --- and hence the minimax risk
 
 \subsection{Setup: The Modulus of Continuity Framework}\label{sec:tc:modulus}
 
-We adopt the framework of \textcite{donoho_statistical_1994} and \textcite{armstrong_optimal_2018}.
+\paragraph{The classical modulus of continuity.}
+In real analysis, the modulus of continuity of a function $f \colon \mathbb{R} \to \mathbb{R}$ is
+\begin{equation}\label{eq:modulus_classical}
+	\omega_f(\delta) = \sup\bigl\{ \abs{f(x) - f(y)} : \abs{x - y} \leq \delta \bigr\}.
+\end{equation}
+This measures the worst-case oscillation of $f$ over intervals of width $\delta$: it answers the question, ``how much can $f$ change between two points that are $\delta$-close?''
+For a Lipschitz function with constant $M$, the modulus is $\omega_f(\delta) = M\delta$ --- the function changes at most linearly in the distance between the points.
+
+Over a function \emph{class} $\mathcal{F}$, the modulus becomes the worst case over all functions in the class:
+\begin{equation}\label{eq:modulus_class}
+	\omega(\delta; \mathcal{F}) = \sup_{f \in \mathcal{F}}\, \omega_f(\delta) = \sup\bigl\{ \abs{f(x) - f(y)} : \abs{x - y} \leq \delta,\; f \in \mathcal{F} \bigr\}.
+\end{equation}
+This is the fundamental quantity for approximation theory: it governs how well $f$ can be approximated from partial information.
+If we observe $f$ at a point $x$ and wish to estimate $f$ at a nearby point $y$ with $\abs{x-y} \leq \delta$, the best possible error is $\omega(\delta; \mathcal{F})/2$ --- the modulus determines the minimax rate.
+
+Three properties of the classical modulus carry over to the statistical setting:
+\begin{enumerate}
+	\item \emph{Monotonicity in $\delta$:} larger distances allow larger oscillations, so $\omega(\cdot; \mathcal{F})$ is nondecreasing.
+	\item \emph{Monotonicity in $\mathcal{F}$:} larger function classes allow wilder functions, so $\mathcal{F}_1 \subseteq \mathcal{F}_2$ implies $\omega(\delta; \mathcal{F}_1) \leq \omega(\delta; \mathcal{F}_2)$.
+	\item \emph{Concavity in $\delta$} (for convex classes): the modulus is concave, reflecting diminishing returns --- the first observations near the target are most informative.
+\end{enumerate}
+
+\paragraph{The statistical modulus of continuity.}
+\textcite{donoho_statistical_1994} and \textcite{armstrong_optimal_2018} generalize the classical modulus to the statistical estimation problem.
+The key substitution is: instead of measuring ``distance between two evaluation points'' in the domain, the statistical modulus measures ``distance between two functions as seen through the data.''
+
 Let $\mathcal{F}$ be a convex subset of a function space, $K \colon \mathcal{F} \to \mathcal{Y}$ a linear operator mapping functions to an observation space $\mathcal{Y}$, and $Lf$ a linear functional to be estimated.
 We observe $Y = Kf + \sigma\varepsilon$, where $\varepsilon$ is standard Gaussian noise.
 
@@ -18,8 +43,17 @@ When $\mathcal{F}$ is \emph{centrosymmetric} ($f \in \mathcal{F} \implies -f \in
 \begin{equation}\label{eq:modulus_single}
 	\omega(\delta; \mathcal{F}) = \sup\bigl\{ 2Lf : \norm{Kf} \leq \delta/2,\; f \in \mathcal{F} \bigr\}.
 \end{equation}
+
+The parallel with the classical modulus is exact.
+In \eqref{eq:modulus_classical}, $\abs{x - y} \leq \delta$ constrains the distance between two points in the domain; in \eqref{eq:modulus_two_class}, $\norm{K(g-f)} \leq \delta$ constrains the distance between two functions \emph{as seen through the observation operator} $K$.
+In both cases, the modulus asks: ``given that two objects are $\delta$-close in the observable metric, how far apart can they be in the quantity of interest?''
+The classical modulus measures the worst-case gap $\abs{f(x) - f(y)}$ between function values; the statistical modulus measures the worst-case gap $Lg - Lf$ between functional values.
+The three monotonicity and concavity properties carry over unchanged.
+
 By Theorem~3.1 and Corollary~3.1 of \textcite{armstrong_optimal_2018}, the minimax one-sided CI for $Lf$ has worst-case excess length equal to $\omega(\delta_\beta; \mathcal{F})$, and no other $1-\alpha$ CI can improve upon this.
 In particular, the minimax risk for estimating $Lf$ over $\mathcal{F}$ is governed by the modulus: all optimal bias--variance tradeoffs are parameterized by $\omega$.
+
+\commentT{The classical $\to$ statistical modulus analogy can be pushed further.  In the classical case, the modulus of a Lipschitz-$M$ function is $\omega_f(\delta) = M\delta$, and the Lipschitz constant $M$ is the ``worst-case slope'' --- which is exactly the support function $h_{[-M,M]}(v) = M|v|$ of the 1D gradient constraint set $[-M,M]$.  So even in one dimension, the modulus is governed by the support function.  The multivariate generalization replaces $M|v|$ with $h_{\mathcal{C}}(v)$ for a convex constraint set $\mathcal{C} \subset \mathbb{R}^d$, and the entire paper's argument is that this replacement is non-trivial when $\mathcal{C}$ is a rectangle vs.\ a disk.  In the statistical version, $\delta$ is no longer a domain distance but a ``noise budget'' --- the constraint $\|K(g-f)\| \leq \delta$ says the two functions are indistinguishable at noise level $\delta$.  The modulus then measures the identification problem: how much can the target $Lf$ vary among functions that look alike in the data?  This is the bias--variance tradeoff: $\delta$ indexes the variance budget (how much noise the estimator tolerates), and $\omega(\delta)$ is the resulting worst-case bias.  The optimal estimator balances the two by choosing $\delta^*$ to minimize $\omega(\delta)^2 + \delta^2\sigma^2$ (or the analogous criterion for CIs).  Develop this into a remark connecting the classical approximation-theoretic and statistical interpretations.}
 
 
 \subsection{Gradient-Constrained Classes and the Support Function}\label{sec:tc:support}
