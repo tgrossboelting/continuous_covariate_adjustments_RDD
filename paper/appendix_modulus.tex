@@ -1,0 +1,139 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The Modulus Problem for Gradient-Constrained Classes}\label{app:modulus}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+This appendix develops the structure of the modulus of continuity problem for the bivariate gradient-constrained classes $\mathcal{F}(\mathcal{C})$ introduced in \cref{sec:technical:support}, with the goal of characterizing the exact minimax risk constant for the anisotropic rectangle $\mathcal{C}_{\mathrm{rect}} = [-M_x, M_x] \times [-M_z, M_z]$.
+
+
+\subsection{Setup and the Role of $\delta$}\label{app:modulus:setup}
+
+Consider a fixed design $\{(x_i, z_i)\}_{i=1}^n$ with outcomes $Y_i = f(x_i, z_i) + \varepsilon_i$, $\varepsilon_i \sim \mathcal{N}(0, \sigma^2)$, and target functional $Lf = f(x_0, z_0)$ (evaluation at the cutoff).
+The observation operator $K$ maps $f$ to the vector $(f(x_1, z_1), \ldots, f(x_n, z_n))$.
+
+The single-class modulus of continuity for a centrosymmetric class $\mathcal{F}(\mathcal{C})$ is
+\begin{equation}\label{eq:app_modulus}
+	\omega(\delta;\, \mathcal{F}(\mathcal{C})) = \sup\bigl\{ 2f(x_0, z_0) : \norm{Kf} \leq \delta/2,\; f \in \mathcal{F}(\mathcal{C}) \bigr\}.
+\end{equation}
+
+The parameter $\delta$ controls the \emph{noise budget}: the constraint $\norm{Kf} = \sqrt{\sum_i f(x_i, z_i)^2} \leq \delta/2$ requires the function to be small at the observation points, while the objective maximizes $f$ at the target.
+A function that achieves a large value of $f(x_0, z_0)$ while remaining small at the observations is one that the data cannot distinguish from the zero function --- the hardest function to estimate.
+
+The modulus $\omega(\delta)$ is increasing in $\delta$: a larger noise budget permits the function to be more visible at the observations, allowing a taller ``tent'' around the target.
+The optimal bias--variance tradeoff selects $\delta^* = \delta^*(\sigma, n)$ such that the worst-case bias $\omega(\delta^*)/2$ balances the estimation variance.
+By Theorem~3.1 of \textcite{armstrong_optimal_2018}, the minimax risk is governed by $\omega(\delta^*)$.
+
+
+\subsection{The Least Favorable Function}\label{app:modulus:lff}
+
+The function achieving the supremum in \eqref{eq:app_modulus} --- the \emph{least favorable function} --- is determined by both the constraint set $\mathcal{C}$ and the design geometry $K$.
+
+\paragraph{Unconstrained case: the Lipschitz tent.}
+Ignoring the data constraint $\norm{Kf} \leq \delta/2$, the function maximizing $f(x_0, z_0)$ subject to $\nabla f \in \mathcal{C}$ and $f(x_0, z_0) = 0$ is the support function itself:
+\begin{equation}\label{eq:app_tent}
+	f^*(x, z) = h_{\mathcal{C}}(x - x_0,\, z - z_0).
+\end{equation}
+For the rectangle, this is
+\begin{equation*}
+	f^*_{\mathrm{rect}}(x, z) = M_x\abs{x - x_0} + M_z\abs{z - z_0},
+\end{equation*}
+which increases linearly from the target in both coordinate directions.
+For the disk, $f^*_{\mathrm{disk}}(x, z) = R\sqrt{(x - x_0)^2 + (z - z_0)^2}$, a cone.
+
+\paragraph{Constrained case: the modulated tent.}
+The data constraint $\norm{Kf} \leq \delta/2$ forces the function to be small at the observation points.
+The unconstrained tent $h_{\mathcal{C}}(x - x_0, z - z_0)$ is large at distant observations, so the actual least favorable function must ``bend down'' --- it rises from the observations toward the target, peaks, and returns.
+In the univariate case ($d = 1$), \textcite{armstrong_optimal_2018} show that the least favorable functions are piecewise linear with bandwidths $h_+, h_-$ (their equation~(3)):
+\begin{equation*}
+	g^*(x) = 1(x \geq 0)(L_0 + b) + C h_+ \cdot k_+(x/h_+) - C h_- \cdot k_-(x/h_-),
+\end{equation*}
+where $k(u) = \max\{0, 1 - \abs{u}\}$ is the triangular kernel.
+The bandwidths are determined by the equal-weighting condition (their equation~(5)), which ensures that positive and negative observations contribute equally to distinguishing the null from the alternative.
+
+In the bivariate case with the rectangle constraint, the least favorable function inherits the separable structure of $h_{\mathrm{rect}}$, but the data constraint couples the coordinates through the design geometry.
+
+
+\subsection{Derivative Switching Under the Rectangle}\label{app:modulus:switching}
+
+A key structural feature of the rectangle constraint is that the least favorable function can \emph{switch} the sign of $\partial f / \partial z$ across different regions of the design, independently of $\partial f / \partial x$.
+
+Consider the support function tent centered at the target $(x_0, z_0) = (0, 0)$:
+\begin{equation*}
+	f^*_{\mathrm{rect}}(x, z) = M_x\abs{x} + M_z\abs{z}.
+\end{equation*}
+This function has gradient
+\begin{equation*}
+	\nabla f^*_{\mathrm{rect}}(x, z) = \bigl(M_x \sign(x),\; M_z \sign(z)\bigr)
+\end{equation*}
+at every point where the gradient exists.
+The $z$-derivative switches from $+M_z$ above $z = 0$ to $-M_z$ below $z = 0$, while the $x$-derivative independently takes value $+M_x$ or $-M_x$ depending on the sign of $x$.
+This switching is feasible because the rectangle is a product set: the pair $(M_x, +M_z)$ and the pair $(M_x, -M_z)$ are both in $[-M_x, M_x] \times [-M_z, M_z]$.
+
+Under the disk constraint, the same switching is feasible only if the switched gradients both lie in $B_2(R)$:
+both $(M_x, +M_z)$ and $(M_x, -M_z)$ require $M_x^2 + M_z^2 \leq R^2$.
+This is satisfied when $R \geq \sqrt{M_x^2 + M_z^2}$, but at the cost of an inflated bound: the disk must be large enough to contain the corners of the rectangle.
+
+\paragraph{Design-dependent switching pattern.}
+The actual least favorable function's switching pattern depends on the design.
+For a linear estimator $\hat{L} = \sum_i w_i Y_i$ targeting $f(x_0)$, the worst-case function must simultaneously:
+\begin{enumerate}
+	\item Maximize $f$ at positive-weight observations (bias contribution $w_i [f(x_i, z_i) - f(x_0)]$ is large positive).
+	\item Minimize $f$ at negative-weight observations (bias contribution is large positive when $w_i < 0$ and $f(x_i, z_i) < f(x_0)$).
+	\item Satisfy the inter-observation Lipschitz constraints: $\abs{f(x_i, z_i) - f(x_j, z_j)} \leq h_{\mathcal{C}}(x_i - x_j, z_i - z_j)$.
+\end{enumerate}
+
+\commentT{The inter-observation Lipschitz constraints (item 3) are the key complication.  Without them, the worst-case bias is simply $\sum_i \abs{w_i} h_{\mathcal{C}}(x_i - x_0, z_i - z_0)$ --- the formula from \cref{prop:wcb}.  But a single function cannot simultaneously achieve $+h_{\mathcal{C}}$ at some observations and $-h_{\mathcal{C}}$ at others if they are too close to each other.  The worst-case function must navigate these pairwise constraints, and the actual worst-case bias is the solution to a constrained optimization (linear program) over the feasible function values $\Delta_i = f(x_i) - f(x_0)$ subject to $\abs{\Delta_i - \Delta_j} \leq h_{\mathcal{C}}(x_i - x_j, z_i - z_j)$ for all pairs.  This is already noted in the proof of \cref{prop:wcb}.}
+
+Whether the derivative switches between $+M_z$ and $-M_z$ at a given observation depends on the relative position of nearby observations in the $z$-direction:
+\begin{itemize}
+	\item If two cross-stratum observations $(x_i, z_i)$ and $(x_j, z_j)$ with $z_i > z_0 > z_j$ both carry positive weight, the adversary wants $f$ large at both.
+	The fastest increase from the target to $z_i > 0$ uses $\partial f / \partial z = +M_z$; the fastest increase to $z_j < 0$ uses $\partial f / \partial z = -M_z$.
+	The V-shape $M_z\abs{z}$ achieves both simultaneously.
+	\item If one observation carries positive weight and a nearby observation carries negative weight, the adversary wants $f$ large at one and small at the other.
+	The derivative sign is chosen to maximize the difference $f(x_i, z_i) - f(x_j, z_j)$, subject to the inter-observation Lipschitz constraint.
+\end{itemize}
+
+Under the rectangle, these switches are ``free'': the $x$-derivative can independently take its worst-case value regardless of what $\partial f / \partial z$ is doing.
+Under the disk, switching the $z$-derivative from $+M_z$ to $-M_z$ while maintaining a large $x$-derivative requires the gradient to traverse the disk boundary, constraining the achievable $x$-derivative during the transition.
+
+
+\subsection{The Modulus as a Constrained Program}\label{app:modulus:program}
+
+For a fixed design with $n$ observation points, the modulus problem \eqref{eq:app_modulus} can be written as a finite-dimensional optimization over the function values $\Delta_i = f(x_i, z_i) - f(x_0, z_0)$:
+\begin{equation}\label{eq:app_modulus_program}
+\begin{aligned}
+	\omega(\delta;\, \mathcal{F}(\mathcal{C})) = \sup_{\Delta \in \mathbb{R}^n} \quad & {-2} \cdot 0 \\
+	\text{subject to} \quad & \sqrt{\textstyle\sum_i (\Delta_i + f_0)^2} \leq \delta/2, \\
+	& \abs{\Delta_i - \Delta_j} \leq h_{\mathcal{C}}(x_i - x_j,\, z_i - z_j), \quad \forall\, i, j, \\
+	& \abs{\Delta_i} \leq h_{\mathcal{C}}(x_i - x_0,\, z_i - z_0), \quad \forall\, i,
+\end{aligned}
+\end{equation}
+where the last two families of constraints ensure that the function values are achievable by some $f \in \mathcal{F}(\mathcal{C})$.
+
+\commentT{This formulation needs to be made precise.  The modulus maximizes $2f(x_0)$, which with the normalization $f(x_0) = 0$ becomes: maximize $0$ subject to $f$ being small at the observations --- this is not right.  The correct formulation follows AK's testing interpretation: the modulus is $\sup\{Lg^* - Lf^* : \norm{K(g^* - f^*)} \leq \delta,\; f^*, g^* \in \mathcal{F}\}$, where $f^*$ and $g^*$ are the least favorable pair.  Alternatively, for the single-class modulus with centrosymmetric $\mathcal{F}$: $\omega(\delta) = \sup\{2Lf : \norm{Kf} \leq \delta/2,\; f \in \mathcal{F}\}$.  The finite-dimensional reduction requires showing that the modulus depends on $f$ only through its values at $x_0, x_1, \ldots, x_n$, which holds because the constraints are path-based (Lipschitz along any path connecting observations to the target).  Need to write this out carefully, potentially following Donoho (1994) Section~3 or AK Appendix~A.}
+
+For the rectangle, $h_{\mathrm{rect}}(d_x, d_z) = M_x\abs{d_x} + M_z\abs{d_z}$, so the inter-observation constraints decompose additively:
+\begin{equation*}
+	\abs{\Delta_i - \Delta_j} \leq M_x\abs{x_i - x_j} + M_z\abs{z_i - z_j}.
+\end{equation*}
+For the disk, $h_{\mathrm{disk}}(d_x, d_z) = R\sqrt{d_x^2 + d_z^2}$, which does not decompose.
+
+The additive structure of $h_{\mathrm{rect}}$ suggests that the modulus for the rectangle may be bounded or computed using the 1D moduli for $M_x$ and $M_z$ separately, but the design geometry (through the pairwise constraints) couples them.
+
+\commentT{Open problem: can the bivariate modulus for the rectangle be decomposed into (or bounded by) a combination of univariate moduli?  The additive support function $h_{\mathrm{rect}}(v) = M_x\abs{v_1} + M_z\abs{v_2}$ suggests a connection to the product structure, but the data constraint $\norm{Kf} \leq \delta/2$ operates on the joint function values, not on marginals.  If the design is a product grid ($x$-points $\times$ $z$-points), the modulus might factorize.  For general designs, an upper bound via $\omega_{\mathrm{rect}} \leq \omega_{M_x}^{(x)} + \omega_{M_z}^{(z)}$ (sum of marginal moduli) would already give a tighter bound than the disk modulus.  This is the key technical step needed for the exact constant.}
+
+
+\subsection{Comparison: Rectangle vs.\ Disk Modulus}\label{app:modulus:comparison}
+
+The inclusion $\mathcal{C}_{\mathrm{rect}} \subsetneq \mathcal{C}_{\mathrm{disk}}$ gives $\omega(\delta; \mathcal{F}(\mathcal{C}_{\mathrm{rect}})) \leq \omega(\delta; \mathcal{F}(\mathcal{C}_{\mathrm{disk}}))$ by monotonicity (\cref{thm:monotonicity}).
+
+The gap arises because the disk's least favorable function can concentrate its gradient budget:
+\begin{itemize}
+	\item Under the disk, the adversary can set $\nabla f = (R, 0)$ --- concentrating the entire budget into $x$.
+	Under the rectangle, $\abs{\partial f / \partial x} \leq M_x < R$: the $z$-budget cannot be transferred.
+	\item Under the disk, the adversary pays $R\sqrt{\Delta x^2 + \Delta z^2}$ for a diagonal displacement.
+	Under the rectangle, the cost is $M_x\abs{\Delta x} + M_z\abs{\Delta z}$ --- the coordinates contribute additively, and the $z$-cost is ``stranded'' for horizontal displacements.
+\end{itemize}
+
+The exact ratio of moduli, and hence of minimax risks, depends on the design through the displacement vectors $\{(x_i - x_0, z_i - z_0)\}_{i=1}^n$.
+By \cref{lem:ratio_range}, the pointwise support function ratio satisfies $1 \leq r(v) \leq R / \min(M_x, M_z)$, which bounds the modulus ratio.
+Computing the exact ratio for a specific design is an open problem (\cref{sec:technical:open}).

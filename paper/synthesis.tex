@@ -17,9 +17,15 @@ The only structural requirement on $\mathcal{C}$ is convexity: if $f, g \in \mat
 Convexity of $\mathcal{C}$ is necessary and sufficient for the function class to be closed under convex combinations --- the minimal assumption for a coherent smoothness class and for the minimax machinery that relies on convexity of $\mathcal{F}$.
 Beyond convexity, the constraint set must respect the primitive information: any $(u,v) \in \mathcal{C}$ must satisfy $\abs{u} \leq M_x$ and $\abs{v} \leq M_z$.
 
+\begin{definition}[Centrosymmetry]\label{def:centrosymmetric}
+	A set $\mathcal{C} \subset \mathbb{R}^d$ is \emph{centrosymmetric} if $\mathcal{C} = -\mathcal{C}$, i.e., $u \in \mathcal{C}$ implies $-u \in \mathcal{C}$.
+	A function class $\mathcal{F}$ is centrosymmetric if $f \in \mathcal{F}$ implies $-f \in \mathcal{F}$.
+	If $\mathcal{C}$ is centrosymmetric, then $\mathcal{F}(\mathcal{C})$ is centrosymmetric.
+\end{definition}
+
 \begin{definition}[Primitive-consistent constraint set]\label{def:primitive_consistent}
 	Let $M_x, M_z > 0$.
-	A set $\mathcal{C} \subset \mathbb{R}^2$ is \emph{primitive-consistent} with bounds $(M_x, M_z)$ if $\mathcal{C}$ is compact, convex, contains the origin, and satisfies: for all $(u, v) \in \mathcal{C}$, $\abs{u} \leq M_x$ and $\abs{v} \leq M_z$.
+	A set $\mathcal{C} \subset \mathbb{R}^2$ is \emph{primitive-consistent} with bounds $(M_x, M_z)$ if $\mathcal{C}$ is nonempty, convex, centrosymmetric, and satisfies: for all $(u, v) \in \mathcal{C}$, $\abs{u} \leq M_x$ and $\abs{v} \leq M_z$. Note that boundedness of the set is implied by primitive consistency. To facilitate proofs I also require closedness, to ensure the set is compact. This is not strictly necessary, and could be relaxed.
 \end{definition}
 
 A natural choice for $\mathcal{C}$ is the rectangle $[-M_x, M_x] \times [-M_z, M_z]$: the Cartesian product of the two marginal bounds.
@@ -375,6 +381,54 @@ By standard convex duality, $\mathcal{C}$ is recovered from $h_{\mathcal{C}}$:
 	For tightness: $h_{\mathcal{C}}$ is convex and positively homogeneous, hence differentiable a.e.\ with $\nabla h_{\mathcal{C}}(x) \in \mathcal{C}$ (as a subgradient), so $f^* = h_{\mathcal{C}} \in \mathcal{F}(\mathcal{C})$.
 \end{proof}
 
+\subsection{Coordinate Decomposition and Coupling in Proofs}\label{sec:technical:decomposition}
+
+The bound in \cref{lem:lipschitz} specializes differently for the two constraint sets, and the difference reveals how coupling enters at the proof level.
+
+\paragraph{Anisotropic class (rectangle).}
+The constraint set is the product $[-M_x, M_x] \times [-M_z, M_z]$, so the partial derivative bounds are independent: knowing $\abs{\partial f / \partial x}$ places no restriction on $\abs{\partial f / \partial z}$.
+To bound $f(x', z') - f(x, z)$, decompose the path into coordinate segments:
+\begin{equation}\label{eq:ftc_aniso}
+	f(x', z') - f(x, z) = \int_x^{x'} \frac{\partial f}{\partial x}(t, z)\, dt + \int_z^{z'} \frac{\partial f}{\partial z}(x', s)\, ds.
+\end{equation}
+Each integral is bounded independently: the first by $M_x\abs{x' - x}$, the second by $M_z\abs{z' - z}$.
+The two bounds do not interact --- the worst case for the horizontal leg and the worst case for the vertical leg are achieved simultaneously, because the constraint set is a Cartesian product.
+The resulting bound is
+\begin{equation*}
+	f(x', z') - f(x, z) \leq M_x\abs{x' - x} + M_z\abs{z' - z} = h_{\mathrm{rect}}(x' - x, z' - z).
+\end{equation*}
+
+\paragraph{Isotropic class (disk).}
+The constraint $\norm{\nabla f}_2 \leq R$ couples the partials: if $\abs{\partial f / \partial x}$ is close to $R$, then $\abs{\partial f / \partial z}$ must be close to zero.
+The coordinate decomposition \eqref{eq:ftc_aniso} is no longer useful, because bounding each partial at $R$ separately would give the rectangle bound $R\abs{\Delta x} + R\abs{\Delta z}$ --- an overestimate that ignores the coupling.
+Instead, the proof takes the straight-line path and bounds the directional derivative jointly via Cauchy--Schwarz:
+\begin{equation*}
+	f(x', z') - f(x, z) = \int_0^1 \langle \nabla f(\gamma(t)),\, (\Delta x, \Delta z) \rangle\, dt \leq \norm{\nabla f}_2 \norm{(\Delta x, \Delta z)}_2 \leq R\sqrt{\Delta x^2 + \Delta z^2} = h_{\mathrm{disk}}(\Delta x, \Delta z).
+\end{equation*}
+To see this concretely, parameterize the straight line from $(x, z)$ to $(x', z')$ as $\gamma(t) = (x + t\Delta x,\; z + t\Delta z)$ with $\Delta x = x' - x$ and $\Delta z = z' - z$.
+The chain rule gives:
+\begin{equation*}
+	\frac{d}{dt}f(\gamma(t)) = \frac{\partial f}{\partial x}(\gamma(t))\cdot \frac{d\gamma_1}{dt} + \frac{\partial f}{\partial z}(\gamma(t))\cdot \frac{d\gamma_2}{dt} = \frac{\partial f}{\partial x}(\gamma(t))\cdot \Delta x + \frac{\partial f}{\partial z}(\gamma(t))\cdot \Delta z,
+\end{equation*}
+where $\frac{d\gamma_1}{dt} = \Delta x$ and $\frac{d\gamma_2}{dt} = \Delta z$ are constants (the velocity of the straight line).
+Integrating from $t = 0$ to $t = 1$ recovers $f(x', z') - f(x, z)$:
+\begin{equation*}
+	f(x', z') - f(x, z) = \int_0^1 \left[ \frac{\partial f}{\partial x}(\gamma(t))\, \Delta x + \frac{\partial f}{\partial z}(\gamma(t))\, \Delta z \right] dt \leq \sqrt{\left(\frac{\partial f}{\partial x}\right)^2 + \left(\frac{\partial f}{\partial z}\right)^2}\; \sqrt{\Delta x^2 + \Delta z^2} \leq R\sqrt{\Delta x^2 + \Delta z^2}.
+\end{equation*}
+The coordinates are never separated.
+The worst-case gradient aligns with the displacement direction: for a displacement mostly in $x$, the adversary concentrates the entire gradient budget into $\partial f / \partial x$, setting $\partial f / \partial z \approx 0$.
+
+\paragraph{Consequence for estimation.}
+A linear estimator $\hat{L} = \sum_i w_i Y_i$ targeting $f(x_0)$ has worst-case bias $\sum_i \abs{w_i}\, h_{\mathcal{C}}(x_i - x_0)$.
+For the segmented estimator, all displacements are horizontal ($\Delta z_i = 0$), so:
+\begin{alignat*}{2}
+	&\text{Rectangle:} &\quad \wcb &= \textstyle\sum_i \abs{w_i}\, M_x\abs{\Delta x_i}, \\
+	&\text{Disk:} &\quad \wcb &= \textstyle\sum_i \abs{w_i}\, R\abs{\Delta x_i}.
+\end{alignat*}
+Under the rectangle, the $M_z$ bound is \emph{stranded}: it cannot contribute to bias along horizontal displacements.
+Under the disk, the adversary reallocates the freed $z$-budget into $x$, inflating the effective bound from $M_x$ to $R = \sqrt{M_x^2 + M_z^2} > M_x$.
+This is the proof-level manifestation of coupling: the isotropic constraint prevents the analyst from exploiting the per-direction structure of the displacements.
+
 
 \subsection{Modulus of Continuity}\label{sec:technical:modulus}
 
@@ -465,6 +519,8 @@ The rectangle's worst-case bias decomposes additively; the disk's couples the di
 	The modulus-achieving function for $\mathcal{F}(\mathcal{C}_1)$ can be perturbed to tilt the gradient toward $u^*$, remaining in $\mathcal{F}(\mathcal{C}_2)$ while strictly increasing $Lf$.
 
 	\commentT{This proof sketch needs to be made rigorous.  The key step is constructing a perturbation that exploits the extra gradient freedom in $\mathcal{C}_2 \setminus \mathcal{C}_1$ to strictly increase $Lf$ without violating $\norm{Kf} \leq \delta/2$.  Core open problem.}
+
+	\commentT{The theorem as stated is too strong.  Strict set inclusion $\mathcal{C}_1 \subsetneq \mathcal{C}_2$ (both compact) guarantees $h_{\mathcal{C}_1}(v^*) < h_{\mathcal{C}_2}(v^*)$ for some direction $v^*$ (by the support function's uniqueness for compact convex sets).  However, strict inequality of the modulus requires that $v^*$ aligns with a displacement direction $x_i - x_0$ that the estimation problem actually uses.  If the design has no observations with displacement component in the $v^*$ direction, the extra freedom in $\mathcal{C}_2 \setminus \mathcal{C}_1$ is invisible to the modulus.  The correct condition is: $h_{\mathcal{C}_1}(v) < h_{\mathcal{C}_2}(v)$ for some $v$ in the set of displacement directions relevant to $(L, K)$.  In the bivariate case, this fails only if all design points and the target lie on the same line in the covariate space --- e.g., all units share the same $Z$-value, so all displacements are purely horizontal.  This is the degenerate case of complete $Z$-invariance in the design.  Whenever $Z$ has variation (observations at different covariate values), the displacement vectors span $\mathbb{R}^2$, and any strict difference between $h_{\mathcal{C}_1}$ and $h_{\mathcal{C}_2}$ in any direction is exploitable.  Note also: compactness is doing real work here.  For non-compact sets (e.g.\ $\mathcal{C}_1 = \mathrm{int}(\mathcal{C}_2)$), strict set inclusion holds but the support functions are identical, so the moduli coincide trivially.  Compactness prevents this by ensuring the support function uniquely determines the set.}
 \end{proof}
 
 \begin{corollary}[Strict improvement from anisotropic class]\label{cor:strict_improvement}
@@ -478,6 +534,89 @@ The rectangle's worst-case bias decomposes additively; the disk's couples the di
 	$\mathcal{C}_{\mathrm{rect}} \subsetneq \mathcal{C}_{\mathrm{disk}}$: the corners $(\pm M_x, \pm M_z)$ lie on the disk boundary, but $(R, 0) \in \mathcal{C}_{\mathrm{disk}} \setminus \mathcal{C}_{\mathrm{rect}}$ since $R > M_x$.
 	Apply \cref{thm:strict_monotonicity}.
 \end{proof}
+
+
+\subsection{Z-Balance and the Necessity of Covariate Variation}\label{sec:technical:zbalance}
+
+\begin{definition}[$Z$-balanced design]\label{def:z_balanced}
+	A fixed design $\{(x_i, z_i)\}_{i=1}^n$ is \emph{$Z$-balanced} if, on each side of the cutoff, the multiset of $x$-positions is identical across all $z$-strata.
+	That is, for each treatment status $d \in \{0,1\}$, the conditional empirical distribution of $x_i$ given $z_i = z$ and $D_i = d$ does not depend on $z$.
+\end{definition}
+
+\begin{proposition}[$Z$-imbalance is necessary for strict improvement from covariate adjustment]\label{prop:z_imbalance}
+	Consider a fixed design $\{(x_i, z_i)\}_{i=1}^n$ with homoscedastic errors and target $\tau$ at the cutoff.
+	\begin{enumerate}
+		\item If the design is $Z$-balanced, the local constant and segmented estimators coincide: $\hat\tau_{\mathrm{lc}} = \hat\tau_{\mathrm{seg}}$.
+		Covariate adjustment does not reduce worst-case bias under any primitive-consistent $\mathcal{C}$.
+		\item If the design is $Z$-imbalanced and $M_z > 0$, the segmented estimator has strictly lower worst-case bias than the local constant estimator under $\mathcal{F}(\mathcal{C}_{\mathrm{rect}})$.
+	\end{enumerate}
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+	(1) Under $Z$-balance, each $z$-stratum contains the same $x$-positions on each side of the cutoff.
+	The segmented estimator computes within-stratum treatment effects using identical $x$-pairs and averages across strata; this coincides with the local constant estimator, which pools across strata with equal weights.
+	Since the estimators coincide, their worst-case biases are identical --- covariate adjustment is redundant.
+
+	(2) Under $Z$-imbalance, the local constant estimator necessarily makes cross-stratum comparisons: there exist paired units $(x_i, z_i)$ and $(x_j, z_j)$ with $z_i \neq z_j$ on opposite sides of the cutoff.
+	The displacement $d = (x_i - x_j,\, z_i - z_j)$ has $\Delta z \neq 0$, contributing $M_z\abs{\Delta z}$ to the worst-case bias under $h_{\mathrm{rect}}$.
+	The segmented estimator avoids these cross-stratum displacements entirely: all its within-stratum displacement vectors satisfy $\Delta z = 0$, so the $M_z$ bound is stranded.
+\end{proof}
+
+\begin{remark}
+	$Z$-balance is the design-level condition under which the $z$-direction of the support function is irrelevant to the minimax problem.
+	It arises only under complete $Z$-degeneracy: the covariate provides no additional design variation beyond what is already present in the running variable.
+	This is precisely the condition under which covariate adjustment is redundant --- the estimator cannot exploit $Z$ because $Z$ carries no information not already encoded in the $X$-design.
+	In any design with genuine $Z$-variation (different $x$-configurations across $z$-strata), the segmented estimator strictly outperforms the local constant under the anisotropic class.
+\end{remark}
+
+\commentT{Under a random design drawn from any continuous joint density $f(x,z) > 0$, exact $Z$-balance (identical $x$-realizations across $z$-strata) is an event of probability zero.  Therefore, with probability 1 over the random design, the $Z$-imbalance condition of \cref{prop:z_imbalance} holds, and covariate adjustment yields a strict improvement.  The strict improvement is generic: it holds almost surely without needing to verify the imbalance condition.  The fixed-design result (\cref{prop:z_imbalance}) identifies the knife-edge pathology; the random-design perspective shows it never occurs in practice with continuous covariates.  This could be formalized as a corollary: under any DGP with continuous $(X, Z)$ and $f_{X,Z} > 0$, $R^*_{\mathrm{seg}} < R^*_{\mathrm{lc}}$ almost surely.}
+
+\commentT{Practical diagnostic: for a given fixed design, the $Z$-balance condition is directly verifiable.  Define a \emph{$Z$-imbalance statistic} that quantifies the deviation from balance and gauges the potential gain from covariate adjustment.  Three approaches at different levels of generality:
+
+	(1) \emph{Bias decomposition under the relevant function class.}  In existing univariate RDD designs, practitioners impose a joint smoothness bound (typically isotropic or elliptic --- a convex class inscribing the anisotropic rectangle).  Under any such class, the worst-case bias of the LC estimator decomposes into an $x$-component and a $z$-component.  The $z$-component, $M_z \sum_i |w_i^{\mathrm{lc}}| |\Delta z_i|$ under the rectangle, is what covariate adjustment can eliminate.  This is directly computable for any design and any convex constraint set, and is interpretable in worst-case bias units.
+
+	(2) \emph{Dependence measures.}  Any measure of dependence between $X$ and $Z$ conditional on treatment status ($X \perp Z \mid D$ is the continuous $Z$-balance condition).  Linear correlation $|\mathrm{Corr}(X_i, Z_i \mid D_i)|$ is a first step but may miss nonlinear dependence.
+
+	(3) \emph{Propensity score variation} (most promising).  The conditional propensity score $e(z) = P(D_i = 1 \mid Z_i = z)$ within the bandwidth is the natural sufficient statistic.  It aggregates the conditional density $f_{X|Z}(x \mid z)$ within the bandwidth into a single scalar at each covariate value.  Constant $e(z) = e$ corresponds to exact $Z$-balance: the treated/control mix does not depend on the covariate.  Variation in $e(z)$ is $Z$-imbalance: at some covariate values there are proportionally more treated observations, creating the cross-stratum displacements that covariate adjustment eliminates.  This is easy to estimate (local logistic regression of $D_i$ on $Z_i$, or a kernel smoother), directly interpretable, and captures the relevant condition exactly.  A test for constancy of $e(z)$ within the bandwidth would be a formal test for the $Z$-balance null.
+
+	For the propensity score approach, a simple partition estimator is natural: divide the $Z$-support into $J$ bins and estimate $\hat{e}_j = (\text{number treated in bin } j) / (\text{total in bin } j)$ within the bandwidth.  Variation in $\hat{e}_j$ across bins is the $Z$-imbalance diagnostic.  With growing $J$ (as $n \to \infty$) this is a consistent nonparametric estimator of $e(z)$.  The partition aligns directly with the segmented estimator: the same bins used to diagnose $Z$-imbalance define the strata used for covariate adjustment, creating a unified framework for diagnosis and estimation.
+
+	Note that the dependence on $K$ is already visible in the modulus definition of \textcite{armstrong_optimal_2018}: the observation operator $K$ appears directly in the constraint $\norm{Kf} \leq \delta/2$, so the modulus is a functional of $(L, K, \mathcal{F})$ jointly.
+
+	The qualitative and quantitative questions separate cleanly.  \emph{Qualitative:} with continuous $Z$, the $Z$-balance condition (\cref{def:z_balanced}) requires exact $z$-matches across treatment and control with identical $x$-positions.  Since no two units share the same $z$-value, there are no strata, and $Z$-balance cannot hold --- covariate adjustment always strictly improves.  This is the fixed-design analog of the probability-zero argument under random designs.  \emph{Quantitative:} how much improvement is available?  This is what the smoothed propensity score or distance measures below quantify.
+
+	(4) \emph{Cross-side covariate distance} (alternative to binning).  For each treated unit $i$ with covariate $Z_i$, find the nearest control unit in $Z$ (or in $(X, Z)$ jointly) and record the distance $d_i$.  The imbalance statistic $\mathcal{I} = \sum_{i : D_i = 1} d_i$ aggregates these cross-side covariate gaps.  Under exact $Z$-balance, $\mathcal{I} = 0$; larger values indicate greater imbalance and hence greater potential gain from covariate adjustment.  This avoids the binning choice entirely and is directly computable from the design.  It can also be computed symmetrically (control-to-treatment) and averaged.
+
+	All four approaches could be applied as diagnostics to any existing univariate RDD with observed but currently ignored covariates.  This is a natural applied contribution.}
+
+\begin{remark}[Interplay of $L$ and $K$]\label{rem:L_K_interplay}
+	The condition for strict improvement from covariate adjustment is an interplay between the target functional $L$ and the observation operator $K$.
+	The functional $L$ determines the \emph{treatment axis}: the direction perpendicular to the cutoff along which the effect is defined.
+	The observation operator $K$ determines the \emph{design geometry}: the locations at which the function is observed.
+	Covariate adjustment yields a strict improvement when $K$ has variation in the direction orthogonal to the treatment axis --- the covariate direction that $L$ makes relevant.
+
+	More generally, for a cutoff along an arbitrary direction $\eta \in \mathbb{R}^2$: decompose displacements into $\eta$ (running variable component) and $\eta^\perp$ (covariate component).
+	The segmented estimator eliminates the $\eta^\perp$-component from its displacements, stranding the corresponding smoothness bound.
+	The condition for strict improvement becomes: the design must be imbalanced in $\eta^\perp$, i.e., the distribution of $\eta$-coordinates must vary across $\eta^\perp$-strata.
+	\Cref{prop:z_imbalance} is the special case $\eta = e_1$.
+
+	\commentT{In geographic RDD, the cutoff is a curve $\gamma \subset \mathbb{R}^2$, the treatment effect is a line integral $L = \int_\gamma \tau(\gamma(s))\, ds$, and the perpendicular direction $\eta(s)$ rotates along the boundary.  The running/covariate decomposition becomes point-dependent, the support function must be evaluated at varying directions along $\gamma$, and the $Z$-balance condition becomes a local property.  One could in principle reparameterize the space into rectangular form (straightening the boundary), but this requires bounds on the partials in the reparameterized coordinates, which are hard to argue about substantively.  This is out of scope.
+
+	Our primary example imposes a specific functional: $L = \int_{\mathbb{R}} \tau(0, z)\, w(z)\, dz$ --- a convex weighted average treatment effect at the cutoff $x = 0$.  The treatment axis is $\eta = e_1$ (fixed, not point-dependent), and the $Z$-imbalance condition on $K$ from \cref{prop:z_imbalance} applies directly.  This specificity is a feature: for this functional the theory is clean, the conditions are verifiable, and the geometric intuition is sharp.  Generalizing to curved cutoffs and more complex functionals is a direction for future work that would extend the general theory beyond the standard RDD setting.}
+\end{remark}
+
+\begin{remark}[Fixed-design minimax constants and the role of the density]\label{rem:fixed_design_constant}
+	The framework of \textcite{armstrong_optimal_2018} yields \emph{finite-sample, exact} minimax results for fixed designs: the running variable $x_i$ is deterministic, and the minimax optimal CI is computed for the realized design points $\{x_1, \ldots, x_n\}$.
+	The minimax constant is therefore a fixed-design object --- it depends on the actual design geometry, the smoothness constant, and the noise level, with no density or asymptotics involved.
+
+	For any given fixed design $\{(x_i, z_i)\}_{i=1}^n$, the $Z$-balance condition (\cref{def:z_balanced}) is directly verifiable, and the exact minimax risk under the rectangle vs.\ the disk can be computed.
+	The improvement from covariate adjustment is a property of the specific design, not an asymptotic statement.
+
+	The joint density $f(x, z)$ enters only at a second level: when the design is viewed as a random sample from $f$, the probability of exact $Z$-balance is zero under any continuous density with $f(x, z) > 0$.
+	This gives a complementary, distributional statement: the strict improvement from covariate adjustment holds for almost every realized design.
+	The magnitude of the improvement for a \emph{typical} design depends on the local dependence between $X$ and $Z$ near the cutoff --- governed by $f_{Z|X}$ --- which ties back to the restricted function class $\mathcal{F}^R(M_x, M_z, L)$ from \cref{sec:argument:rdd}.
+	In this sense the full tuple $(m, f_{Z|X}, \bar{m})$ is relevant: the smoothness bounds $M_x, M_z$ govern the bias for a given design, while the density governs which designs are likely to arise.
+\end{remark}
 
 
 \subsection{Bounding the Ratio}\label{sec:technical:ratio}
