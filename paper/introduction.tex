@@ -1,5 +1,44 @@
 
 \section{Introduction}\label{sec:introduction}
 
+Minimax optimal inference over convex function classes requires the researcher to specify a smoothness class --- a function class in which the true function is assumed to be included. A classic example is to assume the regression function to lie in a Lipschitz class with constant K, where K bounds the absolute value of the first derivative of the function across its domain. The choice of this class is both crucial and difficult as it encodes assumptions the researcher has about the function and controls how difficult it will be to estimate. In multivariate settings, constructing such a class is more complex as it \emph{jointly} constraints the partial derivatives of the function. The geometry of the constraint set governing feasible gradients determines how assumptions on each variable dimension enters the minimax problem.
+It is common for papers in multivariate nonparametric estimation to use function classes that impose a joint norm on all partial derivatives to define smoothness. A classical example is \textcite{stone_optimal_1980} and more recently a similar approach has been adopted by \textcite{imbens_optimized_2019}.
+This paper shows that this approach inherently couples the partial derivatives. This coupling either imposes additional assumptions on the regression function or inflates the function class. wich leads to worse minimax inference. I argue that in nonparametric estimation problems such as regression or density estimation additional information on coupling is not available. 
 
-Test
+
+I characterize a separable class as the minimal convex set that only uses a researcher primitive assumptions on the partials and does not impose additional assumptions. This class bounds each partial derivative independently. Since the class is the minimal convex set using it provides a sharper bound on the bias for standard minimax estimators. The improvements are strict except on an explicitly characterized equality set of fixed designs. In an example using an equidistant lattice fixed design and different scenarios of bounds on the partial derivatives the separable class leads to a worst-case bias reduction of 8-23\%.
+
+
+The argument applies to any linear functional estimated over a gradient-constrained function class.
+Three leading estimation problems illustrate the scope:
+\begin{enumerate}
+	\item \emph{Nonparametric regression at a point.}
+	The target is $\mu(x_0, z_0) = \E[Y \mid X = x_0, Z = z_0]$.
+	A linear estimator $\hat{\mu} = \sum_i w_i Y_i$ with $\sum_i w_i = 1$ has displacement vectors $\Delta_i = (x_i - x_0,\, z_i - z_0)$ from the target to each design point.
+
+
+	\item \emph{Treatment effect at a point (RDD).}
+	In a sharp regression discontinuity design with covariate $Z$, the target is $\tau(c, z_0) = \lim_{x \downarrow c} m(x, z_0) - \lim_{x \uparrow c} m(x, z_0)$.
+	A linear estimator $\hat{\tau} = \sum_i w_i Y_i$ satisfies $\sum_{i \in T} w_i = 1$ and $\sum_{i \in C} w_i = -1$ (equivalently, $\sum_i w_i = 0$).
+
+
+	\item \emph{Convex weighted average treatment effect (optimized RDD).}
+	Following \textcite{imbens_optimized_2019}, the target is $\tau_w = \int \tau(c, z)\, w(z)\, dz$, a weighted average over the covariate distribution.
+\end{enumerate}
+
+
+
+\commentT{Add: preview of the 2$\times$2 table (2 designs $\times$ 2 ratios $M_x/M_z$) with explicit $\rho$ values once computed.}
+
+For the convex weighted average treatment effect, the distinction between separable and coupled classes has additional consequences.
+Pooling the bivariate regression into a univariate problem --- as in standard RDD practice --- bundles direct smoothness with compositional variation through the covariate distribution, creating a further source of inflation beyond coupling.
+Under a coupled class, covariate adjustment cannot improve worst-case risk: the adversary reallocates the entire budget into the estimation direction.
+Under the separable class, the per-direction budgets are locked, and covariate adjustment yields a strict improvement.
+
+The paper proceeds as follows.
+\Cref{sec:illustration} illustrates the mechanism on a six-unit RDD design, showing how the constraint set geometry determines which estimator-design combinations incur unnecessary bias.
+\Cref{sec:function_classes} develops the formal framework: primitive bounds, the rectangle as the smallest primitive-consistent class, the coupling dichotomy, and the isotropic disk as the leading example of inflation.
+\Cref{sec:geometry_risk} connects geometry to minimax risk through the support function, the modulus of continuity, and the monotonicity theorem, and characterizes the equality set.
+\Cref{sec:evaluation_point} applies the framework to point evaluation --- nonparametric regression and RDD at a point --- with explicit bias inflation ratios for concrete designs.
+\Cref{sec:weighted_treatment} treats the convex weighted average treatment effect, where integrating out the covariate introduces pooling as a distinct inflation mechanism, and connects to the framework of \textcite{imbens_optimized_2019}.
+\Cref{sec:discussion} discusses extensions and open problems.

@@ -15,7 +15,8 @@ The task is to translate these bounds into a smoothness class $\mathcal{F}$ by c
 
 The only structural requirement on $\mathcal{C}$ is convexity: if $f, g \in \mathcal{F}(\mathcal{C})$, then $\nabla(\lambda f + (1-\lambda)g) = \lambda \nabla f + (1-\lambda) \nabla g$ must lie in $\mathcal{C}$.
 Convexity of $\mathcal{C}$ is necessary and sufficient for the function class to be closed under convex combinations --- the minimal assumption for a coherent smoothness class and for the minimax machinery that relies on convexity of $\mathcal{F}$.
-Beyond convexity, the constraint set must respect the primitive information: any $(u,v) \in \mathcal{C}$ must satisfy $\abs{u} \leq M_x$ and $\abs{v} \leq M_z$.
+
+Another structural restriction, standard in the minimax literature, is centrosymmetry. 
 
 \begin{definition}[Centrosymmetry]\label{def:centrosymmetric}
 	A set $\mathcal{C} \subset \mathbb{R}^d$ is \emph{centrosymmetric} if $\mathcal{C} = -\mathcal{C}$, i.e., $u \in \mathcal{C}$ implies $-u \in \mathcal{C}$.
@@ -23,98 +24,96 @@ Beyond convexity, the constraint set must respect the primitive information: any
 	If $\mathcal{C}$ is centrosymmetric, then $\mathcal{F}(\mathcal{C})$ is centrosymmetric.
 \end{definition}
 
+Throughout the paper I restrict attention to constraint sets that are nonempty, convex, compact and centrosymmetric, unless stated otherwise.
+
+\begin{definition}[Separable constraint set]\label{def:separable}
+	A constraint set $\mathcal{C} \subset \mathbb{R}^2$ is \emph{separable} if it is a Cartesian product of symmetric intervals: $\mathcal{C} = [-A, A] \times [-B, B]$ for some $A, B > 0$.
+	In a separable set, each partial derivative is constrained independently --- the feasible range of one does not depend on the value of the other.
+\end{definition}
+
+The natural separable class matching the primitive bounds is the rectangle
+\begin{equation*}
+	\mathcal{C}_s \defeq [-M_x, M_x] \times [-M_z, M_z].
+\end{equation*}
+It admits every gradient pair individually consistent with the primitives, without imposing any relationship between $\partial m / \partial x$ and $\partial m / \partial z$ and induces the function class $\mathcal{F}(\mathcal{C}_s)$.
+\footnote{The separable class has a structural parallel in copula theory. The Fréchet class $\mathcal{F}(F_1, F_2)$ of all joint distributions with marginals $F_1, F_2$ is bounded by the Fréchet--Hoeffding bounds, and the independence copula $C(u,v) = uv$ is the unique element imposing no dependence. The rectangle is to gradient constraint sets what the independence copula is to joint distributions: the Cartesian product of the marginal objects, imposing no cross-coordinate structure \parencite[cf.][Chapter~2]{nelsen_introduction_2006}.} If $M_x \neq M_z$ the separable class contains directional information and is in that sense \textit{anisotropic}. It then resembles anisotropic function classes occasionally used in the minimax literature $\mathcal{F}_1^{\mathrm{aniso}}(M_x, M_z) \defeq \mathcal{F}(\mathcal{C}_s)$.
+
+The separable class encodes the primitive information and nothing more: each partial derivative is constrained independently, with no restriction on how they combine.
+But could there be other constraint sets that also respect the primitive information --- that is, sets which do not exclude any individually-permitted gradient pair?
+
 \begin{definition}[Primitive-consistent constraint set]\label{def:primitive_consistent}
 	Let $M_x, M_z > 0$.
-	A set $\mathcal{C} \subset \mathbb{R}^2$ is \emph{primitive-consistent} with bounds $(M_x, M_z)$ if $\mathcal{C}$ is nonempty, convex, centrosymmetric, and satisfies: for all $(u, v) \in \mathcal{C}$, $\abs{u} \leq M_x$ and $\abs{v} \leq M_z$. Note that boundedness of the set is implied by primitive consistency. To facilitate proofs I also require closedness, to ensure the set is compact. This is not strictly necessary, and could be relaxed.
+	A set $\mathcal{C} \subset \mathbb{R}^2$ is \emph{primitive-consistent} with bounds $(M_x, M_z)$ if $\mathcal{C}$ satisfies $\mathcal{C}_s \subseteq \mathcal{C}$: every gradient pair individually permitted by the primitive bounds is also permitted by $\mathcal{C}$.
 \end{definition}
 
-A natural choice for $\mathcal{C}$ is the rectangle $[-M_x, M_x] \times [-M_z, M_z]$: the Cartesian product of the two marginal bounds.
-It admits every gradient pair that is individually consistent with the primitives, without imposing any relationship between $\partial m / \partial x$ and $\partial m / \partial z$.
-This is the anisotropic class $\mathcal{F}_1^{\mathrm{aniso}}(M_x, M_z)$.
+Primitive consistency requires that the constraint set does not discard any gradient pair that the researcher's marginal bounds allow.
+A class that fails this condition forbids some individually-permitted gradient combination --- it imports information beyond the primitives.
 
-
-\subsection{Coupling: Further Restricting the Constraint Set}\label{sec:argument:coupling}
-
-The researcher could further restrict the constraint set by imposing a joint restriction on the partial derivatives --- a constraint that links the feasible values of $\partial m / \partial x$ and $\partial m / \partial z$.
-Such a restriction takes the form of a convex function $\phi : \mathbb{R}^2 \to \mathbb{R}$ that carves out a subset of the rectangle:
-\begin{equation*}
-	\mathcal{C}_\phi = \bigl\{ g \in \mathbb{R}^2 : \phi(g) \leq 1 \bigr\} \;\subseteq\; [-M_x, M_x] \times [-M_z, M_z].
-\end{equation*}
-
-\begin{definition}[Constrained gradient set --- implicit form]\label{def:primitive_consistent_implicit}
-	Let $\phi : \mathbb{R}^2 \to \mathbb{R}$ be a convex function with $\phi(0) \leq 1$.
-	The sublevel set $\mathcal{C}_\phi = \{ g \in \mathbb{R}^2 : \phi(g) \leq 1 \}$ is primitive-consistent with bounds $(M_x, M_z)$ if $\mathcal{C}_\phi \subseteq [-M_x, M_x] \times [-M_z, M_z]$.
-\end{definition}
-
-The rectangle itself corresponds to $\phi(g) = \max(\abs{g_1}/M_x,\, \abs{g_2}/M_z)$ --- no additional restriction.
-The isotropic disk corresponds to $\phi(g) = \norm{g}_2 / R$ --- the quadratic constraint $(\partial m / \partial x)^2 + (\partial m / \partial z)^2 \leq R^2$, which forces a large value of one partial to be accompanied by a small value of the other.
-
-Such joint restrictions require substantive knowledge about the regression function: the researcher must have reason to believe that certain combinations of partial derivatives cannot occur.
-In most nonparametric settings --- including density estimation, conditional expectation estimation, and the RDD application of this paper --- such structural beliefs are difficult to justify.
-The default, absent strong model-specific reasoning, is to not restrict the partials beyond the primitive bounds.
-
-When the implicit function $\phi$ does impose a binding constraint --- so that $\mathcal{C}_\phi$ is a \emph{strict} subset of the rectangle --- the set of feasible functions shrinks.
-
-\begin{definition}[Coupling]\label{def:coupling}
-	A primitive-consistent set $\mathcal{C}$ with respect to bounds $(M_x, M_z)$ \emph{imposes coupling} if $\mathcal{C} \subsetneq [-M_x, M_x] \times [-M_z, M_z]$.
-	That is, there exist gradient pairs $(u, v)$ permitted by the marginal bounds ($\abs{u} \leq M_x$, $\abs{v} \leq M_z$) that $\mathcal{C}$ forbids: knowing the value of one partial restricts the feasible values of the other.
-\end{definition}
-
-Coupling is additional information about the regression function.
-A smaller constraint set means a smaller function class, and a smaller function class means the adversary in the minimax problem has fewer functions to choose from.
-Geometrically, coupling shrinks the set of possible functions that the estimator must guard against --- which improves estimation.
-This is the covering argument: a class $\mathcal{F}(\mathcal{C}_1) \subseteq \mathcal{F}(\mathcal{C}_2)$ is easier to estimate over, because the worst case is taken over a smaller set.
-
-The question is then: which primitive-consistent set uses only the primitive information --- and no coupling?
-The answer is the rectangle, and it is the only one.
-
-\begin{proposition}[The rectangle is the unique coupling-agnostic class]\label{prop:coupling_agnostic}
-	For any $M_x, M_z > 0$, the rectangle $[-M_x, M_x] \times [-M_z, M_z]$ is the unique primitive-consistent set that does not impose coupling.
-	We call this the \emph{coupling-agnostic} class.\footnote{The uniqueness of the rectangle has a structural parallel in copula theory. The Fréchet class $\mathcal{F}(F_1, F_2)$ of all joint distributions with marginals $F_1, F_2$ is bounded by the Fréchet--Hoeffding bounds, and the independence copula $C(u,v) = uv$ is the unique element imposing no dependence. The rectangle is to gradient constraint sets what the independence copula is to joint distributions: the Cartesian product of the marginal objects, imposing no cross-coordinate structure \parencite[cf.][Chapter~2]{nelsen_introduction_2006}.}
+\begin{proposition}[The separable class is the smallest primitive-consistent class]\label{prop:coupling_agnostic}
+	For any $M_x, M_z > 0$, the separable class $\mathcal{C}_s = [-M_x, M_x] \times [-M_z, M_z]$ is the smallest primitive-consistent constraint set: any primitive-consistent $\mathcal{C}$ satisfies $\mathcal{C}_s \subseteq \mathcal{C}$.
+	The induced function class $\mathcal{F}(\mathcal{C}_s) = \mathcal{F}_1^{\mathrm{aniso}}(M_x, M_z)$ is therefore the smallest function class the researcher can justify from the primitive bounds alone.
 \end{proposition}
 
 \begin{proof}
-	The rectangle is primitive-consistent by construction and does not impose coupling ($\mathcal{C} = [-M_x, M_x] \times [-M_z, M_z]$, not a strict subset of itself).
-	For uniqueness, let $\mathcal{C}$ be any primitive-consistent set.
-	For any $(u, v) \in \mathcal{C}$, primitive-consistency gives $\abs{u} \leq M_x$ and $\abs{v} \leq M_z$, so $(u, v) \in [-M_x, M_x] \times [-M_z, M_z]$.
-	Thus every primitive-consistent set is contained in the rectangle.
-	If $\mathcal{C}$ does not impose coupling, it is not a strict subset of the rectangle, so $\mathcal{C} = [-M_x, M_x] \times [-M_z, M_z]$.
+	$\mathcal{C}_s$ is primitive-consistent: $\mathcal{C}_s \subseteq \mathcal{C}_s$.
+	Any primitive-consistent $\mathcal{C}$ satisfies $\mathcal{C}_s \subseteq \mathcal{C}$ by definition.
+	Hence $\mathcal{C}_s$ is contained in every primitive-consistent set.
+	Since $\mathcal{F}(\mathcal{C}_1) \subseteq \mathcal{F}(\mathcal{C}_2)$ whenever $\mathcal{C}_1 \subseteq \mathcal{C}_2$, the induced class $\mathcal{F}(\mathcal{C}_s)$ is the smallest among all primitive-consistent classes.
 \end{proof}
 
-The rectangle is the largest primitive-consistent constraint set, which means the induced function class $\mathcal{F}_1^{\mathrm{aniso}}(M_x, M_z)$ is the \emph{smallest function class} the researcher can justify without coupling information.
-Any smaller constraint set requires coupling assumptions; any function class that avoids coupling but exceeds the rectangle must inflate the primitive bounds.
-The rectangle uses the primitive information fully and adds nothing beyond it.
+The separable class is the tightest encoding of primitive information.
+Any primitive-consistent superset admits gradients beyond the marginal bounds, inflating the effective smoothness constants.
+Any strict subset forbids individually-permitted gradient pairs, importing information beyond the primitives.
+Without additional information about how the partials interact, the researcher cannot justify a class smaller than $\mathcal{C}_s$ --- and any larger primitive-consistent class weakens the resulting inference.
 
-\begin{corollary}[Coupling restricts]\label{cor:coupling_restricts}
-	Any primitive-consistent $\mathcal{C} \subsetneq [-M_x, M_x] \times [-M_z, M_z]$ imposes coupling: the induced function class satisfies $\mathcal{F}(\mathcal{C}) \subsetneq \mathcal{F}_1^{\mathrm{aniso}}(M_x, M_z)$.
-	This includes the inscribed isotropic class $\mathcal{F}_1^{\mathrm{iso}}(M)$ with $M \leq \min(M_x, M_z)$.
+
+\subsection{Coupling: Non-Separable Constraint Sets}\label{sec:argument:coupling}
+
+\begin{definition}[Coupling]\label{def:coupling}
+	A constraint set $\mathcal{C}$ \emph{imposes coupling} if it is not separable --- that is, if it cannot be written as a Cartesian product $[-A, A] \times [-B, B]$ for any $A, B > 0$.
+	In a coupled set, the feasible range of one partial derivative depends on the value of the other.
+\end{definition}
+
+Coupling amounts to a joint restriction on the primitive bounds --- a budget constraint $h(M_x, M_z) \leq c$ linking the two directions, so that increasing one partial's effective bound requires decreasing the other's.
+The leading example is the isotropic disk $B_2(R) = \bigl\{ (u, v) \in \mathbb{R}^2 : u^2 + v^2 \leq R^2 \bigr\}$, which corresponds to the budget constraint $M_x^2 + M_z^2 \leq R^2$: the total gradient budget is $R$, fungible across directions.
+A large value of $\partial m / \partial x$ forces a small value of $\partial m / \partial z$, and vice versa.
+The isotropic class $\mathcal{F}_1^{\mathrm{iso}}(R) = \mathcal{F}(B_2(R))$ is the standard smoothness class in nonparametric estimation \parencite[e.g.,][]{tsybakov_introduction_2009,stone_optimal_1982}.
+
+Such coupling requires substantive knowledge about the regression function: the researcher must have reason to believe that certain combinations of partial derivatives cannot occur.
+In most nonparametric settings --- including density estimation, conditional expectation estimation, and the RDD application of this paper --- such structural beliefs are difficult to justify.
+The default, absent strong model-specific reasoning, is to not restrict the partials beyond the primitive bounds.
+
+Non-separable classes face a dichotomy, characterized by whether they contain or exclude the separable class.
+
+\begin{corollary}[Primitive-inconsistent classes add information]\label{cor:coupling_restricts}
+	If $\mathcal{C}_s \not\subseteq \mathcal{C}$, then $\mathcal{C}$ is primitive-inconsistent: it excludes individually-permitted gradient pairs, importing information beyond the primitive bounds.
+	The induced function class satisfies $\mathcal{F}(\mathcal{C}) \neq \mathcal{F}_1^{\mathrm{aniso}}(M_x, M_z)$.
 \end{corollary}
 
-\begin{corollary}[Agnostic isotropic classes inflate]\label{cor:iso_inflates}
-	If an isotropic class $\mathcal{F}_1^{\mathrm{iso}}(R)$ contains the anisotropic class --- that is, $[-M_x, M_x] \times [-M_z, M_z] \subseteq B_2(R)$ --- then $R \geq \sqrt{M_x^2 + M_z^2} > \max(M_x, M_z)$.
-	The isotropic class admits per-partial derivatives up to $R$, strictly exceeding the primitive bounds.
+\begin{corollary}[Primitive-consistent supersets inflate bounds]\label{cor:iso_inflates}
+	If $\mathcal{C}_s \subsetneq \mathcal{C}$, then $\mathcal{C}$ is primitive-consistent but admits functions with partial derivatives strictly exceeding the primitive bounds: the marginal projections of $\mathcal{C}$ strictly contain $[-M_x, M_x]$ or $[-M_z, M_z]$ (or both).
 \end{corollary}
 
 \begin{proof}
-	The corners $(\pm M_x, \pm M_z)$ must lie in $B_2(R)$, so $M_x^2 + M_z^2 \leq R^2$, giving $R \geq \sqrt{M_x^2 + M_z^2} > \max(M_x, M_z)$.
-	The marginal projections of $B_2(R)$ are $[-R, R]$ on each axis.
-	By \cref{prop:coupling_agnostic}, the coupling-agnostic class with bounds $(R, R)$ is $[-R, R]^2 \supsetneq B_2(R)$.
+	If $\mathcal{C} \supsetneq \mathcal{C}_s$, there exists $(u, v) \in \mathcal{C} \setminus \mathcal{C}_s$, so $\abs{u} > M_x$ or $\abs{v} > M_z$.
+	Hence the projection of $\mathcal{C}$ onto the corresponding axis strictly contains the primitive bound.
 \end{proof}
 
-\begin{corollary}[Isotropic classes inherently impose coupling]\label{cor:iso_is_coupling}
-	For any $R > 0$, $B_2(R) \subsetneq [-R, R]^2$.
-	The disk is primitive-consistent with bounds $(R, R)$ but not coupling-agnostic.
-	Every isotropic class inherently imposes coupling, regardless of $R$.
-\end{corollary}
+\paragraph{The isotropic disk.}
+Consider the disk $B_2(R)$ with $R > 0$.
+The disk is primitive-inconsistent with bounds $(M_x, M_z)$ whenever $R < \sqrt{M_x^2 + M_z^2}$: the corner $(M_x, M_z)$ of the rectangle satisfies $M_x^2 + M_z^2 > R^2$, so $\mathcal{C}_s \not\subseteq B_2(R)$.
+In particular, the inscribed disk with $R \leq \min(M_x, M_z)$ excludes all corners of the rectangle.
 
-\begin{proof}
-	$B_2(R)$ has marginal projections $[-R, R]$, so it is primitive-consistent with bounds $(R, R)$.
-	By \cref{prop:coupling_agnostic}, the unique coupling-agnostic set with bounds $(R, R)$ is $[-R, R]^2$.
-	Since $(R, R) \notin B_2(R)$, the inclusion is strict.
-\end{proof}
+Primitive consistency requires $\mathcal{C}_s \subseteq B_2(R)$, which holds if and only if $R \geq \sqrt{M_x^2 + M_z^2}$.
+But then the disk inflates the per-partial bounds: the marginal projections of $B_2(R)$ are $[-R, R]$ on each axis, giving inflation factors
+\begin{equation*}
+	\frac{R}{M_x} = \sqrt{1 + \frac{M_z^2}{M_x^2}} \quad \text{along } x, \qquad \frac{R}{M_z} = \sqrt{1 + \frac{M_x^2}{M_z^2}} \quad \text{along } z.
+\end{equation*}
+In the symmetric case $M_x = M_z = M$, both factors equal $\sqrt{2}$: the disk inflates each primitive bound by $\sqrt{2}$.
 
-The three corollaries expose the trilemma: the isotropic class either imposes coupling (\cref{cor:coupling_restricts}), inflates the primitive bounds (\cref{cor:iso_inflates}), or both --- and is never coupling-agnostic (\cref{cor:iso_is_coupling}).
-From an information-theoretic perspective, the rectangle encodes exactly the researcher's primitive information and nothing more: any further restriction is an assumption, not a consequence of the data.
+Non-separable classes thus face a dichotomy: they either discard primitive information (\cref{cor:coupling_restricts}) or inflate the primitive bounds (\cref{cor:iso_inflates}).
+The separable class $\mathcal{C}_s$ is the unique class that does neither --- the tightest primitive-consistent encoding of the researcher's information.
+From an information-theoretic perspective, the rectangle encodes exactly the researcher's primitive information and nothing more: any further restriction is an additional assumption on the relation between the partial derivatives.
 
 
 \subsection{From Geometry to Minimax Risk}\label{sec:argument:risk}
@@ -132,7 +131,7 @@ For the two constraint sets of interest:
 The modulus of continuity --- the fundamental quantity governing minimax risk --- depends on $\mathcal{C}$ only through $h_{\mathcal{C}}$ (\cref{cor:modulus_functional} below).
 The chain from geometry to risk is:
 \begin{enumerate}
-	\item $\mathcal{C}_{\mathrm{rect}} \subsetneq \mathcal{C}_{\mathrm{disk}}$ (by \cref{prop:coupling_agnostic} and \cref{cor:iso_inflates}).
+	\item $\mathcal{C}_{\mathrm{rect}} \subsetneq \mathcal{C}_{\mathrm{disk}}$ (by \cref{prop:coupling_agnostic} and \cref{cor:iso_inflates}: the disk is primitive-consistent only if $R \geq \sqrt{M_x^2 + M_z^2}$, making it a strict superset of the rectangle).
 	\item $\mathcal{F}(\mathcal{C}_{\mathrm{rect}}) \subseteq \mathcal{F}(\mathcal{C}_{\mathrm{disk}})$ (definitional: tighter gradient constraint $\implies$ smaller function class).
 	\item $\omega(\delta; \mathcal{F}(\mathcal{C}_{\mathrm{rect}})) \leq \omega(\delta; \mathcal{F}(\mathcal{C}_{\mathrm{disk}}))$ for all $\delta > 0$ (monotonicity of the modulus, \cref{thm:monotonicity}).
 	\item $R^*(\mathcal{F}(\mathcal{C}_{\mathrm{rect}})) \leq R^*(\mathcal{F}(\mathcal{C}_{\mathrm{disk}}))$ (minimax risk is governed by the modulus).
@@ -238,10 +237,10 @@ The isotropic default extends well beyond the RDD literature:
 	\item \emph{Applied multivariate RDD:} When $X_i \in \mathbb{R}^k$, common practice reduces to a univariate problem by using $D_i = \norm{X_i - c}_2$ as a scalar running variable \parencite[e.g.,][]{keele_geographic_2015}, which inherits the isotropic structure.
 \end{itemize}
 In each case, the isotropic class silently imports a coupling assumption with a quantifiable cost in minimax risk.
-By \cref{prop:coupling_agnostic}, the coupling-agnostic alternative --- the rectangle --- is always available and always weakly better.
+By \cref{prop:coupling_agnostic}, the separable class --- the rectangle --- is always the tightest primitive-consistent choice, and always weakly better.
 The improvement is strict whenever the estimation problem has sensitivity in a direction where $h_{\mathrm{disk}} > h_{\mathrm{rect}}$, which by \cref{lem:ratio_range} holds along every direction except $(M_x, M_z)$ and its reflections.
 
-\commentT{Bhattacharya (2014) provides the most explicit conceptual motivation in the existing literature: ``the assumption of isotropy would lead to loss of efficiency which would be more and more accentuated in higher dimensions.''  But even this discussion motivates anisotropy on grounds of efficiency rather than identifying the coupling mechanism.  Our contribution is the coupling-agnosticism characterization: the rectangle is not just ``more efficient'' but the unique class that avoids unjustified coupling.}
+\commentT{Bhattacharya (2014) provides the most explicit conceptual motivation in the existing literature: ``the assumption of isotropy would lead to loss of efficiency which would be more and more accentuated in higher dimensions.''  But even this discussion motivates anisotropy on grounds of efficiency rather than identifying the coupling mechanism.  Our contribution is the separability characterization: the rectangle is not just ``more efficient'' but the unique separable class --- coupling-agnostic by construction --- that avoids unjustified assumptions about cross-partial dependence.}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -380,6 +379,16 @@ By standard convex duality, $\mathcal{C}$ is recovered from $h_{\mathcal{C}}$:
 	using \cref{lem:gradient_support}.
 	For tightness: $h_{\mathcal{C}}$ is convex and positively homogeneous, hence differentiable a.e.\ with $\nabla h_{\mathcal{C}}(x) \in \mathcal{C}$ (as a subgradient), so $f^* = h_{\mathcal{C}} \in \mathcal{F}(\mathcal{C})$.
 \end{proof}
+
+The support function $h_{\mathcal{C}}(d)$ has a concrete geometric interpretation: it is the maximum change in $f$ over the displacement $d$, given that the gradient must lie in $\mathcal{C}$.
+The adversary picks the gradient $g \in \mathcal{C}$ that is most aligned with $d$, achieving $\langle g, d \rangle = \|g\| \|d\| \cos\theta$.
+The displacement's \emph{direction} selects which part of $\partial\mathcal{C}$ the adversary uses; its \emph{magnitude} determines how far the function can ramp.
+For the rectangle, the maximizer is always a corner: $g^* = (M_x \sign(d_1),\, M_z \sign(d_2))$, giving $h_{\mathcal{C}_s}(d) = M_x\abs{d_1} + M_z\abs{d_2}$.
+The absolute gradient components are always $(M_x, M_z)$ regardless of the displacement direction --- each coordinate uses its full budget independently, just as in the univariate case.
+For the disk, the maximizer rotates with the displacement: $g^* = R \cdot d / \|d\|$, giving $h_{B_2}(d) = R\|d\|$.
+A horizontal displacement activates gradient $(R, 0)$; a diagonal displacement activates $(R/\sqrt{2},\, R/\sqrt{2})$.
+The gradient budget is reallocated across coordinates depending on the direction --- this is the geometric content of coupling.
+In an estimation problem with weights $w = (w_1, \ldots, w_n)$ and displacements $\Delta_i$ from the target to each design point, the worst-case bias is $\sum_i \abs{w_i}\, h_{\mathcal{C}}(\Delta_i)$: each displacement contributes its own support function evaluation, and the total bias is the sum over the entire sample.
 
 \subsection{Coordinate Decomposition and Coupling in Proofs}\label{sec:technical:decomposition}
 
@@ -569,6 +578,70 @@ The rectangle's worst-case bias decomposes additively; the disk's couples the di
 	In any design with genuine $Z$-variation (different $x$-configurations across $z$-strata), the segmented estimator strictly outperforms the local constant under the anisotropic class.
 \end{remark}
 
+\begin{remark}[The cost of isotropy under $Z$-balance]\label{rem:isotropy_zbalance}
+	Under $Z$-balance, the worst-case bias of the local constant estimator under $\mathcal{C}_s$ is purely in the $x$-direction: the $z$-variation cancels across strata, stranding the $M_z$ budget.
+	The worst-case bias is $M_x \sum_i \abs{w_i} \abs{\Delta x_i}$.
+	Under the isotropic disk $B_2(R)$ with $R = \sqrt{M_x^2 + M_z^2}$, the adversary reallocates the entire gradient budget into $x$, giving worst-case bias $R \sum_i \abs{w_i} \abs{\Delta x_i}$.
+	The disk overestimates the worst-case bias by the inflation factor $R / M_x = \sqrt{1 + M_z^2 / M_x^2}$, which equals $\sqrt{2}$ in the symmetric case $M_x = M_z$.
+	This is the cost of encoding the primitive information inefficiently: the separable class correctly identifies the $M_z$ budget as irrelevant under $Z$-balance, while the isotropic class makes it transferable to $M_x$, producing a worst-case bias bound that is too large by a factor of $\sqrt{2}$.
+
+	In the degenerate case where all units share the same covariate value $z_i = z_0$, the argument extends beyond the local constant estimator: \emph{every} linear estimator has purely horizontal displacement vectors, so the worst-case bias under the disk exceeds that under the rectangle by the factor $R / M_x$ regardless of the choice of weights.
+	The minimax risk itself is inflated by this factor, since the modulus of continuity sees only the restriction of $f$ to the line $z = z_0$, where the effective Lipschitz constant is $M_x$ under the rectangle versus $R$ under the disk.
+\end{remark}
+
+\begin{remark}[Modulus separation for point evaluation $\tau(c, z)$]\label{rem:modulus_separation}
+	Consider the point functional $L(f) = \tau(c, z_0) = f(c^+, z_0) - f(c^-, z_0)$ for a fixed covariate value $z_0$, estimated from design points $\{(x_i, z_i)\}_{i=1}^n$.
+	The displacement vectors from the target $(c, z_0)$ to the design points are $\Delta_i = (x_i - c,\, z_i - z_0)$, which are fixed by the design.
+	The modulus of continuity $\omega(\delta; L, K, \mathcal{F}(\mathcal{C}))$ depends on the constraint set $\mathcal{C}$ through the directions these displacements activate:
+	\begin{enumerate}
+		\item \emph{Monotonicity.}  $\mathcal{C}_s \subseteq B_2(R)$ implies $\mathcal{F}(\mathcal{C}_s) \subseteq \mathcal{F}(B_2(R))$, hence $\omega(\delta; \mathcal{C}_s) \leq \omega(\delta; B_2(R))$ for all $\delta$.  The minimax risk under the separable class is weakly smaller.
+		\item \emph{Equality condition.}  The moduli coincide if and only if the modulus-attaining function pair uses gradients exclusively in the direction $(\pm M_x, \pm M_z)$ --- the corners of $\mathcal{C}_s$, which lie on $\partial B_2(R)$.  At these points the two constraint sets agree.
+		\item \emph{Strict inequality.}  If even a single displacement $\Delta_i$ is not proportional to $(M_x, M_z)$, then $h_{B_2}(\Delta_i) > h_{\mathcal{C}_s}(\Delta_i)$: the disk allows the function to decay faster from the target to that design point than the rectangle does, using gradients outside $\mathcal{C}_s$.  That observation becomes less informative under the disk, and the adversary can hide a larger value at $x_0$.  Since the modulus is a supremum over functions satisfying the data constraint at all design points simultaneously, one misaligned displacement suffices: $\omega(\delta; B_2(R)) > \omega(\delta; \mathcal{C}_s)$.
+		\item \emph{Maximum gap.}  When displacement is purely along $x$ (i.e., $z_i = z_0$ for all $i$), the disk allows gradient $R$ while the rectangle allows $M_x$.  The inflation factor is $R / M_x = \sqrt{1 + M_z^2 / M_x^2}$, which equals $\sqrt{2}$ in the symmetric case.
+		\item \emph{Design determines the gap.}  The displacement vectors $\Delta_i$ are determined by the design $K$.  They determine which part of the constraint set boundary the modulus exploits, placing the inflation factor in $[1,\, \sqrt{1 + M_z^2 / M_x^2}]$.
+	\end{enumerate}
+	In particular, the minimax risk under $\mathcal{C}_s$ is always weakly smaller, and strictly smaller for any design whose displacement vectors do not all align with the slope $M_z / M_x$.
+	The bias inflation can reach $\sqrt{2}$ (symmetric case) when the design generates purely horizontal displacements.
+\end{remark}
+
+\begin{remark}[Bias inflation on the equispaced lattice]\label{rem:lattice_inflation}
+	For a fixed linear estimator with weights $w = (w_1, \ldots, w_n)$ targeting $f(0,0)$, the worst-case bias under constraint set $\mathcal{C}$ is $\sum_i \abs{w_i}\, h_{\mathcal{C}}(\Delta_i)$, where $\Delta_i = (x_i, z_i)$ is the displacement from the target to design point $i$.
+	The bias inflation from using the disk instead of the rectangle is
+	\begin{equation*}
+		\rho_n \defeq \frac{\sum_i \abs{w_i}\, h_{B_2}(\Delta_i)}{\sum_i \abs{w_i}\, h_{\mathcal{C}_s}(\Delta_i)} = \frac{\sum_i \abs{w_i}\, R \norm{\Delta_i}_2}{\sum_i \abs{w_i}\, (M_x\abs{x_i} + M_z\abs{z_i})}.
+	\end{equation*}
+	Consider the equispaced lattice design on $[-1,1]^2$ with $(n+1)^2$ design points $\{(x_i, z_j)\}$ where $x_i = -1 + 2i/n$, $z_j = -1 + 2j/n$ for $i, j = 0, \ldots, n$, target at the origin, and equal weights.
+	The ratio $\rho_n$ is exactly computable for any $n$ and converges as $n \to \infty$ to
+	\begin{equation*}
+		\rho = \frac{R \cdot \tfrac{\sqrt{2} + \ln(1 + \sqrt{2})}{3}}{\tfrac{M_x + M_z}{2}},
+	\end{equation*}
+	using $\int_{[-1,1]^2} \sqrt{x^2 + z^2}\, dx\, dz / 4 = (\sqrt{2} + \ln(1+\sqrt{2}))/3 \approx 0.765$.
+	Convergence is fast: $\rho_n$ is within $0.001$ of the limit for $n \geq 50$ (see \texttt{code/01\_lattice\_bias\_inflation.R}).
+
+	\emph{Symmetric case} ($M_x = M_z$, $R = M_x\sqrt{2}$): $\rho \approx 1.082$ --- $8\%$ inflation, against a maximum of $\sqrt{2} \approx 1.414$.
+	The longest displacements point toward the corners of $[-1,1]^2$ at slope $1$, which coincides with the slope $M_z / M_x = 1$ where $\mathcal{C}_s$ and $B_2(R)$ agree.
+
+	\emph{Moderately asymmetric case} ($M_z = 2 M_x$, $R = M_x\sqrt{5}$): $\rho \approx 1.141$ --- $14\%$ inflation, against a maximum of $\sqrt{5} \approx 2.236$.
+	The agreement slope shifts to $\arctan(2) \approx 63°$, while the longest displacements still point at $45°$; the angular mismatch activates directions where $B_2(R) \supsetneq \mathcal{C}_s$.
+
+	\emph{Strongly asymmetric case} ($M_z = 5 M_x$, $R = M_x\sqrt{26}$): $\rho \approx 1.301$ --- $30\%$ inflation, against a maximum of $\sqrt{26} \approx 5.099$.
+	The agreement direction is now $\arctan(5) \approx 79°$, nearly vertical, while the design geometry remains isotropic at $45°$.
+
+	The general pattern: the bias inflation grows with the angular gap between the agreement direction $\arctan(M_z / M_x)$ and the dominant displacement direction of the design.
+\end{remark}
+
+\begin{remark}[Bias inflation under random designs]\label{rem:uniform_inflation}
+	Under a random design $(x_i, z_i) \iid f(x, z)$ with equal weights, $\rho_n$ converges by the law of large numbers to the same limit as the lattice.
+	More generally, the bias inflation under a random design with joint density $f(x, z)$ is a \emph{density-weighted mean width ratio}: the pointwise support function ratio $r(\Delta_i)$ from \cref{def:sfr} is averaged over the design distribution, with each direction weighted by the displacement magnitude and the density.
+	The design geometry and the constraint set geometry interact: the inflation is largest when the density concentrates mass on displacements along the coordinate axes (where $r$ is maximized) and smallest when it concentrates mass near the slope $M_z / M_x$ (where $r = 1$).
+\end{remark}
+
+\commentT{Decision-theoretic framing of the weak inequality.  The result $R^*(\mathcal{F}(\mathcal{C}_s), K) \leq R^*(\mathcal{F}(B_2(R)), K)$ for all designs $K$ is a \emph{dominance} result in the decision-theoretic sense (Blackwell-style): the separable class weakly dominates the disk across all designs.  The equality set is fully characterized: equality holds if and only if all displacement vectors $\Delta_i$ from the target to the design points are proportional to $(\pm M_x, \pm M_z)$ --- the corners of $\mathcal{C}_s$ where the two constraint sets agree.  This is a knife-edge condition: under any continuous design distribution with $f(x,z) > 0$, it holds with probability zero.  The weak inequality with characterized equality is the standard form for such results; Blackwell's theorem itself is a weak inequality with a characterized equality case.  The contribution is the characterization --- how convex smoothness classes encode assumptions on the regression function --- not the magnitude of the inflation.
+
+	The lattice examples in \cref{rem:lattice_inflation} are \emph{integrated risk} computations in the following sense: $\rho_n$ averages the deterministic support-function ratio over the design points, producing a summary of the AK fixed-design risk across the lattice.  This is a descriptive summary of the design-dependent risk, not random-design inference.  The paper stays entirely within the AK fixed-design framework; no asymptotic equivalence results are invoked.}
+
+\commentT{Conditions for strict modulus separation between rectangle and disk.  By \cref{lem:ratio_range}, the pointwise support function ratio $r(v) = h_{\mathrm{disk}}(v) / h_{\mathrm{rect}}(v)$ equals 1 only when $v \propto (M_x, M_z)$; in all other directions $r(v) > 1$.  The modulus under the disk is therefore strictly larger than under the rectangle unless the worst-case function generates bias exclusively along the direction $(M_x, M_z)$.  This requires all relevant displacement directions in the estimation problem to align with $(M_x, M_z)$, i.e., $\Delta z_i / \Delta x_i = M_z / M_x$ for every observation --- all design points lie on a single ray through the target at slope $M_z / M_x$.  This is a knife-edge condition that fails whenever the design has any $z$-variation not perfectly tracking this slope.  The single-line case ($z_i = z_0$ for all $i$) is the opposite extreme: all displacements are horizontal, the direction where $r(v) = R / M_x$ is maximized.  This connects the pointwise ratio lemma to the modulus: the lemma identifies where disk and rectangle agree and disagree, the design determines which directions the modulus exploits.  To do: formalize the condition on displacement directions that guarantees strict modulus separation and determine whether general $Z$-balance (not just the single-line case) suffices for all minimax-optimal estimators.}
+
 \commentT{Under a random design drawn from any continuous joint density $f(x,z) > 0$, exact $Z$-balance (identical $x$-realizations across $z$-strata) is an event of probability zero.  Therefore, with probability 1 over the random design, the $Z$-imbalance condition of \cref{prop:z_imbalance} holds, and covariate adjustment yields a strict improvement.  The strict improvement is generic: it holds almost surely without needing to verify the imbalance condition.  The fixed-design result (\cref{prop:z_imbalance}) identifies the knife-edge pathology; the random-design perspective shows it never occurs in practice with continuous covariates.  This could be formalized as a corollary: under any DGP with continuous $(X, Z)$ and $f_{X,Z} > 0$, $R^*_{\mathrm{seg}} < R^*_{\mathrm{lc}}$ almost surely.}
 
 \commentT{Practical diagnostic: for a given fixed design, the $Z$-balance condition is directly verifiable.  Define a \emph{$Z$-imbalance statistic} that quantifies the deviation from balance and gauges the potential gain from covariate adjustment.  Three approaches at different levels of generality:
@@ -618,6 +691,7 @@ The rectangle's worst-case bias decomposes additively; the disk's couples the di
 	In this sense the full tuple $(m, f_{Z|X}, \bar{m})$ is relevant: the smoothness bounds $M_x, M_z$ govern the bias for a given design, while the density governs which designs are likely to arise.
 \end{remark}
 
+\commentT{Asymptotic equivalence and the $\beta = 1$, $d = 2$ boundary.  Brown and Low (1996) establish asymptotic equivalence between nonparametric regression and Gaussian white noise for estimation of linear functionals; the multivariate extension (Reiß 2008) requires $\beta > d/2$.  Our Lipschitz setting ($\beta = 1$, $d = 2$) gives $\beta / d = 1/2$, exactly at the boundary on the wrong side.  Asymptotic equivalence does \emph{not} apply: constants computed in the white noise model cannot be transferred to our fixed-design regression setting.  This is why the paper works entirely in the Armstrong-Kolesár fixed-design framework, where the modulus machinery applies directly to Lipschitz classes without requiring equivalence.  The equispaced lattice examples in \cref{rem:lattice_inflation} provide quantitative benchmarks within this framework.}
 
 \subsection{Bounding the Ratio}\label{sec:technical:ratio}
 

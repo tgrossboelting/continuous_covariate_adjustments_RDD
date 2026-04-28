@@ -18,9 +18,25 @@ The single-class modulus of continuity for a centrosymmetric class $\mathcal{F}(
 The parameter $\delta$ controls the \emph{noise budget}: the constraint $\norm{Kf} = \sqrt{\sum_i f(x_i, z_i)^2} \leq \delta/2$ requires the function to be small at the observation points, while the objective maximizes $f$ at the target.
 A function that achieves a large value of $f(x_0, z_0)$ while remaining small at the observations is one that the data cannot distinguish from the zero function --- the hardest function to estimate.
 
-The modulus $\omega(\delta)$ is increasing in $\delta$: a larger noise budget permits the function to be more visible at the observations, allowing a taller ``tent'' around the target.
-The optimal bias--variance tradeoff selects $\delta^* = \delta^*(\sigma, n)$ such that the worst-case bias $\omega(\delta^*)/2$ balances the estimation variance.
-By Theorem~3.1 of \textcite{armstrong_optimal_2018}, the minimax risk is governed by $\omega(\delta^*)$.
+The modulus $\omega(\delta)$ is increasing and concave in $\delta$: a larger noise budget permits the function to be more visible at the observations, allowing a taller ``tent'' around the target.
+
+\paragraph{Determining $\delta^*$: the bias--variance tradeoff.}
+The modulus governs the minimax risk through the following chain.
+Fix the function class $\mathcal{F}(\mathcal{C})$, the observation operator $K$ (determined by the design), and the noise level $\sigma$.
+For any $\delta > 0$, the worst-case bias of the modulus-optimal affine estimator is $\omega(\delta)/2$ (increasing in $\delta$), while the worst-case standard deviation is $\sigma \delta / \omega(\delta)$ (decreasing in $\delta$ for concave $\omega$).
+The optimal tradeoff selects $\delta^*$ as the solution to
+\begin{equation}\label{eq:app_delta_star}
+	\delta^* = \argmin_{\delta > 0}\; \frac{\omega(\delta)^2}{4} + \frac{\sigma^2 \delta^2}{\omega(\delta)^2},
+\end{equation}
+or equivalently, the value at which the marginal bias reduction from decreasing $\delta$ equals the marginal variance increase.
+By Theorem~3.1 of \textcite{armstrong_optimal_2018}, the minimax risk over $\mathcal{F}(\mathcal{C})$ is governed by $\omega(\delta^*)$.
+The practical implication is that once $\omega(\delta;\, \mathcal{F}(\mathcal{C}))$ is known as a function of $\delta$, the noise level $\sigma$ pins down $\delta^*$ and hence the minimax risk and the optimal estimator.
+
+\paragraph{The observation operator $K$ and the sample size $n$.}
+The operator $K$ maps a function $f$ to its values at the $n$ design points: $Kf = (f(x_1, z_1), \ldots, f(x_n, z_n)) \in \mathbb{R}^n$.
+Thus $K$ is not a primitive of the problem independent of $n$ --- it is \emph{defined} by the design, and adding or removing observations changes $K$.
+The modulus $\omega(\delta;\, \mathcal{F}(\mathcal{C}))$ depends on $n$ entirely through $K$: adding an observation point $(x_{n+1}, z_{n+1})$ tightens the data constraint $\norm{Kf} \leq \delta/2$ (the function must now be small at one more point), which shrinks $\omega(\delta)$ for every $\delta$ and hence reduces the minimax risk.
+In particular, different designs with the same $n$ yield different moduli --- what matters is not the number of observations per se but their \emph{geometric configuration} relative to the target $(x_0, z_0)$.
 
 
 \subsection{The Least Favorable Function}\label{app:modulus:lff}
@@ -137,3 +153,62 @@ The gap arises because the disk's least favorable function can concentrate its g
 The exact ratio of moduli, and hence of minimax risks, depends on the design through the displacement vectors $\{(x_i - x_0, z_i - z_0)\}_{i=1}^n$.
 By \cref{lem:ratio_range}, the pointwise support function ratio satisfies $1 \leq r(v) \leq R / \min(M_x, M_z)$, which bounds the modulus ratio.
 Computing the exact ratio for a specific design is an open problem (\cref{sec:technical:open}).
+
+
+\subsection{The Separability Argument for Second-Order Classes}\label{app:modulus:hessian_norms}
+
+The separability trilemma of \cref{prop:coupling_agnostic} applies not only to first-order (gradient) constraints but extends to second-order (Hessian) constraints, clarifying the norm choice in \textcite{imbens_optimized_2019}.
+
+\paragraph{Entry-wise bounds as the separable class.}
+For a bivariate function $f(x,z)$, the Hessian is the symmetric matrix
+\begin{equation*}
+	\nabla^2 f = \begin{pmatrix} \partial^2 f / \partial x^2 & \partial^2 f / \partial x \partial z \\ \partial^2 f / \partial x \partial z & \partial^2 f / \partial z^2 \end{pmatrix},
+\end{equation*}
+with three free parameters: the diagonal entries $a = \partial^2 f / \partial x^2$, $c = \partial^2 f / \partial z^2$ and the cross-partial $b = \partial^2 f / \partial x \partial z$.
+If a researcher has separate bounds $\abs{a} \leq B_1$, $\abs{b} \leq B_2$, $\abs{c} \leq B_3$ on each second derivative, the constraint set in $(a,b,c)$-space is the cuboid $[-B_1, B_1] \times [-B_2, B_2] \times [-B_3, B_3]$.
+This cuboid is the \emph{separable} constraint for second derivatives: it bounds each entry independently without imposing any relationship between them --- the direct analog of the rectangle for gradients.
+
+\paragraph{The operator norm imposes coupling.}
+\textcite{imbens_optimized_2019} bound the operator norm $\norm{\nabla^2 f}_{\mathrm{op}} = \max(\abs{\lambda_1}, \abs{\lambda_2}) \leq B$, where the eigenvalues are
+\begin{equation*}
+	\lambda_{\pm} = \frac{a + c}{2} \pm \sqrt{\left(\frac{a-c}{2}\right)^2 + b^2}.
+\end{equation*}
+The eigenvalues are nonlinear functions of the entries, coupling $a$, $b$, and $c$ jointly.
+The key inequalities between the operator norm and the entry-wise maximum are
+\begin{equation}\label{eq:entry_vs_op}
+	\max_{i,j} \abs{H_{ij}} \;\leq\; \norm{H}_{\mathrm{op}} \;\leq\; n \cdot \max_{i,j} \abs{H_{ij}},
+\end{equation}
+where $n = 2$ in the bivariate case.
+The left inequality shows that the operator-norm ball $\{\norm{H}_{\mathrm{op}} \leq B\}$ is contained in the entry-wise cube $\{\max \abs{H_{ij}} \leq B\}$: the operator norm is the stricter constraint.
+The containment is strict: the matrix $\bigl(\begin{smallmatrix} B & B \\ B & B \end{smallmatrix}\bigr)$ has all entries equal to $B$ but $\lambda_{\max} = 2B$, so it lies in the cube but outside the operator-norm ball.
+
+The operator norm constrains the entries \emph{jointly} through the eigenvalue structure: a large diagonal entry forces the off-diagonal to be small, and vice versa.
+This is coupling in the sense of \cref{def:coupling} --- the second-order analog of the disk constraining $(\partial f / \partial x,\, \partial f / \partial z)$ jointly.
+
+\paragraph{The trilemma extends.}
+By the logic of \cref{def:coupling_agnostic}, coupling-agnosticism requires the constraint set to contain the separable class (the cuboid).
+For the operator-norm ball, containing the cube $[-B, B]^3$ requires radius at least $nB$ (to accommodate the corner $(B, B, B)$, which has $\norm{H}_{\mathrm{op}} = nB$).
+But an operator-norm ball of radius $nB$ admits entry-wise values up to $nB$ by the left inequality in \eqref{eq:entry_vs_op} --- inflating the primitive bounds by a factor of $n$.
+
+The same trilemma from the first-order case applies to second-order classes:
+\begin{itemize}
+	\item The operator-norm ball at radius $B$ is a strict subset of the entry-wise cube at radius $B$: it imposes coupling on the second derivatives.
+	\item To be coupling-agnostic (contain the cube), the operator-norm ball must inflate to radius $nB$, exceeding the primitive entry-wise bounds.
+	\item The entry-wise cuboid is the unique separable class that is simultaneously coupling-agnostic and respects the primitive bounds on each second derivative.
+\end{itemize}
+
+\paragraph{Eigenvalue space clarifies the geometry.}
+In eigenvalue coordinates $(\lambda_1, \lambda_2)$, the standard matrix norms take the same forms as vector norms:
+\begin{center}
+\begin{tabular}{lll}
+	Norm & Eigenvalue constraint & Shape in $(\lambda_1, \lambda_2)$ \\
+	\hline
+	Operator ($\norm{\cdot}_{\mathrm{op}}$) & $\max(\abs{\lambda_1}, \abs{\lambda_2}) \leq L$ & Square ($\ell^\infty$-ball) \\
+	Frobenius ($\norm{\cdot}_F$) & $\sqrt{\lambda_1^2 + \lambda_2^2} \leq L$ & Disk ($\ell^2$-ball) \\
+	Nuclear ($\norm{\cdot}_*$) & $\abs{\lambda_1} + \abs{\lambda_2} \leq L$ & Diamond ($\ell^1$-ball)
+\end{tabular}
+\end{center}
+The Frobenius disk is inscribed in the operator-norm square, just as the $\ell^2$-disk is inscribed in the $\ell^\infty$-square for gradients.
+The entry-wise cube, mapped to eigenvalue space, produces a \emph{bulged} region that strictly contains the operator-norm square at the same radius: the off-diagonal entry $b$ contributes to eigenvalue spread through $\sqrt{((a-c)/2)^2 + b^2}$ without being directly constrained by the eigenvalue bound.
+
+\commentT{The parallel between first-order and second-order separability is structurally clean and suggests a general principle.  For gradients: the rectangle (product of marginal bounds) is separable, the disk (joint norm) imposes coupling.  For Hessians: the entry-wise cuboid is separable, the operator-norm ball imposes coupling.  In both cases, the coupling-agnostic class is the entry-wise constraint, and any joint norm constraint must either impose coupling or inflate the primitive bounds.  The inflation factor scales with dimension $n$.  This extends to any order of derivatives: for a $k$-th order derivative tensor, the entry-wise bound on its unique elements is the separable class, and any rotationally-invariant norm constraint imposes coupling between them.}

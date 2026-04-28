@@ -84,3 +84,43 @@ Under $\mathcal{F}_{\mathrm{aniso}}(M, M)$, the separate bounds prevent curvatur
 \paragraph{Practical consequence.}
 The segmented estimator is not minimax optimal under the anisotropic class, but it reduces worst-case bias relative to pooling (\cref{sec:bias_comparison}) and is simple to implement --- it corresponds to the segment fixed effects already common in applied work.
 Characterizing the exact minimax estimator under the anisotropic class is an open problem; the present paper establishes that the anisotropic class is the appropriate framework and that segmentation yields a strict improvement within it.
+
+
+\subsection*{Balancing Constraints and the Separability Argument}
+
+In Section~V.B, \textcite{imbens_optimized_2019} propose incorporating auxiliary covariates $Z_i \in \mathbb{R}^p$ by adding \emph{balancing constraints} $\sum_{i=1}^n \hat\gamma_i Z_{ij} = 0$ for $j = 1, \ldots, p$ to the weight optimization.
+These constraints force the estimator weights to be balanced in the covariate directions, and are motivated as a robustness device: even if the smoothness class does not model $Z$, enforcing balance ``may improve robustness'' to hidden biases and can reduce variance when $Y_i$ depends additively on $Z_i$.
+
+The separability framework developed in this paper reveals why such external constraints are necessary under Imbens--Wager's setup --- and why they cannot improve honest inference.
+
+\paragraph{Why the constraints are necessary.}
+The Imbens--Wager smoothness class constrains $\mu_w(x)$ as a function of the running variable $X$ only.
+Covariates $Z$ live entirely outside the function class: the minimax machinery is blind to $z$-variation.
+There is no mechanism within the smoothness class to encode the covariate's role, so covariate information must be injected externally through weight constraints.
+By the separability trilemma (\cref{cor:iso_inflates}), extending the smoothness class to include $z$ isotropically --- e.g., $\norm{\nabla^2 m(x,z)}_{\mathrm{op}} \leq B$ --- would not resolve this.
+The operator-norm class couples the primitive bounds: it constrains the curvature in $x$ and $z$ jointly through a single constant $B$.
+To remain coupling-agnostic with respect to the primitive entry-wise bounds $(B_{xx}, B_{xz}, B_{zz})$, the operator-norm ball must inflate to radius $nB$ (\cref{app:modulus:hessian_norms}), strictly exceeding the primitive bounds.
+The resulting function class is strictly larger than the separable class --- the curvature budget is fungible across directions, and the worst-case function concentrates the entire budget into whichever direction maximizes the bias, rendering covariate adjustment pointless.
+
+\paragraph{Why the constraints cannot improve honest inference.}
+Under the isotropic class, the unconstrained minimax estimator already ignores $z$: the worst-case function sets $\partial f / \partial z = 0$ and concentrates the entire curvature budget into $x$.
+Adding balancing constraints restricts the class of estimators (from $\mathcal{L}$ to $\mathcal{L}_{\mathrm{bal}} \subsetneq \mathcal{L}$) while leaving the function class unchanged.
+Since the minimax risk is a minimum over estimators,
+\begin{equation*}
+	\min_{\hat\tau \in \mathcal{L}_{\mathrm{bal}}} \sup_{f \in \mathcal{F}_{\mathrm{iso}}} \mathrm{MSE}(\hat\tau, f) \;\geq\; \min_{\hat\tau \in \mathcal{L}} \sup_{f \in \mathcal{F}_{\mathrm{iso}}} \mathrm{MSE}(\hat\tau, f).
+\end{equation*}
+The balancing constraints can only weakly \emph{worsen} worst-case performance.
+They may reduce empirical bias when the true regression function is better behaved than the worst case, but the worst-case bias bound --- which governs honest confidence intervals --- is unchanged or inflated.
+
+\paragraph{The separable class resolves both problems.}
+The separable class $\mathcal{F}(\mathcal{C}_{\mathrm{rect}})$ models the covariate direction directly through separate bounds $(M_x, M_z)$.
+The $z$-budget is stranded: the adversary cannot reallocate $M_z$ into the $x$-direction.
+The minimax estimator over $\mathcal{F}(\mathcal{C}_{\mathrm{rect}})$ automatically incorporates covariate information --- it downweights cross-$z$ comparisons because doing so reduces worst-case bias, not as an external requirement.
+Covariate adjustment is a consequence of minimax optimality under the separable class, not an ad hoc correction.
+
+The practical implication is that a researcher who has primitive bounds $(M_x, M_z)$ and works with the separable class obtains:
+\begin{enumerate}
+	\item A strictly smaller function class than the coupling-agnostic isotropic class (\cref{cor:iso_inflates}), and hence a strictly lower minimax risk.
+	\item An estimator that uses covariate information through the minimax machinery, yielding honest confidence intervals that are genuinely shorter --- not merely empirically shorter.
+	\item No need for external balancing constraints: the structure that Imbens--Wager inject through weight restrictions is already encoded in the function class.
+\end{enumerate}
