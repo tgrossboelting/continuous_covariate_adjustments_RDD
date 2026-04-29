@@ -55,6 +55,12 @@ for a known, nonnegative weight function $w$ satisfying $\int w(z)\, dz = 1$.
 Since $w$ is chosen by the researcher rather than estimated, it does not contribute to the estimation problem.
 The canonical RD parameter corresponds to $w(z) = f_{Z|X}(z|c)$.
 
+\paragraph{Fixed-design framework.}
+For the minimax inference developed in subsequent sections, both $X_i$ and $Z_i$ are treated as part of the fixed design: inference is conducted conditional on the realized values $(X_1, Z_1), \ldots, (X_n, Z_n)$, following \textcite{armstrong_simple_2018}.
+At the sample level, the weighted estimand takes the form $\tau_w = \sum_i \lambda_i \tau(c, Z_i)$ with pre-specified weights~$\lambda_i$, a linear functional of the bivariate regression function evaluated at the design points.
+This sidesteps the conditional density $f_{Z|X}$ and its derivatives as nuisance objects in the inference problem; the population-level definitions above motivate the covariate adjustment problem, but the minimax machinery operates on the bivariate function $m(x,z)$ at the observed $(X_i, Z_i)$.
+When $Z_i$ are viewed as draws from some distribution $F_Z$, the sample-level estimand approximates $\int \tau(c,z)\, w(z)\, dz$ as $n \to \infty$, but the finite-sample inference does not depend on this.
+
 
 \subsection{Pooled Estimation --- Base RD}\label{sec:setup:base}
 

@@ -13,22 +13,13 @@ The argument applies to any linear functional estimated over a gradient-constrai
 Three leading estimation problems illustrate the scope:
 \begin{enumerate}
 	\item \emph{Nonparametric regression at a point.}
-	The target is $\mu(x_0, z_0) = \E[Y \mid X = x_0, Z = z_0]$.
-	A linear estimator $\hat{\mu} = \sum_i w_i Y_i$ with $\sum_i w_i = 1$ has displacement vectors $\Delta_i = (x_i - x_0,\, z_i - z_0)$ from the target to each design point.
-
 
 	\item \emph{Treatment effect at a point (RDD).}
-	In a sharp regression discontinuity design with covariate $Z$, the target is $\tau(c, z_0) = \lim_{x \downarrow c} m(x, z_0) - \lim_{x \uparrow c} m(x, z_0)$.
-	A linear estimator $\hat{\tau} = \sum_i w_i Y_i$ satisfies $\sum_{i \in T} w_i = 1$ and $\sum_{i \in C} w_i = -1$ (equivalently, $\sum_i w_i = 0$).
 
-
-	\item \emph{Convex weighted average treatment effect (optimized RDD).}
-	Following \textcite{imbens_optimized_2019}, the target is $\tau_w = \int \tau(c, z)\, w(z)\, dz$, a weighted average over the covariate distribution.
+	\item \emph{Convex weighted average treatment effect \parencite{imbens_optimized_2019}}
 \end{enumerate}
 
 
-
-\commentT{Add: preview of the 2$\times$2 table (2 designs $\times$ 2 ratios $M_x/M_z$) with explicit $\rho$ values once computed.}
 
 For the convex weighted average treatment effect, the distinction between separable and coupled classes has additional consequences.
 Pooling the bivariate regression into a univariate problem --- as in standard RDD practice --- bundles direct smoothness with compositional variation through the covariate distribution, creating a further source of inflation beyond coupling.
@@ -37,8 +28,7 @@ Under the separable class, the per-direction budgets are locked, and covariate a
 
 The paper proceeds as follows.
 \Cref{sec:illustration} illustrates the mechanism on a six-unit RDD design, showing how the constraint set geometry determines which estimator-design combinations incur unnecessary bias.
-\Cref{sec:function_classes} develops the formal framework: primitive bounds, the rectangle as the smallest primitive-consistent class, the coupling dichotomy, and the isotropic disk as the leading example of inflation.
-\Cref{sec:geometry_risk} connects geometry to minimax risk through the support function, the modulus of continuity, and the monotonicity theorem, and characterizes the equality set.
+\Cref{sec:primitive_risk} develops the formal framework: primitive bounds, the rectangle as the smallest primitive-consistent class, the coupling dichotomy, and the isotropic disk as the leading example of inflation; it then connects geometry to minimax risk through the support function, the modulus of continuity, and the monotonicity theorem, and characterizes the equality set.
 \Cref{sec:evaluation_point} applies the framework to point evaluation --- nonparametric regression and RDD at a point --- with explicit bias inflation ratios for concrete designs.
 \Cref{sec:weighted_treatment} treats the convex weighted average treatment effect, where integrating out the covariate introduces pooling as a distinct inflation mechanism, and connects to the framework of \textcite{imbens_optimized_2019}.
 \Cref{sec:discussion} discusses extensions and open problems.
