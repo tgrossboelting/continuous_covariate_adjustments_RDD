@@ -1,0 +1,45 @@
+\documentclass[12pt,a4paper]{article}
+
+\input{../paper/preamble.tex}
+
+\author{Tobias Großbölting}
+\title{Meeting Notes --- April 30, 2026}
+\begin{document}
+
+\maketitle
+
+\section*{Supervisor Meeting}
+
+\subsection*{General Reception}
+Supervisor liked the general idea. Main pushback: ``so what?''\ --- resolved by arguing that the separable class encodes primitive information more tightly than any other class (primitive-consistent, no coupling imported).
+
+\subsection*{Critical Bottleneck: Solvability of the Convex Problem}
+Key question: is the modulus/minimax optimization problem still solvable when the constraint set is the separable rectangle, or does the solver rely on the isotropic disk structure?
+This is the current bottleneck of the project. If the convex problem remains tractable under the separable class, the main result is essentially complete.
+
+Partial resolution (numerical solvability): for a finite design, the gradient constraint $\nabla f \in \mathcal{C}$ translates to pairwise Lipschitz bounds $f_i - f_j \leq h_{\mathcal{C}}(x_i - x_j)$, which are linear constraints on the function values regardless of $\mathcal{C}$. Only the RHS constants change. The problem has identical structure for both the disk and the rectangle, so numerical solvability is not in question --- this is standard convex optimization.
+
+Open questions:
+\begin{itemize}
+	\item Can the solution be \emph{characterized analytically} for the rectangle, as AK do for the scalar case (parametric form of least favorable functions, bandwidth parameterization)?
+	\item Do AK's regularity conditions (existence/uniqueness of modulus-achieving functions, differentiability of $\omega$) need re-verification for the rectangle?
+	\item Does the continuous case (Gaussian white noise, as opposed to finite design) introduce additional difficulties?
+	\item Check AK's Supplemental Appendix~E and Kolesár's \texttt{RDHonest} for implicit reliance on scalar/isotropic structure.
+\end{itemize}
+
+\subsection*{Wasserstein Distance and Covariate Adjustment}
+Supervisor was curious about the 1D Wasserstein distance interpretation in the covariate adjustment problem. He noted that people typically use balancing conditions (balancing of moments).
+My counterargument: balancing conditions are imprecise because the worst-case bias function (through the sup) will optimally exploit any slack left by moment-based balancing. The minimax solver already internalizes the Wasserstein distance in the $z$-displacement, just as it internalizes $x$-displacements --- in that sense, it produces an optimal estimator without needing separate balancing conditions.
+
+\subsection*{Action Item: 2D Setup Derivation}
+Supervisor wants a clear derivation showing that the 2D setup with treatment rule $T_i = \ind\{X_i \geq c\}$ is equivalent to a univariate RD with covariates. Requirements:
+\begin{itemize}
+	\item Write in potential outcomes notation.
+	\item State a predeterminedness assumption on covariates $Z_i$ and running variable $X_i$.
+	\item Show equivalence to univariate RD with covariates explicitly.
+\end{itemize}
+
+\subsection*{Action Item: Stefan Wager Poster}
+Supervisor mentioned a Stefan Wager poster on optimized RD and covariates. Need to find this poster or contact Stefan Wager directly.
+
+\end{document}

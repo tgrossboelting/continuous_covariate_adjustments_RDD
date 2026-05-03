@@ -171,6 +171,25 @@ Consider a linear estimator $\hat{L} = a + \sum_{i=1}^n w_i Y_i$ for the functio
 	\commentT{The absolute value formula \eqref{eq:wcb_abs} and the attainment claim need revision for mixed-sign weights. The argument ``taking $w_i \geq 0$ terms at their upper bound and $w_i < 0$ terms at their lower bound'' requires a single function $f$ to simultaneously achieve $f(x_i) - f(x_0) = +h_{\mathcal{C}}(x_i - x_0)$ at positive-weight observations and $-h_{\mathcal{C}}(x_i - x_0)$ at negative-weight observations. But the inter-observation Lipschitz constraint $\abs{f(x_i) - f(x_j)} \leq h_{\mathcal{C}}(x_i - x_j)$ prevents this in general. Counterexample in 1D: $w_1 = 2$ at $x_1 = 1$, $w_2 = -1$ at $x_2 = 2$, $x_0 = 0$, Lipschitz constant $C = 1$. Formula gives $\sum \abs{w_i} C\abs{x_i} = 4$, but the actual wcb is $2$ (set $f(1) = 1, f(2) = 0$). The formula is an upper bound, not an equality. Note the contrast with AK's second-order case ($p = 2$): there, $f''$ can be freely sign-flipped at each point ($f''(x) = M\,\mathrm{sign}(w(x))$), making the $\abs{w_i}$ formula tight. For first-order (gradient) constraints, gradient choices propagate through the function values. Three options: (1) restrict to $w_i \geq 0$ (covers standard kernel estimators), (2) state the formula as an upper bound, (3) derive the correct formula as a linear program over $\Delta_i = f(x_i) - f(x_0)$ subject to $\abs{\Delta_i - \Delta_j} \leq h_{\mathcal{C}}(x_i - x_j)$.}
 \end{proof}
 
+\begin{remark}[Connection to AK's worst-case bias]\label{rem:ak_support_function}
+	For Lipschitz classes ($p = 1$), the worst-case bias in \cref{prop:wcb} is a direct instance of the framework in \textcite{armstrong_optimal_2018}.
+	Their modulus under centrosymmetry (\citeyear{armstrong_optimal_2018}, eq.~25),
+	\[
+		\omega(\delta; \mathcal{F}) = \sup\bigl\{ 2Lf : \norm{Kf} \leq \delta/2,\; f \in \mathcal{F} \bigr\},
+	\]
+	is itself a support function computation: it maximizes a linear functional ($2Lf$) over the convex set $\mathcal{F} \cap \{f : \norm{Kf} \leq \delta/2\}$.
+	For gradient-constrained Lipschitz classes $\mathcal{F}(\mathcal{C})$, this infinite-dimensional optimization reduces to the finite-dimensional support function $h_{\mathcal{C}}$ because the bias is \emph{directly linear} in the gradient:
+	$f(x_i) - f(x_0) = \int_0^1 \langle \nabla f(x_0 + t(x_i - x_0)),\, x_i - x_0 \rangle \, dt$,
+	and maximizing $\langle \nabla f, v \rangle$ over $\nabla f \in \mathcal{C}$ is the definition of $h_{\mathcal{C}}(v)$.
+	No intermediate reduction is needed --- the support function characterization is essentially definitional for $p = 1$.
+
+	For second-order smoothness classes ($p = 2$), such as the Hessian-constrained classes in \textcite{imbens_optimized_2019}, the analogous reduction requires an additional step.
+	The constraint set $\mathcal{C}_H$ acts on second derivatives, and the bias involves second-order terms:
+	$f(x_i) - f(x_0) - \nabla f(x_0) \cdot (x_i - x_0) = \tfrac{1}{2}(x_i - x_0)^\prime H (x_i - x_0) + o(\norm{x_i - x_0}^2)$.
+	The worst-case bias is still a support function, but of $\mathcal{C}_H$ evaluated at displacement vectors constructed from the outer products $(x_i - x_0)(x_i - x_0)^\prime$.
+	The key step is showing that the bias is linear in the Hessian entries $H_{jk}$: the first-order terms are unconstrained (absorbed by the estimator weights satisfying $\sum w_i = 1$, $\sum w_i x_i = x_0$), leaving only the second-order remainder, which depends linearly on $H$.
+\end{remark}
+
 \paragraph{Specialization to the rectangle and disk.}
 For the two constraint sets:
 \begin{align}
